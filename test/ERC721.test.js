@@ -3,10 +3,12 @@ const {ZERO_ADDRESS} = constants;
 
 const {shouldBehaveLikeERC721} = require('./ERC721.behavior');
 const BlockCities = artifacts.require('BlockCities');
+const Generator = artifacts.require('Generator');
 
 contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
     beforeEach(async function () {
-        this.token = await BlockCities.new({from: creator});
+        this.generator = await Generator.new({from: creator});
+        this.token = await BlockCities.new(this.generator.address, {from: creator});
     });
 
     shouldBehaveLikeERC721(creator, creator, accounts);

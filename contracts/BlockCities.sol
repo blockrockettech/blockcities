@@ -6,8 +6,6 @@ import "./Generator.sol";
 
 contract BlockCities is ERC721Full, ERC721MetadataMintable {
 
-
-    // Emitted on every mint
     event BuildingMinted(
         uint256 indexed _tokenId,
         address indexed _architect

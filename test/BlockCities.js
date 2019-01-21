@@ -3,7 +3,7 @@ const Generator = artifacts.require('Generator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
     context('ensure counters are functional', function () {
         before(async function () {
@@ -54,7 +54,6 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
 
         it('should revert if not enough payable', async function () {
             await shouldFail.reverting(this.token.mintBuilding({from: tokenOwner, value: 0}));
-            await shouldFail.reverting(this.token.mintBuilding({from: tokenOwner, value: this.basePrice.sub(1)}));
         });
     });
 
