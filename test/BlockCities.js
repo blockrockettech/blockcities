@@ -50,6 +50,22 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
     });
 
+    context('ensure only owner can add cities', function () {
+        before(async function () {
+            this.generator = await Generator.new({from: creator});
+            this.token = await BlockCities.new(this.generator.address, {from: creator});
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.token.addCity(web3.utils.asciiToHex("Hull"), {from: tokenOwner}));
+        });
+
+        it('should add new city if owner', async function () {
+            const { logs } = await this.token.addCity(web3.utils.asciiToHex("Hull"), {from: creator});
+            expectEvent.inLogs(logs, `CityAdded`);
+        });
+    });
+
     context('ensure can not mint with less than minimum purchase value', function () {
         before(async function () {
             this.generator = await Generator.new({from: creator});
