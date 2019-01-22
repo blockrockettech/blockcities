@@ -3,7 +3,7 @@ const Generator = artifacts.require('Generator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
     const firstTokenId = new BN(0);
     const secondTokenId = new BN(1);
@@ -43,9 +43,10 @@ contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
         it('building has attributes', async function () {
             // 4 = base, body, roof, and architect
             const attrs = await this.token.attributes(0);
-            attrs[0].should.be.bignumber.lte('2');
+            attrs[0].should.be.bignumber.lte('1');
             attrs[1].should.be.bignumber.lte('2');
             attrs[2].should.be.bignumber.lte('2');
+            attrs[3].should.be.bignumber.lte('2');
         });
     });
 
@@ -72,7 +73,13 @@ contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
             for (i = 0; i < 10; i++) {
                 await this.token.mintBuilding({from: accounts[i + 5], value: 100});
                 const attrs = await this.token.attributes(i);
-                console.log(`Base: ${attrs[0].toString()}, Body: ${attrs[1].toString()}, Roof: ${attrs[2].toString()}, Architect: ${attrs[3].toString()}`);
+                console.log(`
+                City: ${attrs[0].toString()}, 
+                Base: ${attrs[1].toString()}, 
+                Body: ${attrs[2].toString()}, 
+                Roof: ${attrs[3].toString()}, 
+                Architect: ${attrs[4].toString()}
+                `);
             }
         });
     });
