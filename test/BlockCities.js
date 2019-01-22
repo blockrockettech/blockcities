@@ -5,6 +5,10 @@ const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-help
 
 contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
+    const firstTokenId = new BN(0);
+    const secondTokenId = new BN(1);
+    const unknownTokenId = new BN(999);
+
     context('ensure counters are functional', function () {
         before(async function () {
             this.generator = await Generator.new({from: creator});
@@ -33,7 +37,7 @@ contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
         it('building has an owner', async function () {
             // tokenOwner owns token ID zero
-            (await this.token.tokensOfOwner(tokenOwner))[0].should.be.bignumber.equal('0');
+            (await this.token.tokensOfOwner(tokenOwner))[0].should.be.bignumber.equal(firstTokenId);
         });
 
         it('building has attributes', async function () {
