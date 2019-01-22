@@ -20,7 +20,8 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
             (await this.token.tokenPointer()).should.be.bignumber.equal('0');
 
             // mint a single building
-            await this.token.mintBuilding({from: tokenOwner, value: this.basePrice});
+            const {logs} = await this.token.mintBuilding({from: tokenOwner, value: this.basePrice});
+            expectEvent.inLogs(logs, `BuildingMinted`, {_tokenId: new BN(0), _architect: tokenOwner});
         });
 
         it('returns total buildings', async function () {
@@ -57,12 +58,13 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.token.addCity(web3.utils.asciiToHex("Hull"), {from: tokenOwner}));
+            await shouldFail.reverting(this.token.addCity(web3.utils.asciiToHex('Hull'), {from: tokenOwner}));
         });
 
         it('should add new city if owner', async function () {
-            const { logs } = await this.token.addCity(web3.utils.asciiToHex("Hull"), {from: creator});
-            expectEvent.inLogs(logs, `CityAdded`);
+            const {logs} = await this.token.addCity(web3.utils.asciiToHex('Hull'), {from: creator});
+            // two already exist in contract, therefore, cityId is 2
+            expectEvent.inLogs(logs, `CityAdded`, {_cityId: new BN(2), _cityName: web3.utils.padRight(web3.utils.asciiToHex('Hull'), 64)});
         });
     });
 
