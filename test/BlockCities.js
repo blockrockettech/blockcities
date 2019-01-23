@@ -64,7 +64,11 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         it('should add new city if owner', async function () {
             const {logs} = await this.token.addCity(web3.utils.asciiToHex('Hull'), {from: creator});
             // two already exist in contract, therefore, cityId is 2
-            expectEvent.inLogs(logs, `CityAdded`, {_cityId: new BN(2), _cityName: web3.utils.padRight(web3.utils.asciiToHex('Hull'), 64)});
+            expectEvent.inLogs(
+                logs,
+                `CityAdded`,
+                {_cityId: new BN(2), _cityName: web3.utils.padRight(web3.utils.asciiToHex('Hull'), 64)}
+            );
         });
     });
 
