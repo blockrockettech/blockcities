@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate"
-     viewBox="320 762.102 240 230.94" width="240" height="230.94">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="320 762.102 240 230.94"
+     style="isolation:isolate">
     <switch>
         <g>
-            <path d="M320 831.384l120 69.282v92.376L320 923.76v-92.376z" fill="#F25454"/>
-            <path d="M560 831.384v92.376l-120 69.282v-92.376l120-69.282z" fill="#FF9494"/>
-            <path d="M320 831.384l120-69.282 120 69.282-120 69.282-120-69.282z" fill="#FFDADA"/>
+            <path fill="#F25454" d="M320 831.384l120 69.282v92.376L320 923.76v-92.376z"/>
+            <path fill="#FF9494" d="M560 831.384v92.376l-120 69.282v-92.376l120-69.282z"/>
+            <path fill="#FFDADA" d="M320 831.384l120-69.282 120 69.282-120 69.282-120-69.282z"/>
         </g>
         <foreignObject requiredExtensions="http://ns.gravit.io/">
             <gravitDesigner:gravitElementRef xmlns:gravitDesigner="http://ns.gravit.io/" xlink:href="#a"/>
