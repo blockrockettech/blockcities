@@ -54,9 +54,7 @@ void async function () {
     console.log(`base ${randomBase} body ${randomBody} roof ${randomRoof}`);
 
     ctx.drawImage(baseSvgs[randomBase], (canvasWidth - bases[randomBase].width) / 2, canvasHeight - bases[randomBase].height);
-
     ctx.drawImage(bodySvgs[randomBody], 40, canvasHeight - bases[randomBase].anchor - bodies[randomBody].height);
-
     ctx.drawImage(roofSvgs[randomRoof], 40, canvasHeight - bases[randomBase].anchor - bodies[randomBody].anchor - roofs[randomRoof].height);
 
     // console.log(canvas.toDataURL());
