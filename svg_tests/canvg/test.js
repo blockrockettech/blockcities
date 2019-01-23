@@ -41,17 +41,21 @@ void async function () {
     const bodySvgs = [body0, body1, body2];
     const roofSvgs = [roof0, roof1, roof2];
 
-    const canvasHeight = 1000;
+    const randomBase = Math.floor(Math.random() * bases.length);
+    const randomBody = Math.floor(Math.random() * bodies.length);
+    const randomRoof = Math.floor(Math.random() * roofs.length);
+    console.log(`base ${randomBase} body ${randomBody} roof ${randomRoof}`);
+
+    const canvasHeight = bases[randomBase].height
+        + bodies[randomBody].height
+        + roofs[randomRoof].height
+        - (bases[randomBase].height - bases[randomBase].anchor)
+        - (bodies[randomBody].height - bodies[randomBody].anchor);
     const canvasWidth = _.maxBy(bases, (b) => b.width).width;
 
     const canvas = createCanvas(canvasWidth, canvasHeight);
 
     const ctx = canvas.getContext('2d');
-
-    const randomBase = Math.floor(Math.random() * bases.length);
-    const randomBody = Math.floor(Math.random() * bodies.length);
-    const randomRoof = Math.floor(Math.random() * roofs.length);
-    console.log(`base ${randomBase} body ${randomBody} roof ${randomRoof}`);
 
     ctx.drawImage(baseSvgs[randomBase], (canvasWidth - bases[randomBase].width) / 2, canvasHeight - bases[randomBase].height);
     ctx.drawImage(bodySvgs[randomBody], 40, canvasHeight - bases[randomBase].anchor - bodies[randomBody].height);
