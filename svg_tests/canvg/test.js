@@ -24,48 +24,64 @@ void async function () {
     const bases = [
         {width: base0.width, height: base0.height, anchor: 92},
         {width: base1.width, height: base1.height, anchor: 69},
-        {width: base2.width, height: base2.height, anchor: 92}
+        {width: base2.width, height: base2.height, anchor: 114}
     ];
+
     const bodies = [
-        {height: body0.height, anchor: 277},
-        {height: body1.height, anchor: 414},
-        {height: body2.height, anchor: 92}
+        {width: body0.width, height: body0.height, anchor: 277},
+        {width: body1.width, height: body1.height, anchor: 414},
+        {width: body2.width, height: body2.height, anchor: 92}
     ];
+
     const roofs = [
-        {height: roof0.height},
-        {height: roof1.height},
-        {height: roof2.height}
+        {width: roof0.width, height: roof0.height},
+        {width: roof1.width, height: roof1.height},
+        {width: roof2.width, height: roof2.height}
     ];
 
     const baseSvgs = [base0, base1, base2];
     const bodySvgs = [body0, body1, body2];
     const roofSvgs = [roof0, roof1, roof2];
 
+    // const randomBase = 2;
+    // const randomBody = 2;
+    // const randomRoof = 2;
+
     const randomBase = Math.floor(Math.random() * bases.length);
     const randomBody = Math.floor(Math.random() * bodies.length);
     const randomRoof = Math.floor(Math.random() * roofs.length);
+
     console.log(`base ${randomBase} body ${randomBody} roof ${randomRoof}`);
 
+    // height of the base, body, roof - minus the difference in the offset anchor from body and height
     const canvasHeight = bases[randomBase].height
         + bodies[randomBody].height
         + roofs[randomRoof].height
         - (bases[randomBase].height - bases[randomBase].anchor)
         - (bodies[randomBody].height - bodies[randomBody].anchor);
-    const canvasWidth = _.maxBy(bases, (b) => b.width).width;
+
+    // Always assume the base if the widest post for now
+    const canvasWidth = bases[randomBase].width;
 
     const canvas = createCanvas(canvasWidth, canvasHeight);
 
     const ctx = canvas.getContext('2d');
 
+    // Base
     ctx.drawImage(baseSvgs[randomBase], (canvasWidth - bases[randomBase].width) / 2, canvasHeight - bases[randomBase].height);
-    ctx.drawImage(bodySvgs[randomBody], 40, canvasHeight - bases[randomBase].anchor - bodies[randomBody].height);
-    ctx.drawImage(roofSvgs[randomRoof], 40, canvasHeight - bases[randomBase].anchor - bodies[randomBody].anchor - roofs[randomRoof].height);
+
+    // Body
+    ctx.drawImage(bodySvgs[randomBody], (canvasWidth - bodySvgs[randomBody].width) / 2, canvasHeight - bases[randomBase].anchor - bodies[randomBody].height);
+
+    // Roof
+    ctx.drawImage(roofSvgs[randomRoof], (canvasWidth - roofSvgs[randomBody].width) / 2, canvasHeight - bases[randomBase].anchor - bodies[randomBody].anchor - roofs[randomRoof].height);
 
     // console.log(canvas.toDataURL());
 
+    // Temp - write file to disk
     // strip off the data: url prefix to get just the base64-encoded bytes
-    var data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
-    var buf = new Buffer(data, 'base64');
+    const data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
+    const buf = new Buffer(data, 'base64');
     fs.writeFileSync(`./svg_tests/canvg/output-${randomBase}-${randomBody}-${randomRoof}.png`, buf);
 
     console.log(`done: output-${randomBase}-${randomBody}-${randomRoof}.png`);
