@@ -28,4 +28,9 @@ void async function () {
 
     // fs.writeFileSync(`./svg_tests/canvg/output.png`, canvas.toDataURL());
 
+    // strip off the data: url prefix to get just the base64-encoded bytes
+    var data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, "");
+    var buf = new Buffer(data, 'base64');
+    fs.writeFileSync(`./svg_tests/canvg/output.png`, buf);
+
 }();
