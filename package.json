@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.11",
+    "sharp": "^0.21.3",
     "svgo": "^1.1.1"
   }
 }
