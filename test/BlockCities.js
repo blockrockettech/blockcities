@@ -92,6 +92,33 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
     });
 
+    context('ensure only owner can transfer buildings', function () {
+        before(async function () {
+            this.generator = await Generator.new({from: creator});
+            this.token = await BlockCities.new(this.generator.address, {from: creator});
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.token.transferBuilding(anyone, 0, 0, 0, 0, {from: tokenOwner}));
+        });
+
+        it('should transfer if owner', async function () {
+            const {logs} = await this.token.transferBuilding(anyone, 0, 0, 0, 0, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `BuildingTransfer`,
+                {_tokenId: new BN(0), _to: anyone, _architect: creator}
+            );
+
+            const attrs = await this.token.attributes(0);
+            attrs[0].should.be.bignumber.equal('0');
+            attrs[1].should.be.bignumber.equal('0');
+            attrs[2].should.be.bignumber.equal('0');
+            attrs[3].should.be.bignumber.equal('0');
+            attrs[4].should.be.equal(creator);
+        });
+    });
+
     context('ensure can not mint with less than minimum purchase value', function () {
         before(async function () {
             this.generator = await Generator.new({from: creator});

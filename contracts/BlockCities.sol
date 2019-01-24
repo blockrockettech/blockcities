@@ -14,6 +14,7 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     event BuildingTransfer(
         uint256 indexed _tokenId,
+        address indexed _to,
         address indexed _architect
     );
 
@@ -94,7 +95,7 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
         _mint(_to, tokenPointer);
 
-        emit BuildingTransfer(tokenPointer, msg.sender);
+        emit BuildingTransfer(tokenPointer, _to, msg.sender);
 
         tokenPointer = tokenPointer.add(1);
         totalBuildings = totalBuildings.add(1);
