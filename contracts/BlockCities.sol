@@ -14,7 +14,12 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     event CityAdded(
         uint256 indexed _cityId,
-        bytes32 indexed _cityName
+        bytes32 _cityName
+    );
+
+    event PricePerBuildingInWeiChanged(
+        uint256 _oldPricePerBuildingInWei,
+        uint256 _newPricePerBuildingInWei
     );
 
     Generator internal generator;
@@ -82,6 +87,15 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         emit CityAdded(cityPointer, _cityName);
 
         cityPointer = cityPointer.add(1);
+
+        return true;
+    }
+
+    function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
+
+        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
+
+        pricePerBuildingInWei = _newPricePerBuildingInWei;
 
         return true;
     }
