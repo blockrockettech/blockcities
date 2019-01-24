@@ -74,7 +74,7 @@ void async function () {
     ctx.drawImage(bodySvgs[randomBody], (canvasWidth - bodySvgs[randomBody].width) / 2, canvasHeight - bases[randomBase].anchor - bodies[randomBody].height);
 
     // Roof
-    ctx.drawImage(roofSvgs[randomRoof], (canvasWidth - roofSvgs[randomBody].width) / 2, canvasHeight - bases[randomBase].anchor - bodies[randomBody].anchor - roofs[randomRoof].height);
+    ctx.drawImage(roofSvgs[randomRoof], (canvasWidth - roofSvgs[randomRoof].width) / 2, canvasHeight - bases[randomBase].anchor - bodies[randomBody].anchor - roofs[randomRoof].height);
 
     // console.log(canvas.toDataURL());
 
