@@ -12,6 +12,11 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         address indexed _architect
     );
 
+    event BuildingTransfer(
+        uint256 indexed _tokenId,
+        address indexed _architect
+    );
+
     event CityAdded(
         uint256 indexed _cityId,
         bytes32 _cityName
@@ -68,6 +73,31 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         tokenPointer = tokenPointer.add(1);
         totalBuildings = totalBuildings.add(1);
         totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+
+        return true;
+    }
+
+    function transferBuilding(
+        address _to,
+        uint256 _city,
+        uint256 _base,
+        uint256 _body,
+        uint256 _roof
+    ) public onlyOwner returns (bool) {
+        buildings[tokenPointer] = Building(
+            _city,
+            _base,
+            _body,
+            _roof,
+            msg.sender
+        );
+
+        _mint(_to, tokenPointer);
+
+        emit BuildingTransfer(tokenPointer, msg.sender);
+
+        tokenPointer = tokenPointer.add(1);
+        totalBuildings = totalBuildings.add(1);
 
         return true;
     }
