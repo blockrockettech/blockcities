@@ -20,7 +20,10 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
         describe('_mint(address, uint256)', function () {
             context('with minted token', async function () {
                 beforeEach(async function () {
-                    ({logs: this.logs} = await this.token.mintBuilding(tokenId, 'abc', {from: tokenOwner, value: this.basePrice}));
+                    ({logs: this.logs} = await this.token.mintBuilding(tokenId, 'abc', {
+                        from: tokenOwner,
+                        value: this.basePrice
+                    }));
                 });
 
                 it('emits a Transfer event', function () {
@@ -33,7 +36,51 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
                 });
 
                 it('reverts when adding a token id that already exists', async function () {
-                    await shouldFail.reverting(this.token.mintBuilding(tokenId, 'abc', {from: tokenOwner, value: this.basePrice}));
+                    await shouldFail.reverting(this.token.mintBuilding(tokenId, 'abc', {
+                        from: tokenOwner,
+                        value: this.basePrice
+                    }));
+                });
+            });
+        });
+    });
+
+    describe('_burn(uint256)', function () {
+
+        it('reverts when burning a non-existent token id', async function () {
+            await shouldFail.reverting(this.token.methods['burn(uint256)'](999, {from: creator}));
+        });
+
+        context('with minted token', function () {
+            const tokenId = new BN('1000000');
+
+            beforeEach(async function () {
+                ({logs: this.logs} = await this.token.mintBuilding(
+                    tokenId,
+                    'abc',
+                    {
+                        from: tokenOwner,
+                        value: this.basePrice
+                    }
+                ));
+            });
+
+            context('with burnt token', function () {
+                beforeEach(async function () {
+                    ({logs: this.logs} = await this.token.methods['burn(uint256)'](tokenId, {from: creator}));
+                });
+
+                it('emits a Transfer event', function () {
+                    expectEvent.inLogs(this.logs, 'Transfer', {from: tokenOwner, to: ZERO_ADDRESS, tokenId});
+                });
+
+                it('deletes the token', async function () {
+                    (await this.token.balanceOf(tokenOwner)).should.be.bignumber.equal('0');
+                    await shouldFail.reverting(this.token.ownerOf(tokenId));
+                });
+
+                it('reverts when burning a token id that has been deleted', async function () {
+                    await shouldFail.reverting(this.token.methods['burn(uint256)'](tokenId));
                 });
             });
         });

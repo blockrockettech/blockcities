@@ -3,7 +3,7 @@ const Generator = artifacts.require('Generator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
     const firstTokenId = new BN(0);
     const secondTokenId = new BN(1);
@@ -96,6 +96,35 @@ contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
                 logs,
                 `PricePerBuildingInWeiChanged`,
                 {_oldPricePerBuildingInWei: new BN(100), _newPricePerBuildingInWei: new BN(123)}
+            );
+        });
+    });
+
+    context('ensure only owner can burn', function () {
+        before(async function () {
+            this.generator = await Generator.new({from: creator});
+            this.token = await BlockCities.new(this.generator.address, {from: creator});
+            this.basePrice = await this.token.pricePerBuildingInWei();
+
+            await this.token.mintBuilding(
+                firstTokenId,
+                firstURI,
+                {
+                    from: tokenOwner,
+                    value: this.basePrice
+                }
+            );
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.token.burn(firstTokenId, {from: tokenOwner}));
+        });
+
+        it('should burn if owner', async function () {
+            const {logs} = await this.token.burn(firstTokenId, {from: creator})
+            expectEvent.inLogs(
+                logs,
+                `Transfer`,
             );
         });
     });
