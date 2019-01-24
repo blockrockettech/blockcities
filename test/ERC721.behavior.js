@@ -14,11 +14,12 @@ function shouldBehaveLikeERC721 (
     const secondTokenId = new BN(1);
     const unknownTokenId = new BN(2);
     const RECEIVER_MAGIC_VALUE = '0x150b7a02';
+    const firstURI = 'abc123';
 
     describe('like an ERC721', function () {
         beforeEach(async function () {
-            await this.token.mintBuilding({from: owner, value: this.basePrice});
-            await this.token.mintBuilding({from: owner, value: this.basePrice});
+            await this.token.mintBuilding(firstTokenId, firstURI, {from: owner, value: this.basePrice});
+            await this.token.mintBuilding(secondTokenId, firstURI, {from: owner, value: this.basePrice});
             this.toWhom = anyone; // default to anyone for toWhom in context-dependent tests
         });
 

@@ -3,7 +3,7 @@ const Generator = artifacts.require('Generator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
     const firstTokenId = new BN(0);
     const secondTokenId = new BN(1);

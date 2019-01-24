@@ -15,16 +15,12 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
     shouldBehaveLikeERC721(creator, creator, accounts);
 
     describe('internal functions', function () {
-        const tokenId = new BN('0');
+        const tokenId = new BN('1000000');
 
         describe('_mint(address, uint256)', function () {
-            // it('reverts with a null destination address', async function () {
-            //     await shouldFail.reverting(this.token.mint(ZERO_ADDRESS, tokenId, {from: creator}));
-            // });
-
             context('with minted token', async function () {
                 beforeEach(async function () {
-                    ({logs: this.logs} = await this.token.mintBuilding({from: tokenOwner, value: this.basePrice}));
+                    ({logs: this.logs} = await this.token.mintBuilding(tokenId, 'abc', {from: tokenOwner, value: this.basePrice}));
                 });
 
                 it('emits a Transfer event', function () {
@@ -36,9 +32,9 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
                     (await this.token.ownerOf(tokenId)).should.equal(tokenOwner);
                 });
 
-                // it('reverts when adding a token id that already exists', async function () {
-                //     await shouldFail.reverting(this.token.mint(tokenOwner, tokenId));
-                // });
+                it('reverts when adding a token id that already exists', async function () {
+                    await shouldFail.reverting(this.token.mintBuilding(tokenId, 'abc', {from: tokenOwner, value: this.basePrice}));
+                });
             });
         });
     });

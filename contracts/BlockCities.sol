@@ -130,11 +130,15 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
     }
 
     function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
-
         emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
 
         pricePerBuildingInWei = _newPricePerBuildingInWei;
 
+        return true;
+    }
+
+    function burn(uint256 _tokenId) public onlyOwner returns (bool) {
+        _burn(_tokenId);
         return true;
     }
 }
