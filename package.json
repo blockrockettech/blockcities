@@ -23,6 +23,8 @@
     "canvg": "^1.5.3",
     "lodash": "^4.17.11",
     "sharp": "^0.21.3",
+    "svg-path-bounds": "^1.0.1",
+    "svg-path-properties": "^0.4.8",
     "svgo": "^1.1.1"
   }
 }
