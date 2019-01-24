@@ -168,6 +168,23 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
     });
 
+    context('credits', function () {
+        before(async function () {
+            this.generator = await Generator.new({from: creator});
+            this.token = await BlockCities.new(this.generator.address, {from: creator});
+            this.basePrice = await this.token.pricePerBuildingInWei();
+        });
+
+        it('should fail if no credit and no value', async function () {
+            await shouldFail.reverting(this.token.mintBuilding(firstTokenId, firstURI, {from: tokenOwner, value: 0}));
+        });
+
+        it('should fulfil if credit and no value', async function () {
+            await this.token.addCredit(tokenOwner, {from: creator});
+            await this.token.mintBuilding(firstTokenId, firstURI, {from: tokenOwner, value: 0});
+        });
+    });
+
     context('random buildings to console', function () {
         before(async function () {
             this.generator = await Generator.new({from: creator});

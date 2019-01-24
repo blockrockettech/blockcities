@@ -51,6 +51,8 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     mapping(uint256 => bytes32) public cities;
 
+    mapping(address => uint256) public credits;
+
     constructor (Generator _generator) public ERC721Full("BlockCities", "BKC") {
         generator = _generator;
 
@@ -60,7 +62,10 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     function mintBuilding(uint256 _tokenId, string memory _tokenURI) public payable returns (bool) {
         require(!_exists(_tokenId), "Building exists with token ID");
-        require(msg.value >= pricePerBuildingInWei, "Must supply at least the required minimum purchase value");
+        require(
+            credits[msg.sender] > 0 || msg.value >= pricePerBuildingInWei,
+            "Must supply at least the required minimum purchase value or have credit"
+        );
 
         buildings[_tokenId] = Building(
             generator.generate(msg.sender, cityPointer),
@@ -76,7 +81,15 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         emit BuildingMinted(_tokenId, msg.sender, msg.sender, _tokenURI);
 
         totalBuildings = totalBuildings.add(1);
-        totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+
+        // use credits first
+        if (credits[msg.sender] > 0) {
+            credits[msg.sender] = credits[msg.sender].sub(1);
+            msg.sender.transfer(msg.value);
+        }
+        else {
+            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+        }
 
         return true;
     }
@@ -139,6 +152,14 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     function burn(uint256 _tokenId) public onlyOwner returns (bool) {
         _burn(_tokenId);
+        return true;
+    }
+
+    function addCredit(address _to) public onlyOwner returns (bool) {
+        credits[_to] = credits[_to].add(1);
+
+        // FIXME EVENT
+
         return true;
     }
 }
