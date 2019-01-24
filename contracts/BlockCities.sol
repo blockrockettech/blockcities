@@ -9,13 +9,16 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     event BuildingMinted(
         uint256 indexed _tokenId,
-        address indexed _architect
+        address indexed _to,
+        address _architect,
+        string _tokenURI
     );
 
     event BuildingTransfer(
         uint256 indexed _tokenId,
         address indexed _to,
-        address indexed _architect
+        address _architect,
+        string _tokenURI
     );
 
     event CityAdded(
@@ -32,7 +35,6 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     uint256 public totalBuildings = 0;
     uint256 public totalPurchasesInWei = 0;
-    uint256 public tokenPointer = 0;
     uint256 public pricePerBuildingInWei = 100;
 
     uint256 internal cityPointer = 0;
@@ -56,10 +58,11 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         addCity("Chicago");
     }
 
-    function mintBuilding() public payable returns (bool) {
+    function mintBuilding(uint256 _tokenId, string memory _tokenURI) public payable returns (bool) {
+        require(!_exists(_tokenId), "Building exists with token ID");
         require(msg.value >= pricePerBuildingInWei, "Must supply at least the required minimum purchase value");
 
-        buildings[tokenPointer] = Building(
+        buildings[_tokenId] = Building(
             generator.generate(msg.sender, cityPointer),
             generator.generate(msg.sender, 3),
             generator.generate(msg.sender, 3),
@@ -67,11 +70,11 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
             msg.sender
         );
 
-        _mint(msg.sender, tokenPointer);
+        _mint(msg.sender, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
 
-        emit BuildingMinted(tokenPointer, msg.sender);
+        emit BuildingMinted(_tokenId, msg.sender, msg.sender, _tokenURI);
 
-        tokenPointer = tokenPointer.add(1);
         totalBuildings = totalBuildings.add(1);
         totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
 
@@ -79,13 +82,17 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
     }
 
     function transferBuilding(
+        uint256 _tokenId,
+        string memory _tokenURI,
         address _to,
         uint256 _city,
         uint256 _base,
         uint256 _body,
         uint256 _roof
     ) public onlyOwner returns (bool) {
-        buildings[tokenPointer] = Building(
+        require(!_exists(_tokenId), "Building exists with token ID");
+
+        buildings[_tokenId] = Building(
             _city,
             _base,
             _body,
@@ -93,11 +100,11 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
             msg.sender
         );
 
-        _mint(_to, tokenPointer);
+        _mint(msg.sender, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
 
-        emit BuildingTransfer(tokenPointer, _to, msg.sender);
+        emit BuildingTransfer(_tokenId, _to, msg.sender, _tokenURI);
 
-        tokenPointer = tokenPointer.add(1);
         totalBuildings = totalBuildings.add(1);
 
         return true;

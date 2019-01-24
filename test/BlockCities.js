@@ -9,6 +9,8 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
     const secondTokenId = new BN(1);
     const unknownTokenId = new BN(999);
 
+    const firstURI = 'abc123';
+
     context('ensure counters are functional', function () {
         before(async function () {
             this.generator = await Generator.new({from: creator});
@@ -17,11 +19,21 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
 
             (await this.token.totalBuildings()).should.be.bignumber.equal('0');
             (await this.token.totalPurchasesInWei()).should.be.bignumber.equal('0');
-            (await this.token.tokenPointer()).should.be.bignumber.equal('0');
 
             // mint a single building
-            const {logs} = await this.token.mintBuilding({from: tokenOwner, value: this.basePrice});
-            expectEvent.inLogs(logs, `BuildingMinted`, {_tokenId: new BN(0), _architect: tokenOwner});
+            const {logs} = await this.token.mintBuilding(
+                firstTokenId,
+                firstURI,
+                {
+                    from: tokenOwner,
+                    value: this.basePrice
+                }
+            );
+            expectEvent.inLogs(
+                logs,
+                `BuildingMinted`,
+                {_tokenId: new BN(0), _to: tokenOwner, _architect: tokenOwner, _tokenURI: firstURI}
+            );
         });
 
         it('returns total buildings', async function () {
@@ -30,10 +42,6 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
 
         it('returns total purchases', async function () {
             (await this.token.totalPurchasesInWei()).should.be.bignumber.equal(this.basePrice);
-        });
-
-        it('token pointer has advanced', async function () {
-            (await this.token.tokenPointer()).should.be.bignumber.equal('1');
         });
 
         it('building has an owner', async function () {
@@ -99,15 +107,15 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.token.transferBuilding(anyone, 0, 0, 0, 0, {from: tokenOwner}));
+            await shouldFail.reverting(this.token.transferBuilding(firstTokenId, firstURI, anyone, 0, 0, 0, 0, {from: tokenOwner}));
         });
 
         it('should transfer if owner', async function () {
-            const {logs} = await this.token.transferBuilding(anyone, 0, 0, 0, 0, {from: creator});
+            const {logs} = await this.token.transferBuilding(firstTokenId, firstURI, anyone, 0, 0, 0, 0, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `BuildingTransfer`,
-                {_tokenId: new BN(0), _to: anyone, _architect: creator}
+                {_tokenId: new BN(0), _to: anyone, _architect: creator, _tokenURI: firstURI}
             );
 
             const attrs = await this.token.attributes(0);
@@ -127,7 +135,7 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
 
         it('should revert if not enough payable', async function () {
-            await shouldFail.reverting(this.token.mintBuilding({from: tokenOwner, value: 0}));
+            await shouldFail.reverting(this.token.mintBuilding(firstTokenId, firstURI, {from: tokenOwner, value: 0}));
         });
     });
 
@@ -140,7 +148,7 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
 
         it('should mint random', async function () {
             for (i = 0; i < 10; i++) {
-                await this.token.mintBuilding({from: accounts[i + 5], value: 100});
+                await this.token.mintBuilding(i, firstURI, {from: accounts[i + 5], value: 100});
                 const attrs = await this.token.attributes(i);
                 console.log(`
                 City: ${attrs[0].toString()}, 
