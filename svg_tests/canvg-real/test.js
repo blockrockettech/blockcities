@@ -21,8 +21,8 @@ void async function () {
         const body3 = await loadImage('./svg_tests/canvg-real/svgs/bodies/body-vert-windows.svg');
 
         const roof0 = await loadImage('./svg_tests/canvg-real/svgs/roofs/432-park-roof.svg');
-        // const roof1 = await loadImage('./svgs/roof-2.svg');
-        // const roof2 = await loadImage('./svgs/roof-3.svg');
+        const roof1 = await loadImage('./svg_tests/canvg-real/svgs/roofs/200-vesey-roof.svg');
+        const roof2 = await loadImage('./svg_tests/canvg-real/svgs/roofs/pool-roof-11.svg');
 
         const bases = [
             {width: base0.width, height: base0.height, anchor: 81},
@@ -32,16 +32,16 @@ void async function () {
         ];
 
         const bodies = [
-            {width: body0.width, height: body0.height, anchor: 232},
-            {width: body1.width, height: body1.height, anchor: 232},
-            {width: body2.width, height: body2.height, anchor: 232},
-            {width: body3.width, height: body3.height, anchor: 232}
+            {width: body0.width, height: body0.height, anchor: 230},
+            {width: body1.width, height: body1.height, anchor: 230},
+            {width: body2.width, height: body2.height, anchor: 230},
+            {width: body3.width, height: body3.height, anchor: 230}
         ];
 
         const roofs = [
-            {width: roof0.width, height: roof0.height}
-            // {width: roof1.width, height: roof1.height},
-            // {width: roof2.width, height: roof2.height}
+            {width: roof0.width, height: roof0.height},
+            {width: roof1.width, height: roof1.height},
+            {width: roof2.width, height: roof2.height}
         ];
 
         const baseSvgs = [
@@ -57,9 +57,9 @@ void async function () {
             body3,
         ];
         const roofSvgs = [
-            roof0
-            // roof1,
-            // roof2
+            roof0,
+            roof1,
+            roof2
         ];
 
         // const randomBase = 2;
