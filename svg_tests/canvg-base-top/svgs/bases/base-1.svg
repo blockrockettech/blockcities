@@ -4,11 +4,11 @@
     <switch>
         <g id="base-1">
             <path d=" M 320 831.384 L 440 900.666 L 440 993.042 L 320 923.76 L 320 831.384 Z " id="right-side"
-                  fill="rgb(242,84,84)"/>
+                  fill="blue"/>
             <path d=" M 560 831.384 L 560 923.76 L 440 993.042 L 440 900.666 L 560 831.384 Z " id="left-side"
-                  fill="rgb(255,148,148)"/>
+                  fill="yellow"/>
             <path d=" M 320 831.384 L 440 762.102 L 560 831.384 L 440 900.666 L 320 831.384 Z " id="base-top"
-                  fill="rgb(255,218,218)"/>
+                  fill="pink"/>
         </g>
         <foreignObject requiredExtensions="http://ns.gravit.io/">
             <gravitDesigner:gravitElementRef xmlns:gravitDesigner="http://ns.gravit.io/"
