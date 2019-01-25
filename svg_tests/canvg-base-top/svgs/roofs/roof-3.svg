@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?><!-- Generator: Gravit.io -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate"
+     viewBox="1240 228.94 240 232.94" width="240" height="232.94">
+    <switch>
+        <g id="roof-3">
+            <path d=" M 1240 369.504 L 1360 438.786 L 1360 461.88 L 1240 392.598 L 1240 369.504 Z " id="Path"
+                  fill="rgb(1,132,119)"/>
+            <path d=" M 1480 369.504 L 1480 392.598 L 1360 461.88 L 1360 438.786 L 1480 369.504 Z " id="Path"
+                  fill="rgb(27,208,190)"/>
+            <path d=" M 1240 369.504 L 1360 300.222 L 1480 369.504 L 1360 438.786 L 1240 369.504 Z " id="roof-top"
+                  fill="rgb(142,240,230)"/>
+            <path d=" M 1360 392.598 L 1400 369.504 L 1400 346.41 L 1360 369.504 L 1360 392.598 Z " id="Path"
+                  fill="rgb(27,208,190)"/>
+            <path d=" M 1320 346.41 L 1360 369.504 L 1360 392.598 L 1320 369.504 L 1320 346.41 Z " id="Path"
+                  fill="rgb(1,132,119)"/>
+            <path d=" M 1400 346.41 L 1360 323.316 L 1320 346.41 L 1360 369.504 L 1400 346.41 Z " id="Path"
+                  fill="rgb(142,240,230)"/>
+            <line x1="1360" y1="346.41" x2="1360" y2="230.94" id="Path" vector-effect="non-scaling-stroke"
+                  stroke-width="4" stroke="rgb(27,208,190)" stroke-linejoin="miter" stroke-linecap="round"
+                  stroke-miterlimit="3"/>
+        </g>
+        <foreignObject requiredExtensions="http://ns.gravit.io/">
+            <gravitDesigner:gravitElementRef xmlns:gravitDesigner="http://ns.gravit.io/"
+                                             xlink:href="#uWnwkmjKORAIlpPygvM5dZCO4M7Pqxnb"/>
+        </foreignObject>
+    </switch>
+    <gravitDesigner:gravitGraphicSource xmlns:gravitDesigner="http://ns.gravit.io/"
+                                        id="uWnwkmjKORAIlpPygvM5dZCO4M7Pqxnb" version="1">
+        <![CDATA[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]]></gravitDesigner:gravitGraphicSource>
+</svg>
