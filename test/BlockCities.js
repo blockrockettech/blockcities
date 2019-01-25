@@ -121,7 +121,7 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
 
         it('should burn if owner', async function () {
-            const {logs} = await this.token.burn(firstTokenId, {from: creator})
+            const {logs} = await this.token.burn(firstTokenId, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `Transfer`,
@@ -180,7 +180,15 @@ contract.only('BlockCities', ([_, creator, tokenOwner, anyone, ...accounts]) => 
         });
 
         it('should fulfil if credit and no value', async function () {
-            await this.token.addCredit(tokenOwner, {from: creator});
+            const {logs} = await this.token.addCredit(tokenOwner, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `CreditAdded`,
+                {_to: tokenOwner}
+            );
+
+            (await this.token.credits(tokenOwner, {from: tokenOwner})).should.be.bignumber.equal('1');
+
             await this.token.mintBuilding(firstTokenId, firstURI, {from: tokenOwner, value: 0});
         });
     });

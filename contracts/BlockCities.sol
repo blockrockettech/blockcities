@@ -26,6 +26,10 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
         bytes32 _cityName
     );
 
+    event CreditAdded(
+        address indexed _to
+    );
+
     event PricePerBuildingInWeiChanged(
         uint256 _oldPricePerBuildingInWei,
         uint256 _newPricePerBuildingInWei
@@ -158,7 +162,7 @@ contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
     function addCredit(address _to) public onlyOwner returns (bool) {
         credits[_to] = credits[_to].add(1);
 
-        // FIXME EVENT
+        emit CreditAdded(_to);
 
         return true;
     }
