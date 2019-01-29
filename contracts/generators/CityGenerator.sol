@@ -27,6 +27,7 @@ contract CityGenerator {
         // have to add to this in order to use new cities in the main contracts
         // manual config required
         // have to config things in order of least likely to happen
+        // is detached from 721 contract (is this needed)
 
         // Plus side:
         // simple to understand
