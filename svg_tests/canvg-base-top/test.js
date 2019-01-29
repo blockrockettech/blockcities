@@ -25,44 +25,31 @@ void async function () {
         const roof1 = await loadImage('./svg_tests/canvg-base-top/svgs/roofs/roof-2.svg');
         const roof2 = await loadImage('./svg_tests/canvg-base-top/svgs/roofs/roof-3.svg');
 
-        // var path = extract(base0.src);
-        // console.log(path);
-        // var svg = parse(path);
-        // console.log(svg);
 
-        // var xml = parser.parse(fs.readFileSync('./svg_tests/canvg-base-top/svgs/bases/base-1.svg').toString());
-        // console.log(JSON.stringify(xml));
-
-        // var draw = SVG('drawing');
-        // draw.svg(fs.readFileSync('./svg_tests/canvg-base-top/svgs/bases/base-1.svg').toString());
-        //
-        // const svgCanvas = SVG(document.documentElement);
-        // //
-        // const svgString = fs.readFileSync('./svg_tests/canvg-base-top/svgs/bases/base-1.svg').toString();
-        // console.log(svgString);
-        //
-        // const svgLoaded = svgCanvas.svg(svgString);
-        //
-        // console.log(svgLoaded.get('right-side'));
-
-        // let fixedSvg = svgLoaded
-        //     .get('right-side');
-        //
-        // console.log(fixedSvg);
-
-        // fixedSvg = fixedSvg.path('left-side')
-        //     .replace(
-        //         svgCanvas.path('left-side').fill('yellow')
-        //     )
-        //     .toDoc();
-        //
-        // fixedSvg = fixedSvg.path('base-top')
-        //     .replace(
-        //         svgCanvas.path('base-top').fill('green')
-        //     )
-        //     .toDoc();
-        //
-        // console.log(fixedSvg.path('left-side'));
+        //https://jsfiddle.net/0pft5z7x/5/
+// initialize SVG.js
+//         var draw = SVG('drawing')
+//
+//         draw.svg(`<?xml version="1.0" standalone="no"?>
+// <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate"
+//      viewBox="320 762.102 240 230.94" width="240" height="230.94">
+//     <switch>
+//         <g id="base-1">
+//             <path d=" M 320 831.384 L 440 900.666 L 440 993.042 L 320 923.76 L 320 831.384 Z " id="right-side"
+//                   />
+//             <path d=" M 560 831.384 L 560 923.76 L 440 993.042 L 440 900.666 L 560 831.384 Z " id="left-side" fill="yellow"
+//                  />
+//             <path d=" M 320 831.384 L 440 762.102 L 560 831.384 L 440 900.666 L 320 831.384 Z " id="base-top"
+//                   "/>
+//         </g>
+//     </switch>
+// </svg>`);
+//
+//         draw.select('path#left-side').fill('cyan');
+//         draw.select('path#right-side').fill('orange');
+//         draw.select('path#base-top').fill('purple');
+//
+//         alert(draw.svg());
 
         const bases = [
             {width: base0.width, height: base0.height, anchor: 81},
