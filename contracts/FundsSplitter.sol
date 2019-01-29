@@ -1,3 +1,5 @@
+pragma solidity >=0.5.0 < 0.6.0;
+
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 

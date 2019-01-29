@@ -1,19 +1,22 @@
-pragma solidity >=0.5.0 < 0.6.0;
+pragma solidity ^0.5.0;
 
-import "./Generator.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract CityGenerator {
+contract CityGenerator is Ownable {
+    using SafeMath for uint256;
 
-    //| Atlanta       |  | 15 |
-    //| ------------- |  | -- |
-    //| Chicago       |  | 30 |
-    //| San Francisco |  | 5  |
-    //| New York City |  | 50 |
+    //| NAME          |  | %  | ID
+    //----------------------------
+    //| San Francisco |  | 5  | 1
+    //| Atlanta       |  | 15 | 2
+    //| Chicago       |  | 30 | 3
+    //| New York City |  | 50 | 4
 
     uint public MAX_VALUE = 100;
 
     struct Config {
-        uint256 value;
+        uint256 id;
         uint256 weight;
     }
 
@@ -35,38 +38,65 @@ contract CityGenerator {
         // cheapish in gas costs (needs more tests)
         // doesnt require knowledge of number of cities in the main contract
 
-        //San Francisco
+        // San Francisco
         configs.push(Config(1, 5));
-        //Chicago
-        configs.push(Config(0, 30));
-        //New York City
-        configs.push(Config(2, 50));
+
+        // Atlanta
+        configs.push(Config(2, 15));
+
+        // Chicago
+        configs.push(Config(3, 30));
+
+        // New York City
+        configs.push(Config(4, 50));
     }
 
     uint256 internal nonce = 0;
 
-    function generate(address _sender) public returns (uint256) {
+    event Matched(uint256 id, uint256 weight, uint256 random);
+
+    function generate(address _sender) external returns (uint256) {
+
+        // bump nonce
+        nonce++;
 
         // generate random seed
         bytes memory packed = abi.encodePacked(blockhash(block.number), _sender, nonce);
 
         // randomise value
-        uint256 randomPercentage = uint256(keccak256(packed)) % MAX_VALUE;
+        uint256 random = uint256(keccak256(packed)) % MAX_VALUE;
 
-        // bump nonce
-        nonce++;
+        uint256 marker = 0;
 
         // find weighting
         for (uint i = 0; i < configs.length; i++) {
-            if (randomPercentage <= configs[i].weight) {
-                return configs[i].value;
+            marker = marker.add(configs[i].weight);
+
+            if (random < marker) {
+                emit Matched(configs[i].id, configs[i].weight, random);
+                return configs[i].id;
             }
         }
 
         // FIXME is this correct
-
-        // return most likely value which should always be value 0
-        return configs[configs.length - 1].value;
+        revert("Unable to find match");
     }
 
+    function getConfigSize() public view returns (uint256) {
+        return configs.length;
+    }
+
+    function getConfig(uint256 index) public view returns (uint256 value, uint256 weight) {
+        return (configs[index].id, configs[index].weight);
+    }
+
+    // Dangerous method but needed
+    function updateConfig(uint256 configIndex, uint256 weight) public onlyOwner {
+        configs[configIndex].weight = weight;
+    }
+
+    // This is a kind of hack to make sure it will never match
+    function deleteConfig(uint256 configIndex) public onlyOwner {
+        configs[configIndex].weight = 101;
+    }
 }
