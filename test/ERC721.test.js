@@ -7,9 +7,9 @@ const Generator = artifacts.require('Generator');
 
 contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
     beforeEach(async function () {
-        this.generator = await Generator.new({from: creator});
-        this.token = await BlockCities.new(this.generator.address, {from: creator});
-        this.basePrice = await this.token.pricePerBuildingInWei();
+        this.token = await BlockCities.new({from: creator});
+        this.token.addCity(web3.utils.fromAscii("Atlanta"));
+        this.token.addCity(web3.utils.fromAscii("Chicago"));
     });
 
     shouldBehaveLikeERC721(creator, creator, accounts);
