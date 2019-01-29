@@ -5,7 +5,7 @@ node_js:
 
 cache: npm
 
-before-script:
+before_script:
   - npm install -g truffle
   
 script:
