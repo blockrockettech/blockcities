@@ -9,7 +9,7 @@ contract FundsSplitter is Ownable {
 
     // TODO configure this
     address payable public techPartner = address(0x0);
-    uint256 public techPartnerRate = 25;
+    uint256 public techPartnerRate = 40;
 
     // TODO add new test for this
     function splitFunds() internal {
