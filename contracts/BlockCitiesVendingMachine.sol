@@ -4,6 +4,7 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./generators/Generator.sol";
+import "./generators/CityGenerator.sol";
 
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
@@ -23,6 +24,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     );
 
     Generator public generator;
+    CityGenerator public cityGenerator;
 
     IBlockCitiesCreator public blockCities;
 
@@ -31,8 +33,13 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public totalPurchasesInWei = 0;
     uint256 public pricePerBuildingInWei = 100;
 
-    constructor (Generator _generator, IBlockCitiesCreator _blockCities) public {
+    constructor (
+        Generator _generator,
+        CityGenerator _cityGenerator,
+        IBlockCitiesCreator _blockCities
+    ) public {
         generator = _generator;
+        cityGenerator = _cityGenerator;
         blockCities = _blockCities;
     }
 
@@ -42,11 +49,9 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        uint256 totalCities = blockCities.totalCities();
-
         uint256 tokenId = blockCities.createBuilding(
         // city
-            generator.generate(msg.sender, totalCities),
+            cityGenerator.generate(msg.sender),
 
         // Base
             generator.generate(msg.sender, 3),

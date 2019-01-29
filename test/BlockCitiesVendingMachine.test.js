@@ -1,5 +1,6 @@
 const BlockCities = artifacts.require('BlockCities');
 const Generator = artifacts.require('Generator');
+const CityGenerator = artifacts.require('CityGenerator');
 const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
@@ -23,9 +24,17 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
         // Create generator
         this.generator = await Generator.new({from: creator});
+        this.cityGenerator = await CityGenerator.new({from: creator});
 
         // Create vending machine
-        this.vendingMachine = await BlockCitiesVendingMachine.new(this.generator.address, this.blockCities.address, {from: creator});
+        this.vendingMachine = await BlockCitiesVendingMachine.new(
+            this.generator.address,
+            this.cityGenerator.address,
+            this.blockCities.address,
+            {
+                from: creator
+            }
+        );
 
         // Add to whitelist
         await this.blockCities.addWhitelisted(this.vendingMachine.address, {from: creator});
