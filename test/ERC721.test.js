@@ -8,38 +8,33 @@ const Generator = artifacts.require('Generator');
 contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
     beforeEach(async function () {
         this.token = await BlockCities.new({from: creator});
-        this.token.addCity(web3.utils.fromAscii("Atlanta"));
-        this.token.addCity(web3.utils.fromAscii("Chicago"));
+
+        await this.token.addCity(web3.utils.fromAscii("Atlanta"), {from: creator});
+        await this.token.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
+        (await this.token.totalCities()).should.be.bignumber.equal('2');
+
+        (await this.token.isWhitelisted(creator)).should.be.true;
+        (await this.token.totalBuildings()).should.be.bignumber.equal('0');
     });
 
     shouldBehaveLikeERC721(creator, creator, accounts);
 
     describe('internal functions', function () {
-        const tokenId = new BN('1000000');
+        const tokenId = new BN('1');
 
         describe('_mint(address, uint256)', function () {
             context('with minted token', async function () {
                 beforeEach(async function () {
-                    ({logs: this.logs} = await this.token.mintBuilding(tokenId, 'abc', {
-                        from: tokenOwner,
-                        value: this.basePrice
-                    }));
+                    ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, creator, {from: creator}));
                 });
 
                 it('emits a Transfer event', function () {
-                    expectEvent.inLogs(this.logs, 'Transfer', {from: ZERO_ADDRESS, to: tokenOwner, tokenId});
+                    expectEvent.inLogs(this.logs, 'Transfer', {from: ZERO_ADDRESS, to: creator, tokenId});
                 });
 
                 it('creates the token', async function () {
-                    (await this.token.balanceOf(tokenOwner)).should.be.bignumber.equal('1');
-                    (await this.token.ownerOf(tokenId)).should.equal(tokenOwner);
-                });
-
-                it('reverts when adding a token id that already exists', async function () {
-                    await shouldFail.reverting(this.token.mintBuilding(tokenId, 'abc', {
-                        from: tokenOwner,
-                        value: this.basePrice
-                    }));
+                    (await this.token.balanceOf(creator)).should.be.bignumber.equal('1');
+                    (await this.token.ownerOf(tokenId)).should.equal(creator);
                 });
             });
         });
@@ -52,17 +47,10 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
         });
 
         context('with minted token', function () {
-            const tokenId = new BN('1000000');
+            const tokenId = new BN('1');
 
             beforeEach(async function () {
-                ({logs: this.logs} = await this.token.mintBuilding(
-                    tokenId,
-                    'abc',
-                    {
-                        from: tokenOwner,
-                        value: this.basePrice
-                    }
-                ));
+                ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, anyone, {from: creator}));
             });
 
             context('with burnt token', function () {
@@ -71,11 +59,11 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
                 });
 
                 it('emits a Transfer event', function () {
-                    expectEvent.inLogs(this.logs, 'Transfer', {from: tokenOwner, to: ZERO_ADDRESS, tokenId});
+                    expectEvent.inLogs(this.logs, 'Transfer', {from: anyone, to: ZERO_ADDRESS, tokenId});
                 });
 
                 it('deletes the token', async function () {
-                    (await this.token.balanceOf(tokenOwner)).should.be.bignumber.equal('0');
+                    (await this.token.balanceOf(creator)).should.be.bignumber.equal('0');
                     await shouldFail.reverting(this.token.ownerOf(tokenId));
                 });
 
