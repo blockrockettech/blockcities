@@ -4,10 +4,12 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./generators/Generator.sol";
+
+import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-contract BlockCitiesVendingMachine is Ownable {
+contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     using SafeMath for uint256;
 
     event PricePerBuildingInWeiChanged(
@@ -74,6 +76,9 @@ contract BlockCitiesVendingMachine is Ownable {
             totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
         }
 
+        // Split funds accordingly
+        splitFunds();
+
         emit VendingMachineTriggered(tokenId, msg.sender);
 
         return tokenId;
@@ -96,5 +101,6 @@ contract BlockCitiesVendingMachine is Ownable {
 
         return true;
     }
+
 
 }
