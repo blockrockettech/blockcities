@@ -5,4 +5,7 @@ node_js:
 
 cache: npm
 
-
+script:
+- ganache-cli -p 7545 > /dev/null &
+- sleep 5
+- npm run test
