@@ -5,7 +5,8 @@ node_js:
 
 cache: npm
 
+before-script:
+  - npm install -g truffle
+  
 script:
-- ganache-cli -p 7545 > /dev/null &
-- sleep 5
-- npm run test
+  - npm run test
