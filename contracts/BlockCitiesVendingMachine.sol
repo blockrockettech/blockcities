@@ -3,8 +3,10 @@ pragma solidity >=0.5.0 < 0.6.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./generators/Generator.sol";
 import "./generators/CityGenerator.sol";
+import "./generators/BaseGenerator.sol";
+import "./generators/BodyGenerator.sol";
+import "./generators/RoofGenerator.sol";
 
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
@@ -23,9 +25,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         address indexed _architect
     );
 
-    Generator public generator;
+    // TODO allow these to be changed
     CityGenerator public cityGenerator;
-
+    BaseGenerator public baseGenerator;
+    BodyGenerator public bodyGenerator;
+    RoofGenerator public roofGenerator;
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -34,11 +38,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public pricePerBuildingInWei = 100;
 
     constructor (
-        Generator _generator,
         CityGenerator _cityGenerator,
+        BaseGenerator _baseGenerator,
+        BodyGenerator _bodyGenerator,
+        RoofGenerator _roofGenerator,
         IBlockCitiesCreator _blockCities
     ) public {
-        generator = _generator;
+        baseGenerator = _baseGenerator;
+        bodyGenerator = _bodyGenerator;
+        roofGenerator = _roofGenerator;
         cityGenerator = _cityGenerator;
         blockCities = _blockCities;
     }
@@ -49,33 +57,34 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
+        uint256 city = cityGenerator.generate(msg.sender);
+
+        (uint256 base, uint256 baseExteriorColorway, uint256 baseWindowColorway) = baseGenerator.generate(city, msg.sender);
+        (uint256 body, uint256 bodyExteriorColorway, uint256 bodyWindowColorway) = bodyGenerator.generate(city, msg.sender);
+        (uint256 roof, uint256 roofExteriorColorway, uint256 roofWindowColorway) = roofGenerator.generate(city, msg.sender);
+
         uint256 tokenId = blockCities.createBuilding(
-        // city
-            cityGenerator.generate(msg.sender),
+            city,
 
-        // Base
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
+            base,
+            baseExteriorColorway,
+            baseWindowColorway,
 
-        // Body
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
+            body,
+            bodyExteriorColorway,
+            bodyWindowColorway,
 
-        // Roof
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
-            generator.generate(msg.sender, 3),
+            roof,
+            roofExteriorColorway,
+            roofWindowColorway,
 
-        // architect
             msg.sender
         );
 
         // use credits first
         if (credits[msg.sender] > 0) {
             credits[msg.sender] = credits[msg.sender].sub(1);
-            // TODO is this correct?
+            // revert any monies sent
             msg.sender.transfer(msg.value);
         } else {
             totalPurchasesInWei = totalPurchasesInWei.add(msg.value);

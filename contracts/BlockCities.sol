@@ -29,10 +29,10 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
     uint256 public cityPointer = 0;
     uint256 public tokenIdPointer = 0;
 
+    // TODO should each section be a struct?
+
     struct Building {
         uint256 city;
-
-        // TODO should each section be a struct?
 
         uint256 base;
         uint256 baseExteriorColorway;

@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 < 0.6.0;
 
 // TODO should this have access controls?
-contract Generator {
+contract RandomNumberGenerator {
 
     uint256 internal randNonce = 0;
 

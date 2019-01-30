@@ -13,7 +13,7 @@ contract CityGenerator is Ownable {
     //| Chicago       |  | 30 | 3
     //| New York City |  | 50 | 4
 
-    uint public MAX_VALUE = 100;
+    uint256 public MAX_VALUE = 100;
 
     struct Config {
         uint256 id;
@@ -22,22 +22,21 @@ contract CityGenerator is Ownable {
 
     Config[] public configs;
 
+    // Assumes the configs are added in the correct order from lowest probability to highest
+
+    // Downsides:
+    // have to add to this in order to use new cities in the main contracts
+    // manual config required
+    // have to config things in order of least likely to happen
+    // is detached from 721 contract (is this needed)
+
+    // Plus side:
+    // simple to understand
+    // simple to config add/remove/changes
+    // cheapish in gas costs (needs more tests)
+    // doesnt require knowledge of number of cities in the main contract
+
     constructor () public {
-
-        // Assumes the configs are added in the correct order from lowest probability to highest
-
-        // Downsides:
-        // have to add to this in order to use new cities in the main contracts
-        // manual config required
-        // have to config things in order of least likely to happen
-        // is detached from 721 contract (is this needed)
-
-        // Plus side:
-        // simple to understand
-        // simple to config add/remove/changes
-        // cheapish in gas costs (needs more tests)
-        // doesnt require knowledge of number of cities in the main contract
-
         // San Francisco
         configs.push(Config(1, 5));
 
@@ -78,7 +77,6 @@ contract CityGenerator is Ownable {
             }
         }
 
-        // FIXME is this correct
         revert("Unable to find match");
     }
 
@@ -97,6 +95,10 @@ contract CityGenerator is Ownable {
 
     // This is a kind of hack to make sure it will never match
     function deleteConfig(uint256 configIndex) public onlyOwner {
-        configs[configIndex].weight = 101;
+        configs[configIndex].weight = MAX_VALUE.add(1);
+    }
+
+    function updateMaxConfig(uint256 _MAX_VALUE) public onlyOwner {
+        MAX_VALUE = _MAX_VALUE;
     }
 }

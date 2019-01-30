@@ -4,7 +4,7 @@ const CityGenerator = artifacts.require('CityGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('CityGenerator tests', (accounts) => {
+contract('CityGenerator tests', (accounts) => {
 
 
     before(async function () {

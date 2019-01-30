@@ -1,6 +1,10 @@
 const BlockCities = artifacts.require('BlockCities');
-const Generator = artifacts.require('Generator');
+
+const BaseGenerator = artifacts.require('./BaseGenerator.sol');
+const BodyGenerator = artifacts.require('./BodyGenerator.sol');
+const RoofGenerator = artifacts.require('./RoofGenerator.sol');
 const CityGenerator = artifacts.require('CityGenerator');
+
 const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
@@ -22,14 +26,18 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         await this.blockCities.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
         (await this.blockCities.totalCities()).should.be.bignumber.equal('2');
 
-        // Create generator
-        this.generator = await Generator.new({from: creator});
+        // Create generators
+        this.baseGenerator = await BaseGenerator.new({from: creator});
+        this.bodyGenerator = await BodyGenerator.new({from: creator});
+        this.roofGenerator = await RoofGenerator.new({from: creator});
         this.cityGenerator = await CityGenerator.new({from: creator});
 
         // Create vending machine
         this.vendingMachine = await BlockCitiesVendingMachine.new(
-            this.generator.address,
             this.cityGenerator.address,
+            this.baseGenerator.address,
+            this.bodyGenerator.address,
+            this.roofGenerator.address,
             this.blockCities.address,
             {
                 from: creator
