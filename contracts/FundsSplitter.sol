@@ -7,10 +7,10 @@ contract FundsSplitter is Ownable {
     using SafeMath for uint256;
 
     // TODO configure this
-    address payable public blockCities = address(0x0);
 
-    // TODO configure this
+    address payable public blockCities = address(0x0);
     address payable public techPartner = address(0x0);
+
     uint256 public techPartnerRate = 40;
 
     // TODO add new test for this

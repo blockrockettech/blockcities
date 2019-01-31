@@ -21,6 +21,7 @@
   "dependencies": {
     "canvas": "^2.3.1",
     "canvg": "^1.5.3",
+    "ethjs": "^0.4.0",
     "extract-svg-path": "^2.1.0",
     "fast-xml-parser": "^3.12.12",
     "lodash": "^4.17.11",
@@ -32,6 +33,7 @@
     "svg-path-properties": "^0.4.8",
     "svg.js": "^2.7.1",
     "svgdom": "0.0.18",
-    "svgo": "^1.1.1"
+    "svgo": "^1.1.1",
+    "truffle-hdwallet-provider": "^1.0.3"
   }
 }

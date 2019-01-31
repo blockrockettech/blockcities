@@ -10,8 +10,7 @@ import "./IBlockCitiesCreator.sol";
 contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
     using SafeMath for uint256;
 
-    // TODO how to handle changing BASE API URI?
-    string public tokenBaseURI = "https://api.blockcitties.co";
+    string public tokenBaseURI = "";
 
     event BuildingMinted(
         uint256 indexed _tokenId,
@@ -53,8 +52,9 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     mapping(uint256 => bytes32) public cities;
 
-    constructor () public ERC721Full("BlockCities", "BKC") {
+    constructor (string memory _tokenBaseURI) public ERC721Full("BlockCities", "BKC") {
         super.addWhitelisted(msg.sender);
+        tokenBaseURI = _tokenBaseURI;
     }
 
     function createBuilding(
@@ -116,10 +116,34 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
         return tokenId;
     }
 
-    // TODO add all attributes to this
-    function attributes(uint256 _tokenId) public view returns (uint256, uint256, uint256, uint256, address) {
+    function attributes(uint256 _tokenId) public view returns (
+        uint256 _city,
+        uint256 _base,
+        uint256 _baseExteriorColorway,
+        uint256 _baseWindowColorway,
+        uint256 _body,
+        uint256 _bodyExteriorColorway,
+        uint256 _bodyWindowColorway,
+        uint256 _roof,
+        uint256 _roofExteriorColorway,
+        uint256 _roofWindowColorway,
+        address _architect
+    ) {
+        require(_exists(_tokenId), "Token ID not found");
         Building storage building = buildings[_tokenId];
-        return (building.city, building.base, building.body, building.roof, building.architect);
+        return (
+        building.city,
+        building.base,
+        building.baseExteriorColorway,
+        building.baseWindowColorway,
+        building.body,
+        building.bodyExteriorColorway,
+        building.bodyWindowColorway,
+        building.roof,
+        building.roofExteriorColorway,
+        building.roofWindowColorway,
+        building.architect
+        );
     }
 
     function tokensOfOwner(address owner) public view returns (uint256[] memory) {
