@@ -18,9 +18,9 @@ contract RoofGenerator is Ownable {
 
         return (
         // Roof
-        generate(_sender, 3),
-        generate(_sender, 3),
-        generate(_sender, 3)
+        generate(_sender, 4),
+        generate(_sender, 4),
+        generate(_sender, 4)
         );
     }
 

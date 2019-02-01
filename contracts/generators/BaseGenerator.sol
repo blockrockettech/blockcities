@@ -18,9 +18,9 @@ contract BaseGenerator is Ownable {
 
         return (
         // Base
-        generate(_sender, 3),
-        generate(_sender, 3),
-        generate(_sender, 3)
+        generate(_sender, 1),
+        generate(_sender, 1),
+        generate(_sender, 1)
         );
     }
 

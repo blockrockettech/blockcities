@@ -51,6 +51,14 @@ module.exports = {
       port: 8555,         // <-- If you change this, also set the port option in .solcover.js.
       gas: 0xfffffffffff, // <-- Use this high gas value
       gasPrice: 0x01      // <-- Use this low gas price
-    }
+    },
+    ropsten: {
+      provider: function () {
+        return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${infuraApikey}`);
+      },
+      network_id: 3,
+      gas: 7000000, // default = 4712388
+      gasPrice: 4000000000 // default = 100 gwei = 100000000000
+    },
   }
 };
