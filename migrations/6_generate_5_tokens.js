@@ -1,49 +1,20 @@
 const BlockCitiesVendingMachine = artifacts.require('./BlockCitiesVendingMachine.sol');
 
+const HDWalletProvider = require('truffle-hdwallet-provider');
+const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
+
 module.exports = async function (deployer, network, accounts) {
     const _blockCitiesVendingMachine = await BlockCitiesVendingMachine.deployed();
 
+    console.log(_blockCitiesVendingMachine);
+
+    let _owner = accounts[0];
+
+    console.log(_owner);
+
     // Add some credit for each account
-    await _blockCitiesVendingMachine.addCredit(accounts[1], {from: accounts[0]});
-    await _blockCitiesVendingMachine.addCredit(accounts[2], {from: accounts[0]});
-    await _blockCitiesVendingMachine.addCredit(accounts[3], {from: accounts[0]});
-    await _blockCitiesVendingMachine.addCredit(accounts[4], {from: accounts[0]});
-    await _blockCitiesVendingMachine.addCredit(accounts[5], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[1], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[2], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[3], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[4], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[5], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[1], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[2], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[3], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[4], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[5], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[1], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[2], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[3], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[4], {from: accounts[0]});
-    // await _blockCitiesVendingMachine.addCredit(accounts[5], {from: accounts[0]});
+    await _blockCitiesVendingMachine.addCredit(_owner, {from: _owner});
 
     // Mint 5 random buildings
-    await _blockCitiesVendingMachine.mintBuilding({from: accounts[1]});
-    await _blockCitiesVendingMachine.mintBuilding({from: accounts[2]});
-    await _blockCitiesVendingMachine.mintBuilding({from: accounts[3]});
-    await _blockCitiesVendingMachine.mintBuilding({from: accounts[4]});
-    await _blockCitiesVendingMachine.mintBuilding({from: accounts[5]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[1]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[2]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[3]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[4]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[5]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[1]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[2]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[3]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[4]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[5]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[1]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[2]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[3]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[4]});
-    // await _blockCitiesVendingMachine.mintBuilding({from: accounts[5]});
+    await _blockCitiesVendingMachine.mintBuilding({from: _owner});
 };
