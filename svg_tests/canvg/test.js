@@ -82,7 +82,7 @@ void async function () {
     // strip off the data: url prefix to get just the base64-encoded bytes
     const data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
     const buf = new Buffer(data, 'base64');
-    fs.writeFileSync(`./svg_tests/canvg/output-${randomBase}-${randomBody}-${randomRoof}.png`, buf);
+    fs.writeFileSync(`./image/canvg/output-${randomBase}-${randomBody}-${randomRoof}.png`, buf);
 
     console.log(`done: output-${randomBase}-${randomBody}-${randomRoof}.png`);
 

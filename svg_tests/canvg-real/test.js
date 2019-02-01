@@ -2,11 +2,6 @@ const {createCanvas, loadImage} = require('canvas');
 const fs = require('fs');
 const _ = require('lodash');
 
-//
-// const canvg = require('canvg');
-//
-// canvg('canvas', canvas);
-
 void async function () {
 
     try {
@@ -82,7 +77,7 @@ void async function () {
         // Always assume the base if the widest post for now
         const canvasWidth = bases[randomBase].width;
 
-        const canvas = createCanvas(canvasWidth, canvasHeight);
+        const canvas = createCanvas(canvasWidth, canvasHeight, 'svg');
 
         const ctx = canvas.getContext('2d');
 
@@ -99,9 +94,11 @@ void async function () {
 
         // Temp - write file to disk
         // strip off the data: url prefix to get just the base64-encoded bytes
-        const data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
-        const buf = new Buffer(data, 'base64');
-        fs.writeFileSync(`./svg_tests/canvg-real/output/${randomBase}-${randomBody}-${randomRoof}.png`, buf);
+        // const data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
+        // const buf = new Buffer(data, 'base64');
+        // fs.writeFileSync(`./svg_tests/canvg-real/output/${randomBase}-${randomBody}-${randomRoof}.png`, buf);
+
+        fs.writeFileSync(`./svg_tests/canvg-real/output/${randomBase}-${randomBody}-${randomRoof}.svg`, canvas.toBuffer());
 
         console.log(`done: output-${randomBase}-${randomBody}-${randomRoof}.png`);
     } catch (e) {

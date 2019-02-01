@@ -15,5 +15,5 @@ sharp({create: {width: 240, height: 600, channels: 4, background: {r: 255, g: 0,
         // onto orange background, composited with overlay.png with SE gravity,
         // sharpened, with metadata, 90% quality WebP image data. Phew!
 
-        fs.writeFileSync(`./svg_tests/sharpjs/output.png`, outputBuffer);
+        fs.writeFileSync(`./image/sharpjs/output.png`, outputBuffer);
     });

@@ -70,7 +70,7 @@ _.forEach(['base', 'body', 'roof'], (type) => {
                 //     }
                 // }
 
-                fs.writeFileSync(`./svg_tests/svgo/optimized/${file_name}-svgo-clean.svg`, result.data);
+                fs.writeFileSync(`./image/svgo/optimized/${file_name}-svgo-clean.svg`, result.data);
 
             });
 

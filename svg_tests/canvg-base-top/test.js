@@ -13,17 +13,17 @@ const document = window.document;
 void async function () {
 
     try {
-        const base0 = await loadImage('./svg_tests/canvg-base-top/svgs/bases/base-1.svg');
-        const base1 = await loadImage('./svg_tests/canvg-base-top/svgs/bases/base-2.svg');
-        const base2 = await loadImage('./svg_tests/canvg-base-top/svgs/bases/base-3.svg');
+        const base0 = await loadImage('./image/canvg-base-top/svgs/bases/base-1.svg');
+        const base1 = await loadImage('./image/canvg-base-top/svgs/bases/base-2.svg');
+        const base2 = await loadImage('./image/canvg-base-top/svgs/bases/base-3.svg');
 
-        const body0 = await loadImage('./svg_tests/canvg-base-top/svgs/bodies/body-1.svg');
-        const body1 = await loadImage('./svg_tests/canvg-base-top/svgs/bodies/body-2.svg');
-        const body2 = await loadImage('./svg_tests/canvg-base-top/svgs/bodies/body-3.svg');
+        const body0 = await loadImage('./image/canvg-base-top/svgs/bodies/body-1.svg');
+        const body1 = await loadImage('./image/canvg-base-top/svgs/bodies/body-2.svg');
+        const body2 = await loadImage('./image/canvg-base-top/svgs/bodies/body-3.svg');
 
-        const roof0 = await loadImage('./svg_tests/canvg-base-top/svgs/roofs/roof-1.svg');
-        const roof1 = await loadImage('./svg_tests/canvg-base-top/svgs/roofs/roof-2.svg');
-        const roof2 = await loadImage('./svg_tests/canvg-base-top/svgs/roofs/roof-3.svg');
+        const roof0 = await loadImage('./image/canvg-base-top/svgs/roofs/roof-1.svg');
+        const roof1 = await loadImage('./image/canvg-base-top/svgs/roofs/roof-2.svg');
+        const roof2 = await loadImage('./image/canvg-base-top/svgs/roofs/roof-3.svg');
 
 
         //https://jsfiddle.net/0pft5z7x/5/
@@ -124,7 +124,7 @@ void async function () {
         // strip off the data: url prefix to get just the base64-encoded bytes
         const data = canvas.toDataURL().replace(/^data:image\/\w+;base64,/, '');
         const buf = new Buffer(data, 'base64');
-        fs.writeFileSync(`./svg_tests/canvg-base-top/output/${randomBase}-${randomBody}-${randomRoof}.png`, buf);
+        fs.writeFileSync(`./image/canvg-base-top/output/${randomBase}-${randomBody}-${randomRoof}.png`, buf);
 
         console.log(`done: output-${randomBase}-${randomBody}-${randomRoof}.png`);
     } catch (e) {

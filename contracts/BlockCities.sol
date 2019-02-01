@@ -1,50 +1,55 @@
 pragma solidity >=0.5.0 < 0.6.0;
 
+import "openzeppelin-solidity/contracts/token/ERC721/ERC721MetadataMintable.sol";
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol";
+import "./Generator.sol";
 
-import "./libs/Strings.sol";
-import "./IBlockCitiesCreator.sol";
-
-contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
-    using SafeMath for uint256;
-
-    string public tokenBaseURI = "";
+contract BlockCities is ERC721Full, ERC721MetadataMintable, Ownable {
 
     event BuildingMinted(
         uint256 indexed _tokenId,
         address indexed _to,
-        address indexed _architect, // why have both _architect & _to - they are both the same for now?
-        string _tokenURI // TODO dont include _tokenURI as can be looked up?
+        address _architect,
+        string _tokenURI
+    );
+
+    event BuildingTransfer(
+        uint256 indexed _tokenId,
+        address indexed _to,
+        address _architect,
+        string _tokenURI
     );
 
     event CityAdded(
         uint256 indexed _cityId,
-        bytes32 _cityName // TODO dont include _cityName as can be looked up?
+        bytes32 _cityName
     );
 
-    uint256 public totalBuildings = 0;
-    uint256 public cityPointer = 0;
-    uint256 public tokenIdPointer = 0;
+    event CreditAdded(
+        address indexed _to
+    );
 
-    // TODO should each section be a struct?
+    event PricePerBuildingInWeiChanged(
+        uint256 _oldPricePerBuildingInWei,
+        uint256 _newPricePerBuildingInWei
+    );
+
+    address payable primary;
+
+    Generator internal generator;
+
+    uint256 public totalBuildings = 0;
+    uint256 public totalPurchasesInWei = 0;
+    uint256 public pricePerBuildingInWei = 100;
+
+    uint256 internal cityPointer = 0;
 
     struct Building {
         uint256 city;
-
         uint256 base;
-        uint256 baseExteriorColorway;
-        uint256 baseWindowColorway;
-
         uint256 body;
-        uint256 bodyExteriorColorway;
-        uint256 bodyWindowColorway;
-
         uint256 roof;
-        uint256 roofExteriorColorway;
-        uint256 roofWindowColorway;
-
         address architect;
     }
 
@@ -52,113 +57,97 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     mapping(uint256 => bytes32) public cities;
 
-    constructor (string memory _tokenBaseURI) public ERC721Full("BlockCities", "BKC") {
-        super.addWhitelisted(msg.sender);
-        tokenBaseURI = _tokenBaseURI;
+    mapping(address => uint256) public credits;
+
+    constructor (Generator _generator) public ERC721Full("BlockCities", "BKC") {
+        generator = _generator;
+
+        addCity("Atlanta");
+        addCity("Chicago");
+
+        primary = msg.sender;
     }
 
-    function createBuilding(
-        uint256 _city,
-        uint256 _base,
-        uint256 _baseExteriorColorway,
-        uint256 _baseWindowColorway,
-        uint256 _body,
-        uint256 _bodyExteriorColorway,
-        uint256 _bodyWindowColorway,
-        uint256 _roof,
-        uint256 _roofExteriorColorway,
-        uint256 _roofWindowColorway,
-        address _architect
-    )
-    public onlyWhitelisted returns (uint256 _tokenId) {
+    function mintBuilding(uint256 _tokenId, string memory _tokenURI) public payable returns (bool) {
+        require(!_exists(_tokenId), "Building exists with token ID");
+        require(
+            credits[msg.sender] > 0 || msg.value >= pricePerBuildingInWei,
+            "Must supply at least the required minimum purchase value or have credit"
+        );
 
-        // Get next token ID
-        uint256 tokenId = tokenIdPointer.add(1);
-        require(!_exists(tokenId), "Building exists with token ID");
+        buildings[_tokenId] = Building(
+            generator.generate(msg.sender, cityPointer),
+            generator.generate(msg.sender, 3),
+            generator.generate(msg.sender, 3),
+            generator.generate(msg.sender, 3),
+            msg.sender
+        );
 
-        // Reset token pointer
-        tokenIdPointer = tokenId;
+        _mint(msg.sender, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
 
-        // Create building
-        buildings[tokenId] = Building({
-            city : _city,
+        emit BuildingMinted(_tokenId, msg.sender, msg.sender, _tokenURI);
 
-            // Base
-            base : _base,
-            baseExteriorColorway : _baseExteriorColorway,
-            baseWindowColorway : _baseWindowColorway,
-
-            // Body
-            body : _body,
-            bodyExteriorColorway : _bodyExteriorColorway,
-            bodyWindowColorway : _bodyWindowColorway,
-
-            // Roof
-            roof : _roof,
-            roofExteriorColorway : _roofExteriorColorway,
-            roofWindowColorway : _roofWindowColorway,
-
-            architect : _architect
-            });
-
-        // Create dynamic string URL
-        string memory _tokenURI = Strings.strConcat(tokenBaseURI, "/token/", Strings.uint2str(tokenId));
-
-        // mint the actual token magic
-        _mint(_architect, tokenId);
-        _setTokenURI(tokenId, _tokenURI);
-
-        // Bump generated building
         totalBuildings = totalBuildings.add(1);
 
-        emit BuildingMinted(tokenId, _architect, _architect, _tokenURI);
+        // use credits first
+        if (credits[msg.sender] > 0) {
+            credits[msg.sender] = credits[msg.sender].sub(1);
 
-        return tokenId;
+            // refund wei if has credit
+            if (msg.value > 0) {
+                msg.sender.transfer(msg.value);
+            }
+        }
+        else {
+            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+
+            // send wei to primary wallet
+            primary.transfer(msg.value);
+        }
+
+        return true;
     }
 
-    function attributes(uint256 _tokenId) public view returns (
+    function transferBuilding(
+        uint256 _tokenId,
+        string memory _tokenURI,
+        address _to,
         uint256 _city,
         uint256 _base,
-        uint256 _baseExteriorColorway,
-        uint256 _baseWindowColorway,
         uint256 _body,
-        uint256 _bodyExteriorColorway,
-        uint256 _bodyWindowColorway,
-        uint256 _roof,
-        uint256 _roofExteriorColorway,
-        uint256 _roofWindowColorway,
-        address _architect
-    ) {
-        require(_exists(_tokenId), "Token ID not found");
-        Building storage building = buildings[_tokenId];
-        return (
-        building.city,
-        building.base,
-        building.baseExteriorColorway,
-        building.baseWindowColorway,
-        building.body,
-        building.bodyExteriorColorway,
-        building.bodyWindowColorway,
-        building.roof,
-        building.roofExteriorColorway,
-        building.roofWindowColorway,
-        building.architect
+        uint256 _roof
+    ) public onlyOwner returns (bool) {
+        require(!_exists(_tokenId), "Building exists with token ID");
+
+        buildings[_tokenId] = Building(
+            _city,
+            _base,
+            _body,
+            _roof,
+            msg.sender
         );
+
+        _mint(msg.sender, _tokenId);
+        _setTokenURI(_tokenId, _tokenURI);
+
+        emit BuildingTransfer(_tokenId, _to, msg.sender, _tokenURI);
+
+        totalBuildings = totalBuildings.add(1);
+
+        return true;
+    }
+
+    function attributes(uint _tokenId) public view returns (uint256, uint256, uint256, uint256, address) {
+        Building storage building = buildings[_tokenId];
+        return (building.city, building.base, building.body, building.roof, building.architect);
     }
 
     function tokensOfOwner(address owner) public view returns (uint256[] memory) {
         return _tokensOfOwner(owner);
     }
 
-    function nextTokenId() public view returns (uint256 _nextTokenID) {
-        return tokenIdPointer.add(1);
-    }
-
-    function totalCities() public view returns (uint256 _total) {
-        return cityPointer;
-    }
-
-    function addCity(bytes32 _cityName) public onlyWhitelisted returns (bool) {
+    function addCity(bytes32 _cityName) public onlyOwner returns (bool) {
         cities[cityPointer] = _cityName;
 
         emit CityAdded(cityPointer, _cityName);
@@ -168,18 +157,24 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
         return true;
     }
 
-    function burn(uint256 _tokenId) public onlyWhitelisted returns (bool) {
+    function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
+
+        pricePerBuildingInWei = _newPricePerBuildingInWei;
+
+        return true;
+    }
+
+    function burn(uint256 _tokenId) public onlyOwner returns (bool) {
         _burn(_tokenId);
         return true;
     }
 
-    function setTokenURI(uint256 _tokenId, string memory _tokenUri) public onlyWhitelisted {
-        require(bytes(_tokenUri).length != 0, "URI invalid");
-        _setTokenURI(_tokenId, _tokenUri);
-    }
+    function addCredit(address _to) public onlyOwner returns (bool) {
+        credits[_to] = credits[_to].add(1);
 
-    function updateTokenBaseURI(string memory _newBaseURI) public onlyWhitelisted {
-        require(bytes(_newBaseURI).length != 0, "Base URI invalid");
-        tokenBaseURI = _newBaseURI;
+        emit CreditAdded(_to);
+
+        return true;
     }
 }
