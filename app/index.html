@@ -12,8 +12,6 @@
 <body>
 
 <div id="vue-app" class="container">
-
-
     <div class="jumbotron mt-5">
         <h1 class="display-4">BlockCities Vending Machine</h1>
         <p class="lead">Be the Architect</p>
@@ -38,7 +36,16 @@
                 </code>
             </div>
             <div class="col text-center">
-                <img :src="buildingMetaData.image"/>
+                <img :src="buildingMetaData.image" class="img-fluid"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-columns" >
+        <div class="card m-2 p-2" v-if="buildings" v-for="b in buildings">
+            <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
+            <div class="card-body">
+                <h3 class="card-title text-center">{{b.data.name}}</h3>
             </div>
         </div>
     </div>
@@ -1353,9 +1360,10 @@
             totalBuildings: 0,
             buildingTokenId: null,
             buildingMetaData: null,
+            buildings: [],
         },
         methods: {
-            mintBuilding: function () {
+            mintBuilding: async function () {
                 let overrides = {
 
                     // The maximum units of gas for the transaction to use
@@ -1368,40 +1376,27 @@
                     value: this.pricePerBuildingInWei,
                 };
 
-                this.vendingContract
-                    .mintBuilding(overrides)
-                    .then((tx) => {
-                        console.log(tx);
-                        return tx.wait(1);
-                    })
-                    .then((receipt) => {
-                        const tokenIdBN = receipt.events.pop().args[0];
+                // wait for tx to be mined
+                let tx = await this.vendingContract.mintBuilding(overrides);
+                let receipt = await tx.wait(1);
+                const tokenIdBN = receipt.events.pop().args[0];
+                this.buildingTokenId = tokenIdBN.toNumber();
+                console.log(`Token ID:`, this.buildingTokenId);
 
-                        this.buildingTokenId = tokenIdBN.toNumber();
-                        console.log(`Token ID:`,  this.buildingTokenId);
-                        return this.blockcitiesContract.attributes(tokenIdBN);
-                    })
-                    .then((attrs) => {
-                        this.$toasted.show(`Building created: ${this.buildingTokenId}`, {
-                            theme: 'bubble',
-                            position: 'bottom-center',
-                            duration: 5000
-                        });
-                        console.log(`NEW BUILDING`, attrs);
+                this.$toasted.show(`Building created: ${this.buildingTokenId}`, {
+                    theme: 'bubble',
+                    position: 'bottom-center',
+                    duration: 5000
+                });
 
-                        return this.blockcitiesContract.totalBuildings();
-                    })
-                    .then((totalBuildings) => {
-                        this.totalBuildings = totalBuildings.toNumber();
+                // refresh total
+                this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                        return axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
-                    })
-                    .then((resp) => {
-                        this.buildingMetaData = resp.data;
-                    });
+                let resp = await axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
+                this.buildingMetaData = resp.data;
             }
         },
-        created: function () {
+        created: async function () {
             this.vendingContract = new ethers.Contract(
                 this.vendingAddress,
                 this.vendingAbi,
@@ -1414,9 +1409,16 @@
                 signer
             );
 
-            this.vendingContract.pricePerBuildingInWei().then((result) => this.pricePerBuildingInWei = result.toNumber());
+            this.pricePerBuildingInWei = (await this.vendingContract.pricePerBuildingInWei()).toNumber();
+            this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-            this.blockcitiesContract.totalBuildings().then((result) => this.totalBuildings = result.toNumber());
+            const allBuildings = [];
+            for (let i = 1; i < this.totalBuildings; i++) {
+                console.log(i);
+                allBuildings.push(axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${i}/details`));
+            }
+
+            this.buildings = await Promise.all(allBuildings);
         }
     });
 </script>
