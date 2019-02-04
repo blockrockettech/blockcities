@@ -36,6 +36,8 @@ contract CityGenerator is Ownable {
     // cheapish in gas costs (needs more tests)
     // doesnt require knowledge of number of cities in the main contract
 
+
+    // FIXME add cities via migration
     constructor () public {
         // San Francisco
         configs.push(Config(1, 5));

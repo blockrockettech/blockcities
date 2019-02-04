@@ -56,10 +56,7 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
         address _architect
     )
     public onlyWhitelisted returns (uint256 _tokenId) {
-
-        // Get next token ID
         uint256 tokenId = tokenIdPointer.add(1);
-        require(!_exists(tokenId), "Building exists with token ID");
 
         // Reset token pointer
         tokenIdPointer = tokenId;
@@ -100,6 +97,7 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
     ) {
         require(_exists(_tokenId), "Token ID not found");
         Building storage building = buildings[_tokenId];
+
         return (
         building.exteriorColorway,
         building.windowColorway,
@@ -113,10 +111,6 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     function tokensOfOwner(address owner) public view returns (uint256[] memory) {
         return _tokensOfOwner(owner);
-    }
-
-    function nextTokenId() public view returns (uint256 _nextTokenID) {
-        return tokenIdPointer.add(1);
     }
 
     function totalCities() public view returns (uint256 _total) {
