@@ -2,4 +2,6 @@
 
 node ./node_modules/.bin/truffle-flattener ./contracts/Migrations.sol > ./contracts-flat/Migrations.sol;
 
+node ./node_modules/.bin/truffle-flattener ./contracts/BlockCities.sol > ./contracts-flat/BlockCities.sol;
+
 node ./node_modules/.bin/truffle-flattener ./contracts/BlockCitiesVendingMachine.sol > ./contracts-flat/BlockCitiesVendingMachine.sol;
