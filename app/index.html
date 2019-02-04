@@ -74,6 +74,16 @@
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
 
+    let networkId = null;
+    let apiRoot = `http://localhost:5000`;
+    web3.version.getNetwork((err, netId) => {
+        networkId = netId;
+
+        if (parseInt(networkId) !== 5777) {
+            apiRoot = `https://us-central1-block-cities.cloudfunctions.net`;
+        }
+    });
+
     new Vue({
         el: '#vue-app',
         data: {
@@ -1361,7 +1371,7 @@
             totalBuildings: 0,
             buildingTokenId: null,
             buildingMetaData: null,
-            buildings: [],
+            buildings: []
         },
         methods: {
             mintBuilding: async function () {
@@ -1384,7 +1394,7 @@
                 this.buildingTokenId = tokenIdBN.toNumber();
                 console.log(`Token ID:`, this.buildingTokenId);
 
-                this.$toasted.show(`Building created: ${this.buildingTokenId}`, {
+                this.$toasted.show(`TX SUCCESS: Building created with ID ${this.buildingTokenId}`, {
                     theme: 'bubble',
                     position: 'bottom-center',
                     duration: 5000
@@ -1393,7 +1403,7 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
+                let resp = await axios.get(`${apiRoot}/block-cities/us-central1/api/network/${networkId}/token/${this.buildingTokenId}/details`);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             }
@@ -1416,8 +1426,7 @@
 
             const allBuildings = [];
             for (let i = 1; i < this.totalBuildings; i++) {
-                console.log(i);
-                allBuildings.push(axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${i}/details`));
+                allBuildings.push(axios.get(`${apiRoot}/block-cities/us-central1/api/network/${networkId}/token/${i}/details`));
             }
 
             this.buildings = await Promise.all(allBuildings);
