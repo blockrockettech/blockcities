@@ -25,6 +25,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         address indexed _architect
     );
 
+    event CreditAdded(
+        address indexed _to
+    );
+
     // TODO allow these to be changed
     CityGenerator public cityGenerator;
     BaseGenerator public baseGenerator;
@@ -59,33 +63,23 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
         uint256 city = cityGenerator.generate(msg.sender);
 
-        (uint256 base, uint256 baseExteriorColorway, uint256 baseWindowColorway) = baseGenerator.generate(city, msg.sender);
-        (uint256 body, uint256 bodyExteriorColorway, uint256 bodyWindowColorway) = bodyGenerator.generate(city, msg.sender);
-        (uint256 roof, uint256 roofExteriorColorway, uint256 roofWindowColorway) = roofGenerator.generate(city, msg.sender);
+        (uint256 body, uint256 exteriorColorway, uint256 windowColorway) = bodyGenerator.generate(city, msg.sender);
+        uint256 base = baseGenerator.generate(city, msg.sender);
+        uint256 roof = roofGenerator.generate(city, msg.sender);
 
         uint256 tokenId = blockCities.createBuilding(
+            exteriorColorway,
+            windowColorway,
             city,
-
             base,
-            baseExteriorColorway,
-            baseWindowColorway,
-
             body,
-            bodyExteriorColorway,
-            bodyWindowColorway,
-
             roof,
-            roofExteriorColorway,
-            roofWindowColorway,
-
             msg.sender
         );
 
         // use credits first
         if (credits[msg.sender] > 0) {
             credits[msg.sender] = credits[msg.sender].sub(1);
-            // revert any monies sent
-            msg.sender.transfer(msg.value);
         } else {
             totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
         }
@@ -106,15 +100,17 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    // TODO batch add credits
-
     function addCredit(address _to) public onlyOwner returns (bool) {
         credits[_to] = credits[_to].add(1);
 
-        // FIXME EVENT
+        emit CreditAdded(_to);
 
         return true;
     }
 
-
+    function addCreditBatch(address[] memory _addresses) public onlyOwner returns (bool) {
+        for (uint i = 0; i < _addresses.length; i++) {
+            addCredit(_addresses[i]);
+        }
+    }
 }
