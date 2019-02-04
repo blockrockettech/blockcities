@@ -1393,6 +1393,7 @@
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
                 let resp = await axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
+                this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             }
         },
