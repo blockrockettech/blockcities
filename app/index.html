@@ -29,14 +29,15 @@
                 </p>
             </div>
         </div>
+        <hr class="my-4" v-if="buildingMetaData">
         <div class="row" v-if="buildingMetaData">
             <div class="col">
-                <code>
+                <code class="mt-5">
                     {{ buildingMetaData}}
                 </code>
             </div>
             <div class="col text-center">
-                <img :src="buildingMetaData.image" class="img-fluid"/>
+                <img :src="buildingMetaData.image" class="img-fluid" style="max-height: 300px;"/>
             </div>
         </div>
     </div>
