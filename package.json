@@ -22,6 +22,7 @@
   "dependencies": {
     "canvas": "^2.3.1",
     "canvg": "^1.5.3",
+    "eth-gas-reporter": "^0.1.12",
     "ethjs": "^0.4.0",
     "extract-svg-path": "^2.1.0",
     "fast-xml-parser": "^3.12.12",
