@@ -1372,7 +1372,12 @@
                             position: "bottom-center",
                             duration : 5000
                         });
-                        console.log(attrs);
+                        console.log(`NEW BUILDING`, attrs);
+
+                        return this.blockcitiesContract.totalBuildings()
+                    })
+                    .then((totalBuildings) => {
+                        this.totalBuildings = totalBuildings.toNumber();
                     });
             }
         },
