@@ -10,17 +10,18 @@ contract BodyGenerator is Ownable {
     external
     returns (
         uint256 base,
-        uint256 baseExteriorColorway,
-        uint256 baseWindowColorway
+        uint256 exteriorColorway,
+        uint256 windowColorway
     ) {
 
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
+        // INCLUDES COLORWAYS
+
         return (
-        // Body
-        generate(_sender, 3),
-        generate(_sender, 3),
-        generate(_sender, 3)
+        generate(_sender, 3), // BODY
+        generate(_sender, 3), // EXTERIOR
+        generate(_sender, 3) // WINDOW
         );
     }
 

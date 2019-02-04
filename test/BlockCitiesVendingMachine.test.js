@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...accounts]) => {
 
     const firstTokenId = new BN(1);
     const secondTokenId = new BN(2);
@@ -137,28 +137,28 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
     context('ensure only owner can transfer buildings', function () {
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 2, 1, 1, 1, 2, 1, tokenOwner, {from: tokenOwner}));
+            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 2, 1, tokenOwner, {from: tokenOwner}));
         });
 
         it('should transfer if owner', async function () {
-            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, anyone, {from: creator});
+            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, anyone, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `BuildingMinted`,
                 {
                     _tokenId: new BN(2),
                     _to: anyone,
-                    _architect: anyone,
-                    _tokenURI: 'https://api.blockcities.co/token/2'
+                    _architect: anyone
                 }
             );
 
-            // TODO fix attributes
             const attrs = await this.blockCities.attributes(new BN(2));
             attrs[0].should.be.bignumber.equal('1');
             attrs[1].should.be.bignumber.equal('1');
             attrs[2].should.be.bignumber.equal('1');
             attrs[3].should.be.bignumber.equal('1');
+            attrs[4].should.be.bignumber.equal('1');
+            attrs[5].should.be.bignumber.equal('1');
         });
     });
 
@@ -180,8 +180,23 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
 
         it('should fulfil if credit and no value', async function () {
-            await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            const {logs} = await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `CreditAdded`,
+                {
+                    _to: tokenOwner
+                }
+            );
+
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: 0});
+        });
+
+        it('should add credit batch', async function () {
+            await this.vendingMachine.addCreditBatch([tokenOwner, anyone], {from: creator});
+
+            (await this.vendingMachine.credits(tokenOwner)).should.be.bignumber.equal('1');
+            (await this.vendingMachine.credits(anyone)).should.be.bignumber.equal('1');
         });
     });
 

@@ -8,20 +8,11 @@ contract BaseGenerator is Ownable {
 
     function generate(uint256 _city, address _sender)
     external
-    returns (
-        uint256 base,
-        uint256 baseExteriorColorway,
-        uint256 baseWindowColorway
-    ) {
+    returns (uint256 base) {
 
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
-        return (
-        // Base
-        generate(_sender, 2),
-        generate(_sender, 2),
-        generate(_sender, 2)
-        );
+        return generate(_sender,2);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {
