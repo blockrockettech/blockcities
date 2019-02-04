@@ -1,0 +1,518 @@
+<html>
+
+<head>
+    <title>BlockCities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+
+<body>
+
+<div id="vue-app" class="container">
+
+
+    <div class="jumbotron mt-5">
+        <h1 class="display-4">BlockCities</h1>
+        <p class="lead">Be the Architect</p>
+        <hr class="my-4">
+        <p class="lead">
+            Price per building: {{ pricePerBuildingInWei }} WEI<br/>
+            <a class="btn btn-primary btn-lg" href="#" role="button" @click="mintBuilding()">Mint building</a>
+        </p>
+    </div>
+
+
+    <!--<div v-if="!loading" v-cloak>-->
+    <!--<div class="titleBar">-->
+    <!--<span @click="selectingContract = !selectingContract">{{ selectedContract.name }}</span>-->
+    <!--<i class="fa fa-chevron-down fa-fw" @click="selectingContract = !selectingContract"></i>-->
+    <!--<div class="titleBarInner">-->
+    <!--<div class="hoverMenu" v-if="selectingContract" v-for="contract in allContracts" href="#" @click="selectContract(contract)">-->
+    <!--{{ contract.name }}-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--<div v-for="contract in allContracts" v-if="selectedContract == contract">-->
+    <!--<h2><span class="grandTotal"><i class="fa fa-gbp"></i>{{ contract.grandTotal }}</span></h2>-->
+    <!--<div class="boyRow" v-for="boy in contract.boys">-->
+    <!--<div class="boyName">-->
+    <!--{{ boy.name }}-->
+    <!--<span v-if="boy.champion" class="champion"><i class="fa fa-trophy"></i></span>-->
+    <!--</div>-->
+    <!--<div class="month">{{ boy.month }}</div>-->
+    <!--<div class="total" :class="{ 'pos': boy.total > 0, 'neut': boy.total === 0, 'tbc': boy.total === -1 }">-->
+    <!--{{ boy.total }}-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+</div>
+
+<script src="https://use.fontawesome.com/e88a1894a6.js" type="text/javascript"></script>
+
+<!-- This exposes the library as a global variable: ethers -->
+<script src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        charset="utf-8"
+        type="text/javascript">
+</script>
+
+<script src="https://unpkg.com/vue/dist/vue.js" type="text/javascript"></script>
+
+
+<script>
+    /* global Vue, ethers */
+    // var provider = new ethers.providers.InfuraProvider('ropsten');
+    // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
+    const provider = new ethers.providers.Web3Provider(web3.currentProvider);
+    const signer = provider.getSigner();
+    console.log(`signer`, signer);
+
+
+
+    new Vue({
+        el: '#vue-app',
+        data: {
+            vendingAddress: `0x4A952a0e80A7549f6A8aa4A08d1d23E840A44fC1`,
+            vendingAbi: [
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'cityGenerator',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x07fa1dc9'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'blockCities',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x0bd3b6fd'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': '_techPartnerRate',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'name': 'updateTechPartnerRate',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x22e836b6'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'techPartner',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x2700c875'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': '_blockCities',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'updateBlockCitiesAddress',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x3ee71ffc'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'baseGenerator',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x5098cd99'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'bodyGenerator',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x57d47e30'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'roofGenerator',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x5bdb51ac'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'totalPurchasesInWei',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x5f1e98c7'
+                },
+                {
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'renounceOwnership',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x715018a6'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'owner',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x8da5cb5b'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'isOwner',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'bool'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x8f32d59b'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'pricePerBuildingInWei',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xb29f3e48'
+                },
+                {
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'techPartnerRate',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xb2c80876'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': '_techPartner',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'updateTechPartnerAddress',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xeddfb745'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': 'newOwner',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'transferOwnership',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xf2fde38b'
+                },
+                {
+                    'constant': true,
+                    'inputs': [
+                        {
+                            'name': '',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'credits',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xfe5ff468'
+                },
+                {
+                    'inputs': [
+                        {
+                            'name': '_cityGenerator',
+                            'type': 'address'
+                        },
+                        {
+                            'name': '_baseGenerator',
+                            'type': 'address'
+                        },
+                        {
+                            'name': '_bodyGenerator',
+                            'type': 'address'
+                        },
+                        {
+                            'name': '_roofGenerator',
+                            'type': 'address'
+                        },
+                        {
+                            'name': '_blockCities',
+                            'type': 'address'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'constructor',
+                    'signature': 'constructor'
+                },
+                {
+                    'anonymous': false,
+                    'inputs': [
+                        {
+                            'indexed': false,
+                            'name': '_oldPricePerBuildingInWei',
+                            'type': 'uint256'
+                        },
+                        {
+                            'indexed': false,
+                            'name': '_newPricePerBuildingInWei',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'name': 'PricePerBuildingInWeiChanged',
+                    'type': 'event',
+                    'signature': '0x6eb4d51aa48070ba41a35eb953c66c728b4c501b8f861193e18c39999f0e1213'
+                },
+                {
+                    'anonymous': false,
+                    'inputs': [
+                        {
+                            'indexed': true,
+                            'name': '_tokenId',
+                            'type': 'uint256'
+                        },
+                        {
+                            'indexed': true,
+                            'name': '_architect',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'VendingMachineTriggered',
+                    'type': 'event',
+                    'signature': '0x372a2d4d08206e1dfd3c166a68a3079282f2d28d305b51a31446b04522032538'
+                },
+                {
+                    'anonymous': false,
+                    'inputs': [
+                        {
+                            'indexed': true,
+                            'name': 'previousOwner',
+                            'type': 'address'
+                        },
+                        {
+                            'indexed': true,
+                            'name': 'newOwner',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'OwnershipTransferred',
+                    'type': 'event',
+                    'signature': '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0'
+                },
+                {
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'mintBuilding',
+                    'outputs': [
+                        {
+                            'name': '_tokenId',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'payable': true,
+                    'stateMutability': 'payable',
+                    'type': 'function',
+                    'signature': '0x6070e053'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': '_newPricePerBuildingInWei',
+                            'type': 'uint256'
+                        }
+                    ],
+                    'name': 'setPricePerBuildingInWei',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'bool'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x9fc1185e'
+                },
+                {
+                    'constant': false,
+                    'inputs': [
+                        {
+                            'name': '_to',
+                            'type': 'address'
+                        }
+                    ],
+                    'name': 'addCredit',
+                    'outputs': [
+                        {
+                            'name': '',
+                            'type': 'bool'
+                        }
+                    ],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x7c334d0b'
+                }
+            ],
+            contract: null,
+            owner: null,
+            pricePerBuildingInWei: null
+        },
+        methods: {
+            mintBuilding: function () {
+                let overrides = {
+
+                    // The maximum units of gas for the transaction to use
+                    gasLimit: 6721975,
+
+                    // The price (in wei) per unit of gas
+                    gasPrice: 1000000000,
+
+                    // The amount to send with the transaction (i.e. msg.value)
+                    value: this.pricePerBuildingInWei,
+                };
+
+
+                this.contract.mintBuilding(overrides).then((result) => {
+                    console.log(result);
+                });
+            }
+        },
+        created: function () {
+            this.contract = new ethers.Contract(
+                this.vendingAddress,
+                this.vendingAbi,
+                signer
+            );
+
+            this.contract.owner().then((result) => {
+                console.log(result);
+                this.owner = result;
+            });
+
+            this.contract.pricePerBuildingInWei().then((result) => {
+                console.log(result);
+                this.pricePerBuildingInWei = result.toNumber();
+            });
+        }
+    });
+</script>
+
+</body>
+
+</html>
