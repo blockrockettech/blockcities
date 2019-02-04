@@ -3,17 +3,26 @@ const {ZERO_ADDRESS} = constants;
 
 const {shouldBehaveLikeERC721} = require('./ERC721.behavior');
 const BlockCities = artifacts.require('BlockCities');
-const Generator = artifacts.require('Generator');
 
 contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
+
+    const firstTokenId = new BN(1);
+    const secondTokenId = new BN(2);
+    const unknownTokenId = new BN(999);
+
+    const firstURI = 'abc123';
+    const baseURI = 'https://api.blockcities.co';
+
     beforeEach(async function () {
-        this.token = await BlockCities.new({from: creator});
+        this.token = await BlockCities.new(baseURI, {from: creator});
 
         await this.token.addCity(web3.utils.fromAscii("Atlanta"), {from: creator});
         await this.token.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
+
         (await this.token.totalCities()).should.be.bignumber.equal('2');
 
         (await this.token.isWhitelisted(creator)).should.be.true;
+
         (await this.token.totalBuildings()).should.be.bignumber.equal('0');
     });
 

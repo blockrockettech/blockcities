@@ -4,8 +4,7 @@ const CityGenerator = artifacts.require('CityGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('CityGenerator tests', (accounts) => {
-
+contract.skip('CityGenerator tests', (accounts) => {
 
     before(async function () {
         console.log(accounts);
@@ -14,7 +13,7 @@ contract('CityGenerator tests', (accounts) => {
 
     it('generate me some randoms', async function () {
         const results = {};
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 100; i++) {
 
             const {logs} = await this.cityGenerator.generate(randomAccount());
 

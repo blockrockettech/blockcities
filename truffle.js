@@ -27,8 +27,15 @@ module.exports = {
         development: {
             host: '127.0.0.1',
             port: 7545,
-            gas: 0xfffffffffff, // <-- Use this high gas value
-            gasPrice: 0x01,    // <-- Use this low gas price
+            gas: 6721975, // <-- Use this high gas value
+            gasPrice: 1000000000,    // <-- Use this low gas price
+            network_id: '5777', // Match any network id
+        },
+        ganache: {
+            host: '127.0.0.1',
+            port: 7545,
+            gas: 6721975, // <-- Use this high gas value
+            gasPrice: 1000000000,    // <-- Use this low gas price
             network_id: '5777', // Match any network id
         },
         ropsten: {
