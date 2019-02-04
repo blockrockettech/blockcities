@@ -12,7 +12,7 @@ contract BaseGenerator is Ownable {
 
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
-        return generate(_sender, 1);
+        return generate(_sender,2);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {

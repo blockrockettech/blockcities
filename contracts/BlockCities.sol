@@ -72,15 +72,14 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
             architect : _architect
             });
 
+        totalBuildings = totalBuildings.add(1);
+
         // Create dynamic string URL
         string memory _tokenURI = Strings.strConcat(tokenBaseURI, "/token/", Strings.uint2str(tokenId));
 
         // mint the actual token magic
         _mint(_architect, tokenId);
         _setTokenURI(tokenId, _tokenURI);
-
-        // Bump generated building
-        totalBuildings = totalBuildings.add(1);
 
         emit BuildingMinted(tokenId, _architect, _architect);
 
