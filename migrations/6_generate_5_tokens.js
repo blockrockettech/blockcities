@@ -21,7 +21,6 @@ module.exports = async function (deployer, network, accounts) {
     // await _blockCitiesVendingMachine.mintBuilding({from: accounts[3]});
     // await _blockCitiesVendingMachine.mintBuilding({from: accounts[4]});
 
-
     for (let i = 0; i < 50; i++) {
         await _blockCitiesVendingMachine.addCredit(accounts[1], {from: _owner});
         await _blockCitiesVendingMachine.mintBuilding({from: accounts[1]});
