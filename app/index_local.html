@@ -72,13 +72,11 @@
     // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
-    const networkId = 5777;
 
     new Vue({
         el: '#vue-app',
         data: {
-            rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
-            blockcitiesAddress: (networkId === 5777) ? `0x194bAfbf8eb2096e63C5d9296363d6DAcdb32527` : `ROPSTEN`,
+            blockcitiesAddress: `0x194bAfbf8eb2096e63C5d9296363d6DAcdb32527`,
             blockcitiesAbi: [
                 {
                     "constant": true,
@@ -962,7 +960,7 @@
                 }
             ],
             blockcitiesContract: null,
-            vendingAddress: (networkId === 5777) ? `0x4A952a0e80A7549f6A8aa4A08d1d23E840A44fC1` : `ROPSTEN`,
+            vendingAddress: `0x4A952a0e80A7549f6A8aa4A08d1d23E840A44fC1`,
             vendingAbi: [
                 {
                     "constant": true,
@@ -1427,7 +1425,7 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`${this.rootApi}/network/5777/token/${this.buildingTokenId}/details`);
+                let resp = await axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             }
@@ -1450,7 +1448,8 @@
 
             const allBuildings = [];
             for (let i = 1; i < this.totalBuildings; i++) {
-                allBuildings.push(axios.get(`${this.rootApi}/network/5777/token/${i}/details`));
+                console.log(i);
+                allBuildings.push(axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${i}/details`));
             }
 
             this.buildings = await Promise.all(allBuildings);
