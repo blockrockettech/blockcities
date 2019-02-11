@@ -1,13 +1,13 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol";
 
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
+import "./erc721/CustomERC721Full.sol";
 
-contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
+contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
     using SafeMath for uint256;
 
     string public tokenBaseURI = "";
@@ -41,7 +41,7 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     mapping(uint256 => bytes32) public cities;
 
-    constructor (string memory _tokenBaseURI) public ERC721Full("BlockCities", "BKC") {
+    constructor (string memory _tokenBaseURI) public CustomERC721Full("BlockCities", "BKC") {
         super.addWhitelisted(msg.sender);
         tokenBaseURI = _tokenBaseURI;
     }
@@ -74,16 +74,22 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
         totalBuildings = totalBuildings.add(1);
 
-        // Create dynamic string URL
-        string memory _tokenURI = Strings.strConcat(tokenBaseURI, "/token/", Strings.uint2str(tokenId));
-
         // mint the actual token magic
         _mint(_architect, tokenId);
-        _setTokenURI(tokenId, _tokenURI);
 
         emit BuildingMinted(tokenId, _architect, _architect);
 
         return tokenId;
+    }
+
+    /**
+     * @dev Returns an URI for a given token ID
+     * Throws if the token ID does not exist. May return an empty string.
+     * @param tokenId uint256 ID of the token to query
+     */
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
+        require(_exists(tokenId));
+        return Strings.strConcat(tokenBaseURI, Strings.uint2str(tokenId));
     }
 
     function attributes(uint256 _tokenId) public view returns (
@@ -130,11 +136,6 @@ contract BlockCities is ERC721Full, WhitelistedRole, IBlockCitiesCreator {
     function burn(uint256 _tokenId) public onlyWhitelisted returns (bool) {
         _burn(_tokenId);
         return true;
-    }
-
-    function setTokenURI(uint256 _tokenId, string memory _tokenUri) public onlyWhitelisted {
-        require(bytes(_tokenUri).length != 0, "URI invalid");
-        _setTokenURI(_tokenId, _tokenUri);
     }
 
     function updateTokenBaseURI(string memory _newBaseURI) public onlyWhitelisted {
