@@ -9,7 +9,7 @@ before_script:
   - npm install -g truffle
   - npm install -g ganache-cli
 
-  
+
 script:
   - ganache-cli -p 7545 > /dev/null &
   - sleep 5
