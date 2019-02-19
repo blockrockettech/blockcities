@@ -4,7 +4,7 @@ const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
 const BaseGenerator = artifacts.require('./BaseGenerator.sol');
 const BodyGenerator = artifacts.require('./BodyGenerator.sol');
 const RoofGenerator = artifacts.require('./RoofGenerator.sol');
-const CityGenerator = artifacts.require('./CityGenerator.sol');
+const BuildingGenerator = artifacts.require('./BuildingGenerator.sol');
 
 module.exports = async function (deployer, network, accounts) {
 
@@ -18,5 +18,5 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(BaseGenerator, {from: _owner});
     await deployer.deploy(BodyGenerator, {from: _owner});
     await deployer.deploy(RoofGenerator, {from: _owner});
-    await deployer.deploy(CityGenerator, {from: _owner});
+    await deployer.deploy(BuildingGenerator, {from: _owner});
 };

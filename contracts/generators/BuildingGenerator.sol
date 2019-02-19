@@ -2,14 +2,14 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract BaseGenerator is Ownable {
+contract BuildingGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
-    function generate(uint256 _city, address _sender)
+    function generate(address _sender)
     external
-    returns (uint256 base) {
-        return generate(_sender, 3);
+    returns (uint256 building) {
+        return generate(_sender, 6);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {

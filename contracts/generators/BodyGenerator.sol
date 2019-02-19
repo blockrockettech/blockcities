@@ -19,9 +19,9 @@ contract BodyGenerator is Ownable {
         // INCLUDES COLORWAYS
 
         return (
-        generate(_sender, 3), // BODY
-        generate(_sender, 3), // EXTERIOR
-        generate(_sender, 3) // WINDOW
+        generate(_sender, 12), // BODY 11
+        generate(_sender, 7), // EXTERIOR 7
+        generate(_sender, 3) // WINDOW 3
         );
     }
 

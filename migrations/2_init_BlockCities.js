@@ -11,15 +11,15 @@ module.exports = async function (deployer, network, accounts) {
         _owner = new HDWalletProvider(require('../mnemonic'), `https://${network}.infura.io/v3/${infuraApikey}`, 0).getAddress();
     }
 
-    let tokenBaseURI = "http://localhost:5000/block-cities/us-central1/api/network/5777";
+    let tokenBaseURI = "http://localhost:5000/block-cities/us-central1/api/network/5777/token/";
 
     // Assume all is live network unless specified
     if (network === 'live') {
-        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/1";
+        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/1/token/";
     } else if (network === 'ropsten') {
-        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/3";
+        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/3/token/";
     } else if (network === 'rinkeby') {
-        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/4";
+        tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/4/token/";
     }
 
     await deployer.deploy(BlockCities, tokenBaseURI, {from: _owner});
