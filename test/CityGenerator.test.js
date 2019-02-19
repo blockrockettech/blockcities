@@ -8,14 +8,14 @@ contract.skip('CityGenerator tests', (accounts) => {
 
     before(async function () {
         console.log(accounts);
-        this.cityGenerator = await CityGenerator.new({from: accounts[0]});
+        this.generator = await CityGenerator.new({from: accounts[0]});
     });
 
     it('generate me some randoms', async function () {
         const results = {};
         for (let i = 0; i < 100; i++) {
 
-            const {logs} = await this.cityGenerator.generate(randomAccount());
+            const {logs} = await this.generator.generate(randomAccount());
 
             const {id, weight, random} = logs[0].args;
             // console.log(`matched id=[${id}] weight=[${weight}] random=[${random}]`);
@@ -29,13 +29,13 @@ contract.skip('CityGenerator tests', (accounts) => {
 
         console.log(results);
 
-        // console.log(await this.cityGenerator.getConfigSize());
-        // console.log(await this.cityGenerator.getConfig(0));
+        // console.log(await this.generator.getConfigSize());
+        // console.log(await this.generator.getConfig(0));
 
-        const totalConfigs = (await this.cityGenerator.getConfigSize()).toNumber();
+        const totalConfigs = (await this.generator.getConfigSize()).toNumber();
 
         for (let i = 0; i < totalConfigs; i++) {
-            const {value, weight} = await this.cityGenerator.getConfig(i);
+            const {value, weight} = await this.generator.getConfig(i);
             console.log(`Config [${i}]`, value, weight);
             // console.log(results[_.toString(value)]);
         }

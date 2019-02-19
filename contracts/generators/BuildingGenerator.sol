@@ -6,10 +6,14 @@ contract BuildingGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
+    event Building(uint256 id);
+
     function generate(address _sender)
     external
     returns (uint256 building) {
-        return generate(_sender, 6);
+        uint256 res =  generate(_sender, 6);
+        emit Building(res);
+        return res;
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {

@@ -6,10 +6,12 @@ contract BodyGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
+    event Body(uint256 body, uint256 exteriorColorway, uint256 windowColorway);
+
     function generate(uint256 _city, address _sender)
     external
     returns (
-        uint256 base,
+        uint256 body,
         uint256 exteriorColorway,
         uint256 windowColorway
     ) {
@@ -17,12 +19,13 @@ contract BodyGenerator is Ownable {
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
         // INCLUDES COLORWAYS
+        uint256 bodyRandom = generate(_sender, 12);
+        uint256 exteriorColorwayRandom = generate(_sender, 7);
+        uint256 windowColorwayRandom = generate(_sender, 3);
 
-        return (
-        generate(_sender, 12), // BODY 11
-        generate(_sender, 7), // EXTERIOR 7
-        generate(_sender, 3) // WINDOW 3
-        );
+        emit Body(bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
+
+        return (bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {

@@ -31,11 +31,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         this.baseGenerator = await BaseGenerator.new({from: creator});
         this.bodyGenerator = await BodyGenerator.new({from: creator});
         this.roofGenerator = await RoofGenerator.new({from: creator});
-        this.cityGenerator = await CityGenerator.new({from: creator});
+        this.generator = await CityGenerator.new({from: creator});
 
         // Create vending machine
         this.vendingMachine = await BlockCitiesVendingMachine.new(
-            this.cityGenerator.address,
+            this.generator.address,
             this.baseGenerator.address,
             this.bodyGenerator.address,
             this.roofGenerator.address,
