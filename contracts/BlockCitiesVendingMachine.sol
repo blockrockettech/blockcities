@@ -55,6 +55,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         blockCities = _blockCities;
     }
 
+    // FIXME add mintBuilding(_to)
+
     function mintBuilding() public payable returns (uint256 _tokenId) {
         require(
             credits[msg.sender] > 0 || msg.value >= pricePerBuildingInWei,
@@ -74,6 +76,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             base,
             body,
             roof,
+            0,
             msg.sender
         );
 

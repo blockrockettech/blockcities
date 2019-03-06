@@ -139,7 +139,7 @@ library SafeMath {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/CityGenerator.sol
+// File: /Users/andy/workspace/blockcities/contracts/generators/CityGenerator.sol
 
 contract CityGenerator is Ownable {
     using SafeMath for uint256;
@@ -243,7 +243,7 @@ contract CityGenerator is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/BaseGenerator.sol
+// File: /Users/andy/workspace/blockcities/contracts/generators/BaseGenerator.sol
 
 contract BaseGenerator is Ownable {
 
@@ -252,10 +252,7 @@ contract BaseGenerator is Ownable {
     function generate(uint256 _city, address _sender)
     external
     returns (uint256 base) {
-
-        // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
-
-        return generate(_sender, 1);
+        return generate(_sender, 3);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {
@@ -265,16 +262,18 @@ contract BaseGenerator is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/BodyGenerator.sol
+// File: /Users/andy/workspace/blockcities/contracts/generators/BodyGenerator.sol
 
 contract BodyGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
+    event Body(uint256 body, uint256 exteriorColorway, uint256 windowColorway);
+
     function generate(uint256 _city, address _sender)
     external
     returns (
-        uint256 base,
+        uint256 body,
         uint256 exteriorColorway,
         uint256 windowColorway
     ) {
@@ -282,12 +281,13 @@ contract BodyGenerator is Ownable {
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
         // INCLUDES COLORWAYS
+        uint256 bodyRandom = generate(_sender, 12);
+        uint256 exteriorColorwayRandom = generate(_sender, 7);
+        uint256 windowColorwayRandom = generate(_sender, 3);
 
-        return (
-        generate(_sender, 3), // BODY
-        generate(_sender, 3), // EXTERIOR
-        generate(_sender, 3) // WINDOW
-        );
+        emit Body(bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
+
+        return (bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {
@@ -297,7 +297,7 @@ contract BodyGenerator is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/RoofGenerator.sol
+// File: /Users/andy/workspace/blockcities/contracts/generators/RoofGenerator.sol
 
 contract RoofGenerator is Ownable {
 
@@ -309,7 +309,7 @@ contract RoofGenerator is Ownable {
 
         // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
 
-        return generate(_sender, 5);
+        return generate(_sender, 6);
     }
 
     function generate(address _sender, uint256 _max) internal returns (uint256) {
@@ -319,7 +319,7 @@ contract RoofGenerator is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/FundsSplitter.sol
+// File: /Users/andy/workspace/blockcities/contracts/FundsSplitter.sol
 
 contract FundsSplitter is Ownable {
     using SafeMath for uint256;
@@ -355,7 +355,7 @@ contract FundsSplitter is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/libs/Strings.sol
+// File: /Users/andy/workspace/blockcities/contracts/libs/Strings.sol
 
 library Strings {
 
@@ -416,7 +416,7 @@ library Strings {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/IBlockCitiesCreator.sol
+// File: /Users/andy/workspace/blockcities/contracts/IBlockCitiesCreator.sol
 
 interface IBlockCitiesCreator {
     function createBuilding(

@@ -11,7 +11,7 @@ contract.skip('CityGenerator tests', (accounts) => {
         this.generator = await CityGenerator.new({from: accounts[0]});
     });
 
-    it('generate me some randoms', async function () {
+    it.skip('generate me some randoms', async function () {
         const results = {};
         for (let i = 0; i < 100; i++) {
 

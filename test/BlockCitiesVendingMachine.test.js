@@ -137,11 +137,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
     context('ensure only owner can transfer buildings', function () {
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 2, 1, tokenOwner, {from: tokenOwner}));
+            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 2, 1, 0, tokenOwner, {from: tokenOwner}));
         });
 
         it('should transfer if owner', async function () {
-            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, anyone, {from: creator});
+            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, 0, anyone, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `BuildingMinted`,

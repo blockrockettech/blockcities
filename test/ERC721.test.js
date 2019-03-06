@@ -34,7 +34,7 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
         describe('_mint(address, uint256)', function () {
             context('with minted token', async function () {
                 beforeEach(async function () {
-                    ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, creator, {from: creator}));
+                    ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 0, creator, {from: creator}));
                 });
 
                 it('emits a Transfer event', function () {
@@ -59,7 +59,7 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
             const tokenId = new BN('1');
 
             beforeEach(async function () {
-                ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, anyone, {from: creator}));
+                ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 0, anyone, {from: creator}));
             });
 
             context('with burnt token', function () {

@@ -8,6 +8,7 @@ interface IBlockCitiesCreator {
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     ) external returns (uint256 _tokenId);
 }

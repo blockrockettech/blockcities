@@ -4,7 +4,7 @@ const BodyGenerator = artifacts.require('BodyGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('Generator tests', (accounts) => {
+contract('Generator tests', (accounts) => {
 
     before(async function () {
         this.generator = await BodyGenerator.new({from: accounts[0]});

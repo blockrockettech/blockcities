@@ -34,6 +34,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 base;
         uint256 body;
         uint256 roof;
+        uint256 special;
         address architect;
     }
 
@@ -53,6 +54,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     )
     public onlyWhitelisted returns (uint256 _tokenId) {
@@ -69,6 +71,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
             base : _base,
             body : _body,
             roof : _roof,
+            special: _special,
             architect : _architect
             });
 
@@ -99,6 +102,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     ) {
         require(_exists(_tokenId), "Token ID not found");
@@ -111,6 +115,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         building.base,
         building.body,
         building.roof,
+        building.special,
         building.architect
         );
     }
