@@ -8,12 +8,14 @@ const BaseGenerator = artifacts.require('./BaseGenerator.sol');
 const BodyGenerator = artifacts.require('./BodyGenerator.sol');
 const RoofGenerator = artifacts.require('./RoofGenerator.sol');
 const BuildingGenerator = artifacts.require('./BuildingGenerator.sol');
+const SpecialGenerator = artifacts.require('./SpecialGenerator.sol');
 
 module.exports = async function (deployer, network, accounts) {
     const _cityGenerator = await BuildingGenerator.deployed();
     const _baseGenerator = await BaseGenerator.deployed();
     const _bodyGenerator = await BodyGenerator.deployed();
     const _roofGenerator = await RoofGenerator.deployed();
+    const _specialGenerator = await SpecialGenerator.deployed();
 
     const _blockCities = await BlockCities.deployed();
 
@@ -31,6 +33,7 @@ module.exports = async function (deployer, network, accounts) {
         _baseGenerator.address,
         _bodyGenerator.address,
         _roofGenerator.address,
+        _specialGenerator.address,
         _blockCities.address,
         {
             from: _owner

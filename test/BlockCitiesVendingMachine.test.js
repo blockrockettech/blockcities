@@ -4,6 +4,7 @@ const BaseGenerator = artifacts.require('BaseGenerator');
 const BodyGenerator = artifacts.require('BodyGenerator');
 const RoofGenerator = artifacts.require('RoofGenerator');
 const CityGenerator = artifacts.require('CityGenerator');
+const SpecialGenerator = artifacts.require('SpecialGenerator');
 
 const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
 
@@ -23,14 +24,15 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
         // Add 2 test cities
-        await this.blockCities.addCity(web3.utils.fromAscii("Atlanta"), {from: creator});
-        await this.blockCities.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
+        await this.blockCities.addCity(web3.utils.fromAscii('Atlanta'), {from: creator});
+        await this.blockCities.addCity(web3.utils.fromAscii('Chicago'), {from: creator});
         (await this.blockCities.totalCities()).should.be.bignumber.equal('2');
 
         // Create generators
         this.baseGenerator = await BaseGenerator.new({from: creator});
         this.bodyGenerator = await BodyGenerator.new({from: creator});
         this.roofGenerator = await RoofGenerator.new({from: creator});
+        this.specialGenerator = await SpecialGenerator.new({from: creator});
         this.generator = await CityGenerator.new({from: creator});
 
         // Create vending machine
@@ -39,6 +41,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
             this.baseGenerator.address,
             this.bodyGenerator.address,
             this.roofGenerator.address,
+            this.specialGenerator.address,
             this.blockCities.address,
             {
                 from: creator
@@ -171,6 +174,18 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
     });
 
+    context('tests if special building', function () {
+        it('should be true is divisable by 3', async function () {
+            (await this.vendingMachine.isSpecial(new BN(`0`))).should.be.true;
+            (await this.vendingMachine.isSpecial(new BN(`1`))).should.be.false;
+            (await this.vendingMachine.isSpecial(new BN(`2`))).should.be.false;
+            (await this.vendingMachine.isSpecial(new BN(`3`))).should.be.true;
+            (await this.vendingMachine.isSpecial(new BN(`4`))).should.be.false;
+            (await this.vendingMachine.isSpecial(new BN(`5`))).should.be.false;
+            (await this.vendingMachine.isSpecial(new BN(`6`))).should.be.true;
+        });
+    });
+
     context('credits', function () {
         it('should fail if no credit and no value', async function () {
             await shouldFail.reverting(this.vendingMachine.mintBuilding({
@@ -200,20 +215,26 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
     });
 
-    // context('random buildings to console', function () {
-    //     it('should mint random', async function () {
-    //         this.basePrice = await this.vendingMachine.pricePerBuildingInWei();
-    //
-    //         for (let i = 0; i < 5; i++) {
-    //             await this.vendingMachine.mintBuilding({from: accounts[i], value: this.basePrice});
-    //             const attrs = await this.blockCities.attributes(i);
-    //             console.log(`
-    //                 City: ${attrs[0].toString()},
-    //                 Base: ${attrs[1].toString()},
-    //                 Body: ${attrs[2].toString()},
-    //                 Roof: ${attrs[3].toString()},
-    //             `);
-    //         }
-    //     });
-    // });
+    context.skip('random buildings to console', function () {
+        it('should mint random', async function () {
+            this.basePrice = await this.vendingMachine.pricePerBuildingInWei();
+
+            for (let i = 1; i < 13; i++) {
+                const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: this.basePrice});
+                console.log(tokenId.logs);
+                const attrs = await this.blockCities.attributes(tokenId, {from: accounts[i]});
+                console.log(`
+                    ID: ${tokenId},
+                    _exteriorColorway: ${attrs[0].toString()},
+                    _windowColorway: ${attrs[1].toString()},
+                    _city: ${attrs[2].toString()},
+                    _base: ${attrs[3].toString()},
+                    _body: ${attrs[4].toString()},
+                    _roof: ${attrs[5].toString()},
+                    _special: ${attrs[6].toString()},
+                    _architect: ${attrs[7].toString()},
+                `);
+            }
+        });
+    });
 });

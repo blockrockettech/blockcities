@@ -5,6 +5,7 @@ const BaseGenerator = artifacts.require('./BaseGenerator.sol');
 const BodyGenerator = artifacts.require('./BodyGenerator.sol');
 const RoofGenerator = artifacts.require('./RoofGenerator.sol');
 const BuildingGenerator = artifacts.require('./BuildingGenerator.sol');
+const SpecialGenerator = artifacts.require('./SpecialGenerator.sol');
 
 module.exports = async function (deployer, network, accounts) {
 
@@ -19,4 +20,5 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(BodyGenerator, {from: _owner});
     await deployer.deploy(RoofGenerator, {from: _owner});
     await deployer.deploy(BuildingGenerator, {from: _owner});
+    await deployer.deploy(SpecialGenerator, {from: _owner});
 };

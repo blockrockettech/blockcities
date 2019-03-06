@@ -7,6 +7,7 @@ import "./generators/CityGenerator.sol";
 import "./generators/BaseGenerator.sol";
 import "./generators/BodyGenerator.sol";
 import "./generators/RoofGenerator.sol";
+import "./generators/SpecialGenerator.sol";
 
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
@@ -34,6 +35,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     BaseGenerator public baseGenerator;
     BodyGenerator public bodyGenerator;
     RoofGenerator public roofGenerator;
+    SpecialGenerator public specialGenerator;
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -46,12 +48,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         BaseGenerator _baseGenerator,
         BodyGenerator _bodyGenerator,
         RoofGenerator _roofGenerator,
+        SpecialGenerator _specialGenerator,
         IBlockCitiesCreator _blockCities
     ) public {
         baseGenerator = _baseGenerator;
         bodyGenerator = _bodyGenerator;
         roofGenerator = _roofGenerator;
         cityGenerator = _cityGenerator;
+        specialGenerator = _specialGenerator;
         blockCities = _blockCities;
     }
 
@@ -69,6 +73,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 base = baseGenerator.generate(city, msg.sender);
         uint256 roof = roofGenerator.generate(city, msg.sender);
 
+        uint256 special = 0;
+        if (isSpecial(block.number)) {
+            special = specialGenerator.generate(msg.sender);
+        }
+
         uint256 tokenId = blockCities.createBuilding(
             exteriorColorway,
             windowColorway,
@@ -76,7 +85,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             base,
             body,
             roof,
-            0,
+            special,
             msg.sender
         );
 
@@ -109,6 +118,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         emit CreditAdded(_to);
 
         return true;
+    }
+
+    function isSpecial(uint256 _x) public pure returns (bool) {
+        return _x % 3 == 0;
     }
 
     function addCreditBatch(address[] memory _addresses) public onlyOwner returns (bool) {
