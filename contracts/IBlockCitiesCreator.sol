@@ -5,6 +5,7 @@ interface IBlockCitiesCreator {
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,

@@ -63,6 +63,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             exteriorColorway,
             windowColorway,
             city,
+            building,
             base,
             body,
             roof,

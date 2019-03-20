@@ -31,6 +31,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 exteriorColorway;
         uint256 windowColorway;
         uint256 city;
+        uint256 building;
         uint256 base;
         uint256 body;
         uint256 roof;
@@ -51,6 +52,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
@@ -68,6 +70,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
             exteriorColorway : _exteriorColorway,
             windowColorway : _windowColorway,
             city : _city,
+            building: _building,
             base : _base,
             body : _body,
             roof : _roof,
@@ -99,6 +102,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
@@ -112,6 +116,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         building.exteriorColorway,
         building.windowColorway,
         building.city,
+        building.building,
         building.base,
         building.body,
         building.roof,
