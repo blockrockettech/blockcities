@@ -1,10 +1,7 @@
 const BlockCities = artifacts.require('BlockCities');
 
-const BaseGenerator = artifacts.require('BaseGenerator');
-const BodyGenerator = artifacts.require('BodyGenerator');
-const RoofGenerator = artifacts.require('RoofGenerator');
-const CityGenerator = artifacts.require('CityGenerator');
-const SpecialGenerator = artifacts.require('SpecialGenerator');
+const LogicGenerator = artifacts.require('LogicGenerator');
+const ColourGenerator = artifacts.require('ColourGenerator');
 
 const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
 
@@ -29,19 +26,14 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         (await this.blockCities.totalCities()).should.be.bignumber.equal('2');
 
         // Create generators
-        this.baseGenerator = await BaseGenerator.new({from: creator});
-        this.bodyGenerator = await BodyGenerator.new({from: creator});
-        this.roofGenerator = await RoofGenerator.new({from: creator});
-        this.specialGenerator = await SpecialGenerator.new({from: creator});
-        this.generator = await CityGenerator.new({from: creator});
+        this.logicGenerator = await LogicGenerator.new({from: creator});
+        this.colourGenerator = await ColourGenerator.new({from: creator});
 
         // Create vending machine
         this.vendingMachine = await BlockCitiesVendingMachine.new(
             this.generator.address,
-            this.baseGenerator.address,
-            this.bodyGenerator.address,
-            this.roofGenerator.address,
-            this.specialGenerator.address,
+            this.logicGenerator.address,
+            this.colourGenerator.address,
             this.blockCities.address,
             {
                 from: creator

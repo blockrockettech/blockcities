@@ -329,7 +329,7 @@ contract FundsSplitter is Ownable {
     address payable public blockCities = address(0x0);
     address payable public techPartner = address(0x0);
 
-    uint256 public techPartnerRate = 40;
+    uint256 public techPartnerRate = 20;
 
     // TODO add new test for this
     function splitFunds() internal {

@@ -4,18 +4,12 @@ const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
 const BlockCitiesVendingMachine = artifacts.require('./BlockCitiesVendingMachine.sol');
 const BlockCities = artifacts.require('./BlockCities.sol');
 
-const BaseGenerator = artifacts.require('./BaseGenerator.sol');
-const BodyGenerator = artifacts.require('./BodyGenerator.sol');
-const RoofGenerator = artifacts.require('./RoofGenerator.sol');
-const BuildingGenerator = artifacts.require('./BuildingGenerator.sol');
-const SpecialGenerator = artifacts.require('./SpecialGenerator.sol');
+const ColourGenerator = artifacts.require('./ColourGenerator.sol');
+const LogicGenerator = artifacts.require('./LogicGenerator.sol');
 
 module.exports = async function (deployer, network, accounts) {
-    const _cityGenerator = await BuildingGenerator.deployed();
-    const _baseGenerator = await BaseGenerator.deployed();
-    const _bodyGenerator = await BodyGenerator.deployed();
-    const _roofGenerator = await RoofGenerator.deployed();
-    const _specialGenerator = await SpecialGenerator.deployed();
+    const _logicGenerator = await LogicGenerator.deployed();
+    const _colourGenerator = await ColourGenerator.deployed();
 
     const _blockCities = await BlockCities.deployed();
 
@@ -29,11 +23,8 @@ module.exports = async function (deployer, network, accounts) {
     // Deploy vending machine
     await deployer.deploy(
         BlockCitiesVendingMachine,
-        _cityGenerator.address,
-        _baseGenerator.address,
-        _bodyGenerator.address,
-        _roofGenerator.address,
-        _specialGenerator.address,
+        _logicGenerator.address,
+        _colourGenerator.address,
         _blockCities.address,
         {
             from: _owner

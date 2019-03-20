@@ -3,11 +3,8 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./generators/CityGenerator.sol";
-import "./generators/BaseGenerator.sol";
-import "./generators/BodyGenerator.sol";
-import "./generators/RoofGenerator.sol";
-import "./generators/SpecialGenerator.sol";
+import "./generators/ColourGenerator.sol";
+import "./generators/LogicGenerator.sol";
 
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
@@ -31,11 +28,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     );
 
     // TODO allow these to be changed
-    CityGenerator public cityGenerator;
-    BaseGenerator public baseGenerator;
-    BodyGenerator public bodyGenerator;
-    RoofGenerator public roofGenerator;
-    SpecialGenerator public specialGenerator;
+    LogicGenerator public logicGenerator;
+    ColourGenerator public colourGenerator;
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -44,18 +38,13 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public pricePerBuildingInWei = 100;
 
     constructor (
-        CityGenerator _cityGenerator,
-        BaseGenerator _baseGenerator,
-        BodyGenerator _bodyGenerator,
-        RoofGenerator _roofGenerator,
-        SpecialGenerator _specialGenerator,
+        LogicGenerator _logicGenerator,
+        ColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities
     ) public {
-        baseGenerator = _baseGenerator;
-        bodyGenerator = _bodyGenerator;
-        roofGenerator = _roofGenerator;
-        cityGenerator = _cityGenerator;
-        specialGenerator = _specialGenerator;
+
+        logicGenerator = _logicGenerator;
+        colourGenerator = _colourGenerator;
         blockCities = _blockCities;
     }
 
@@ -67,16 +56,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        uint256 city = cityGenerator.generate(msg.sender);
-
-        (uint256 body, uint256 exteriorColorway, uint256 windowColorway) = bodyGenerator.generate(city, msg.sender);
-        uint256 base = baseGenerator.generate(city, msg.sender);
-        uint256 roof = roofGenerator.generate(city, msg.sender);
-
-        uint256 special = 0;
-        if (isSpecial(block.number)) {
-            special = specialGenerator.generate(msg.sender);
-        }
+        (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
+        (uint256 exteriorColorway, uint256 windowColorway, uint256 backgroundColourway) = colourGenerator.generate(msg.sender);
 
         uint256 tokenId = blockCities.createBuilding(
             exteriorColorway,
@@ -118,10 +99,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         emit CreditAdded(_to);
 
         return true;
-    }
-
-    function isSpecial(uint256 _x) public pure returns (bool) {
-        return _x % 3 == 0;
     }
 
     function addCreditBatch(address[] memory _addresses) public onlyOwner returns (bool) {

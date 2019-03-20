@@ -41,11 +41,27 @@
         </div>
     </div>
 
-    <div class="card-columns" >
-        <div class="card m-2 p-2" v-if="buildings" v-for="b in buildings">
+    <div class="row" v-if="(buildings || []).length === 0">
+        <div class="col text-center">
+            <i class="fa fa-cog fa-spin fa-5x fa-fw"></i>
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <div class="card-columns" v-if="buildings">
+        <div class="card m-2 p-2" v-for="b in buildings">
             <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
             <div class="card-body">
-                <h3 class="card-title text-center">{{b.data.name}}</h3>
+                <h3 class="card-title text-center">{{ b.data.name }}</h3>
+                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.architect }}</code></p>
+                <p class="small">
+                    <span class="text-muted">City</span> <code>{{ b.data.city }}</code><br/>
+                    <span class="text-muted">Base</span> <code>{{ b.data.base }}</code><br/>
+                    <span class="text-muted">Body</span> <code>{{ b.data.body }}</code><br/>
+                    <span class="text-muted">Roof</span> <code>{{ b.data.roof }}</code><br/>
+                    <span class="text-muted">Exterior</span> <code>{{ b.data.exteriorColorway }}</code><br/>
+                    <span class="text-muted">Windows</span> <code>{{ b.data.windowColorway }}</code>
+                </p>
             </div>
         </div>
     </div>
@@ -72,11 +88,13 @@
     // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
+    const networkId = 3;
 
     new Vue({
         el: '#vue-app',
         data: {
-            blockcitiesAddress: `0x194bAfbf8eb2096e63C5d9296363d6DAcdb32527`,
+            rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
+            blockcitiesAddress: (networkId === 5777) ? `0x194bAfbf8eb2096e63C5d9296363d6DAcdb32527` : `0x79951693b08759fA5c170A066F852D70f69ccB71`,
             blockcitiesAbi: [
                 {
                     "constant": true,
@@ -534,26 +552,6 @@
                     "signature": "0xbb5f747b"
                 },
                 {
-                    "constant": true,
-                    "inputs": [
-                        {
-                            "name": "tokenId",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "tokenURI",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "string"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xc87b56dd"
-                },
-                {
                     "constant": false,
                     "inputs": [],
                     "name": "renounceWhitelisted",
@@ -809,6 +807,26 @@
                     "constant": true,
                     "inputs": [
                         {
+                            "name": "tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "tokenURI",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xc87b56dd"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
                             "name": "_tokenId",
                             "type": "uint256"
                         }
@@ -928,25 +946,6 @@
                     "constant": false,
                     "inputs": [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
-                        },
-                        {
-                            "name": "_tokenUri",
-                            "type": "string"
-                        }
-                    ],
-                    "name": "setTokenURI",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x162094c4"
-                },
-                {
-                    "constant": false,
-                    "inputs": [
-                        {
                             "name": "_newBaseURI",
                             "type": "string"
                         }
@@ -960,12 +959,12 @@
                 }
             ],
             blockcitiesContract: null,
-            vendingAddress: `0x4A952a0e80A7549f6A8aa4A08d1d23E840A44fC1`,
+            vendingAddress: (networkId === 5777) ? `0x4A952a0e80A7549f6A8aa4A08d1d23E840A44fC1` : `0xa8aE4996cB574A00ade7996784599a96167690D6`,
             vendingAbi: [
                 {
                     "constant": true,
                     "inputs": [],
-                    "name": "generator",
+                    "name": "cityGenerator",
                     "outputs": [
                         {
                             "name": "",
@@ -1425,7 +1424,7 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${this.buildingTokenId}/details`);
+                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}/details`);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             }
@@ -1447,9 +1446,8 @@
             this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
             const allBuildings = [];
-            for (let i = 1; i < this.totalBuildings; i++) {
-                console.log(i);
-                allBuildings.push(axios.get(`http://localhost:5000/block-cities/us-central1/api/network/5777/token/${i}/details`));
+            for (let i = 1; i < (this.totalBuildings + 1); i++) {
+                allBuildings.push(axios.get(`${this.rootApi}/network/${networkId}/token/${i}/details`));
             }
 
             this.buildings = await Promise.all(allBuildings);
