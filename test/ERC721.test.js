@@ -16,10 +16,10 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
     beforeEach(async function () {
         this.token = await BlockCities.new(baseURI, {from: creator});
 
-        await this.token.addCity(web3.utils.fromAscii("Atlanta"), {from: creator});
-        await this.token.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
-
-        (await this.token.totalCities()).should.be.bignumber.equal('2');
+        // await this.token.addCity(web3.utils.fromAscii("Atlanta"), {from: creator});
+        // await this.token.addCity(web3.utils.fromAscii("Chicago"), {from: creator});
+        //
+        // (await this.token.totalCities()).should.be.bignumber.equal('2');
 
         (await this.token.isWhitelisted(creator)).should.be.true;
 
@@ -34,7 +34,7 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
         describe('_mint(address, uint256)', function () {
             context('with minted token', async function () {
                 beforeEach(async function () {
-                    ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 0, creator, {from: creator}));
+                    ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 1, 0, creator, {from: creator}));
                 });
 
                 it('emits a Transfer event', function () {
@@ -59,7 +59,7 @@ contract('ERC721', function ([_, creator, tokenOwner, anyone, ...accounts]) {
             const tokenId = new BN('1');
 
             beforeEach(async function () {
-                ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 0, anyone, {from: creator}));
+                ({logs: this.logs} = await this.token.createBuilding(1, 1, 1, 1, 1, 1, 1, 0, anyone, {from: creator}));
             });
 
             context('with burnt token', function () {

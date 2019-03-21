@@ -31,7 +31,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
         // Create vending machine
         this.vendingMachine = await BlockCitiesVendingMachine.new(
-            this.generator.address,
             this.logicGenerator.address,
             this.colourGenerator.address,
             this.blockCities.address,
@@ -80,13 +79,13 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         it('building has attributes', async function () {
             // 4 = base, body, roof, and architect
             const attrs = await this.blockCities.attributes(1);
-            attrs[0].should.be.bignumber.lte('5'); // FIXME add all attrs
+            attrs[0].should.be.bignumber.lte('6'); // FIXME add all attrs
         });
     });
 
     context('ensure only owner can add cities', function () {
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.blockCities.addCity(web3.utils.asciiToHex('Hull'), {from: tokenOwner}));
+            await shouldFail.reverting(this.blockCities.addCity(web3.utils.asciiToHex('Hull'), {from: anyone}));
         });
 
         it('should add new city if owner', async function () {
@@ -132,11 +131,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
     context('ensure only owner can transfer buildings', function () {
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 2, 1, 0, tokenOwner, {from: tokenOwner}));
+            await shouldFail.reverting(this.blockCities.createBuilding(1, 1, 2, 1, 1, 2, 1, 0, tokenOwner, {from: anyone}));
         });
 
         it('should transfer if owner', async function () {
-            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, 0, anyone, {from: creator});
+            const {logs} = await this.blockCities.createBuilding(1, 1, 1, 1, 1, 1, 1, 0, anyone, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `BuildingMinted`,
@@ -163,18 +162,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
                 from: tokenOwner,
                 value: 0
             }));
-        });
-    });
-
-    context('tests if special building', function () {
-        it('should be true is divisable by 3', async function () {
-            (await this.vendingMachine.isSpecial(new BN(`0`))).should.be.true;
-            (await this.vendingMachine.isSpecial(new BN(`1`))).should.be.false;
-            (await this.vendingMachine.isSpecial(new BN(`2`))).should.be.false;
-            (await this.vendingMachine.isSpecial(new BN(`3`))).should.be.true;
-            (await this.vendingMachine.isSpecial(new BN(`4`))).should.be.false;
-            (await this.vendingMachine.isSpecial(new BN(`5`))).should.be.false;
-            (await this.vendingMachine.isSpecial(new BN(`6`))).should.be.true;
         });
     });
 
