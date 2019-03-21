@@ -34,7 +34,7 @@ contract LogicGenerator is Ownable {
         buildingMappings[3] = [3, 9, 6];
         buildingMappings[4] = [6, 6, 7];
         buildingMappings[5] = [6, 12, 3];
-        buildingMappings[6] = [5, 4, 2];
+        buildingMappings[6] = [5, 4, 1];
         buildingMappings[7] = [4, 5, 3];
         buildingMappings[8] = [5, 8, 1];
         buildingMappings[9] = [2, 6, 4];
