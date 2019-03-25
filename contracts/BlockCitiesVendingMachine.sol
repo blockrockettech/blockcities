@@ -66,21 +66,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
         (uint256 exteriorColorway, uint256 windowColorway) = colourGenerator.generate(msg.sender);
 
-        uint256 tokenId = blockCities.createBuilding(
-            exteriorColorway,
-            windowColorway,
-            city,
-            building,
-            base,
-            body,
-            roof,
-            special,
-            msg.sender
-        );
-
-        emit VendingMachineTriggered(tokenId, msg.sender);
-
-        return tokenId;
+        return _generate();
     }
 
     function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
@@ -101,49 +87,32 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
         for (uint i = 0; i < _numberOfBuildings; i++) {
-            (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
-            (uint256 exteriorColorway, uint256 windowColorway) = colourGenerator.generate(msg.sender);
-
-            uint256 tokenId = blockCities.createBuilding(
-                exteriorColorway,
-                windowColorway,
-                city,
-                building,
-                base,
-                body,
-                roof,
-                special,
-                msg.sender
-            );
-
-            emit VendingMachineTriggered(tokenId, msg.sender);
-
-            generatedTokenIds[i] = tokenId;
+            generatedTokenIds[i] = _generate();
         }
 
         return generatedTokenIds;
     }
 
-    //    function _generate(address _to) internal returns (uint256 _tokenId) {
-    //        (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
-    //        (uint256 exteriorColorway, uint256 windowColorway, uint256 backgroundColourway) = colourGenerator.generate(msg.sender);
-    //
-    //        uint256 tokenId = blockCities.createBuilding(
-    //            exteriorColorway,
-    //            windowColorway,
-    //            city,
-    //            building,
-    //            base,
-    //            body,
-    //            roof,
-    //            special,
-    //            _to
-    //        );
-    //
-    //        emit VendingMachineTriggered(tokenId, _to);
-    //
-    //        return tokenId;
-    //    }
+    function _generate() internal returns (uint256 _tokenId) {
+        (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
+        (uint256 exteriorColorway, uint256 windowColorway) = colourGenerator.generate(msg.sender);
+
+        uint256 tokenId = blockCities.createBuilding(
+            exteriorColorway,
+            windowColorway,
+            city,
+            building,
+            base,
+            body,
+            roof,
+            special,
+            msg.sender
+        );
+
+        emit VendingMachineTriggered(tokenId, msg.sender);
+
+        return tokenId;
+    }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
         return _numberOfBuildings.mul(pricePerBuildingInWei);

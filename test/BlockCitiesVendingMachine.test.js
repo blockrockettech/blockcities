@@ -83,6 +83,20 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
     });
 
+    context.only('batch mint buildings', function () {
+
+        it('returns total buildings', async function () {
+            const noOfBuildings = new BN(3);
+            let totalBuildingsPre = await this.blockCities.totalBuildings();
+
+            await this.vendingMachine.mintBatch(noOfBuildings, {from: tokenOwner, value: this.basePrice.mul(noOfBuildings)});
+
+            const totalBuildingsPost = await this.blockCities.totalBuildings();
+            totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(noOfBuildings));
+        });
+
+    });
+
     context('ensure only owner can add cities', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.blockCities.addCity(web3.utils.asciiToHex('Hull'), {from: anyone}));
