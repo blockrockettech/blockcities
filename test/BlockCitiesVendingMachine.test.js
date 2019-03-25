@@ -83,18 +83,62 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
     });
 
-    context.only('batch mint buildings', function () {
+    context('batch mint buildings', function () {
 
         it('returns total buildings', async function () {
-            const noOfBuildings = new BN(3);
+            const numberOfBuildings = new BN(3);
+            const batchPrice = await this.vendingMachine.totalPrice(numberOfBuildings);
             let totalBuildingsPre = await this.blockCities.totalBuildings();
 
-            await this.vendingMachine.mintBatch(noOfBuildings, {from: tokenOwner, value: this.basePrice.mul(noOfBuildings)});
+            await this.vendingMachine.mintBatch(numberOfBuildings, {from: tokenOwner, value: batchPrice});
 
             const totalBuildingsPost = await this.blockCities.totalBuildings();
-            totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(noOfBuildings));
+            totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(numberOfBuildings));
         });
 
+    });
+
+    context.only('total price and adjusting bands', function () {
+
+        it('returns total price for one', async function () {
+            const price = await this.vendingMachine.totalPrice(new BN(1));
+
+            price.should.be.bignumber.equal(this.basePrice);
+        });
+
+        it('returns total price for three', async function () {
+            const price = await this.vendingMachine.totalPrice(new BN(3));
+
+            price.should.be.bignumber.equal(this.basePrice.mul(new BN(3)));
+        });
+
+        it('returns total price for five', async function () {
+            const price = await this.vendingMachine.totalPrice(new BN(5));
+
+            // 20% off
+            price.should.be.bignumber.equal(new BN(400));
+        });
+
+
+        it('returns total price for ten', async function () {
+            const price = await this.vendingMachine.totalPrice(new BN(10));
+
+            // 30% off
+            price.should.be.bignumber.equal(new BN(700));
+        });
+
+        it('adjusts percentage bands', async function () {
+            await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)],  {from: creator});
+
+
+            // 15% off
+            let price = await this.vendingMachine.totalPrice(new BN(5));
+            price.should.be.bignumber.equal(new BN(425));
+
+            // 25% off
+            price = await this.vendingMachine.totalPrice(new BN(10))
+            price.should.be.bignumber.equal(new BN(750));
+        });
     });
 
     context('ensure only owner can add cities', function () {

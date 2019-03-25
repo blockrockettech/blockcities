@@ -28,6 +28,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         address indexed _to
     );
 
+    event PriceDiscountBandsChanged(
+        uint256[2] _priceDiscountBands
+    );
+
     LogicGenerator public logicGenerator;
     ColourGenerator public colourGenerator;
     IBlockCitiesCreator public blockCities;
@@ -36,6 +40,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public totalPurchasesInWei = 0;
     uint256 public pricePerBuildingInWei = 100;
+    uint256[2] public priceDiscountBands = [80, 70];
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -115,13 +120,28 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
-        return _numberOfBuildings.mul(pricePerBuildingInWei);
+        if (_numberOfBuildings < 5) {
+            return _numberOfBuildings.mul(pricePerBuildingInWei);
+        }
+        else if (_numberOfBuildings < 10) {
+            return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[0]);
+        }
+
+        return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[1]);
     }
 
     function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
         emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
 
         pricePerBuildingInWei = _newPricePerBuildingInWei;
+
+        return true;
+    }
+
+    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyOwner returns (bool) {
+        priceDiscountBands = _newPriceDiscountBands;
+
+        emit PriceDiscountBandsChanged(_newPriceDiscountBands);
 
         return true;
     }
