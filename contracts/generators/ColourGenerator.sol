@@ -6,24 +6,22 @@ contract ColourGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
-    event Colours(uint256 exteriorColorway, uint256 windowColorway, uint256 backgroundColourway);
+    event Colours(uint256 exteriorColorway, uint256 windowColorway);
 
     function generate(address _sender)
     external
     returns (
         uint256 exteriorColorway,
-        uint256 windowColorway,
-        uint256 backgroundColourway
+        uint256 windowColorway
     ) {
         bytes32 hash = blockhash(block.number);
 
         uint256 exteriorColorwayRandom = generate(hash, _sender, 7);
         uint256 windowColorwayRandom = generate(hash, _sender, 3);
-        uint256 backgroundColourwayRandom = generate(hash, _sender, 8);
 
-        emit Colours(exteriorColorway,  windowColorway,  backgroundColourway);
+        emit Colours(exteriorColorway,  windowColorway);
 
-        return (exteriorColorwayRandom, windowColorwayRandom, backgroundColourwayRandom);
+        return (exteriorColorwayRandom, windowColorwayRandom);
     }
 
     function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {

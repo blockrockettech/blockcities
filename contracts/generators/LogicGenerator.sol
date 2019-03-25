@@ -45,21 +45,21 @@ contract LogicGenerator is Ownable {
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 city = generate(hash, _sender, 3);
+        uint256 aCity = generate(hash, _sender, 3);
 
-        uint256 building = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
-        uint256 base = generate(hash, _sender, buildingMappings[building][0]);
-        uint256 body = generate(hash, _sender, buildingMappings[building][1]);
-        uint256 roof = generate(hash, _sender, buildingMappings[building][2]);
-        uint256 special = 0;
+        uint256 aBuilding = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
+        uint256 aBase = generate(hash, _sender, buildingMappings[building][0]);
+        uint256 aBody = generate(hash, _sender, buildingMappings[building][1]);
+        uint256 aRoof = generate(hash, _sender, buildingMappings[building][2]);
+        uint256 aSpecial = 0;
 
         // 1 in 3 roughly
         if (isSpecial(block.number)) {
-            special = generate(hash, _sender, 11);
+            aSpecial = generate(hash, _sender, 11);
         }
 
-        emit Generated(city, building, base, body, roof, special);
-        return (city, building, base, body, roof, special);
+        emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+        return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
     }
 
     function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
