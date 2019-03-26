@@ -18,6 +18,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 _newPricePerBuildingInWei
     );
 
+    event PriceStepInWeiChanged(
+        uint256 _oldPriceStepInWei,
+        uint256 _newPriceStepInWei
+    );
+
     event VendingMachineTriggered(
         uint256 indexed _tokenId,
         address indexed _architect
@@ -62,7 +67,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
         require(
-            credits[msg.sender] > 0 || msg.value >= pricePerBuildingInWei,
+            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
             "Must supply at least the required minimum purchase value or have credit"
         );
 
