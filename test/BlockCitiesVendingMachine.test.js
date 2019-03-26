@@ -7,23 +7,18 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...accounts]) => {
+contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
 
     const firstTokenId = new BN(1);
     const secondTokenId = new BN(2);
     const unknownTokenId = new BN(999);
 
     const firstURI = 'abc123';
-    const baseURI = 'https://api.blockcities.co';
+    const baseURI = 'https://api.blockcities.co/';
 
     before(async function () {
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
-
-        // Add 2 test cities
-        await this.blockCities.addCity(web3.utils.fromAscii('Atlanta'), {from: creator});
-        await this.blockCities.addCity(web3.utils.fromAscii('Chicago'), {from: creator});
-        (await this.blockCities.totalCities()).should.be.bignumber.equal('2');
 
         // Create generators
         this.logicGenerator = await LogicGenerator.new({from: creator});
@@ -42,6 +37,9 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         // Add to whitelist
         await this.blockCities.addWhitelisted(this.vendingMachine.address, {from: creator});
         (await this.blockCities.isWhitelisted(this.vendingMachine.address)).should.be.true;
+
+        await this.blockCities.addWhitelisted(whitelisted, {from: creator});
+        (await this.blockCities.isWhitelisted(whitelisted)).should.be.true;
 
         this.basePrice = await this.vendingMachine.pricePerBuildingInWei();
         this.basePrice.should.be.bignumber.equal('100');
@@ -70,7 +68,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         it('returns total purchases', async function () {
             (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.basePrice);
         });
-
         it('building has an owner', async function () {
             // tokenOwner owns token ID zero
             (await this.blockCities.tokensOfOwner(tokenOwner))[0].should.be.bignumber.equal(firstTokenId);
@@ -80,6 +77,16 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
             // 4 = base, body, roof, and architect
             const attrs = await this.blockCities.attributes(1);
             attrs[0].should.be.bignumber.lte('6'); // FIXME add all attrs
+        });
+
+        // FIXME - should be in BlockCities test file - create one
+        it('returns Token URI', async function () {
+            (await this.blockCities.tokenURI(new BN(1))).should.be.equal(baseURI + `1`);
+        });
+
+        it('returns name and symbol', async function () {
+            (await this.blockCities.name()).should.be.equal(`BlockCities`);
+            (await this.blockCities.symbol()).should.be.equal(`BKC`);
         });
     });
 
@@ -91,6 +98,27 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
             let totalBuildingsPre = await this.blockCities.totalBuildings();
 
             await this.vendingMachine.mintBatch(numberOfBuildings, {from: tokenOwner, value: batchPrice});
+
+            const totalBuildingsPost = await this.blockCities.totalBuildings();
+            totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(numberOfBuildings));
+        });
+
+        it('reverts as no value', async function () {
+            await shouldFail.reverting(this.vendingMachine.mintBatch(new BN(3), {from: tokenOwner, value: 0}));
+        });
+    });
+
+    context('batch mint buildings with credits', function () {
+
+        it('returns total buildings', async function () {
+            await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+
+            const numberOfBuildings = new BN(3);
+            let totalBuildingsPre = await this.blockCities.totalBuildings();
+
+            await this.vendingMachine.mintBatch(numberOfBuildings, {from: tokenOwner, value: 0});
 
             const totalBuildingsPost = await this.blockCities.totalBuildings();
             totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(numberOfBuildings));
@@ -143,28 +171,12 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
     });
 
-    context('ensure only owner can add cities', function () {
-        it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.blockCities.addCity(web3.utils.asciiToHex('Hull'), {from: anyone}));
-        });
-
-        it('should add new city if owner', async function () {
-            const {logs} = await this.blockCities.addCity(web3.utils.asciiToHex('Hull'), {from: creator});
-            // two already exist in contract, therefore, cityId is 2
-            expectEvent.inLogs(
-                logs,
-                `CityAdded`,
-                {_cityId: new BN(2), _cityName: web3.utils.padRight(web3.utils.asciiToHex('Hull'), 64)}
-            );
-        });
-    });
-
     context('ensure only owner can change base price', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setPricePerBuildingInWei(1, {from: tokenOwner}));
         });
 
-        it('should add new city if owner', async function () {
+        it('should set price if owner', async function () {
             const {logs} = await this.vendingMachine.setPricePerBuildingInWei(123, {from: creator});
             expectEvent.inLogs(
                 logs,
@@ -265,6 +277,20 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
                     _architect: ${attrs[7].toString()},
                 `);
             }
+        });
+    });
+
+    // FIXME - should be in BlockCities test file - create one
+    context('ensure whitelisted can update base token URI', function () {
+        it('should revert if not whitelisted', async function () {
+            await shouldFail.reverting(this.blockCities.updateTokenBaseURI(firstURI, {from: tokenOwner}));
+        });
+
+        it('should allow if whitelisted', async function () {
+            await this.blockCities.updateTokenBaseURI(firstURI, {from: whitelisted});
+
+            const base = await this.blockCities.tokenBaseURI();
+            base.should.be.equal(firstURI);
         });
     });
 });
