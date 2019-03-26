@@ -10,7 +10,6 @@ import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-// FIXME PAUSABLE?
 contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     using SafeMath for uint256;
 
@@ -39,8 +38,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     mapping(address => uint256) public credits;
 
     uint256 public totalPurchasesInWei = 0;
-    uint256 public pricePerBuildingInWei = 100;
     uint256[2] public priceDiscountBands = [80, 70];
+
+    uint256 public basePricePerBuildingInWei = 0.05 ether;
+    uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
+
+    uint256 public pricePerBuildingInWei = basePricePerBuildingInWei;
+
+    uint256 public priceStepInWei = 0.01 ether;
+    uint256 public lastSale = 0;
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -68,7 +74,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
         splitFunds();
 
-        return _generate();
+        uint256 tokenId =  _generate();
+
+        _stepIncrease();
+
+        return tokenId;
     }
 
     function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
@@ -91,6 +101,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         for (uint i = 0; i < _numberOfBuildings; i++) {
             generatedTokenIds[i] = _generate();
         }
+
+        _stepIncrease();
 
         return generatedTokenIds;
     }
@@ -116,6 +128,16 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return tokenId;
     }
 
+    function _stepIncrease() internal returns (bool) {
+        if (pricePerBuildingInWei.add(priceStepInWei) >= ceilingPricePerBuildingInWei) {
+            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
+            return true;
+        }
+
+        pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
+        return true;
+    }
+
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
         if (_numberOfBuildings < 5) {
             return _numberOfBuildings.mul(pricePerBuildingInWei);
@@ -131,6 +153,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
 
         pricePerBuildingInWei = _newPricePerBuildingInWei;
+
+        return true;
+    }
+
+    function setPriceStepInWei(uint256 _newPriceStepInWei) public onlyOwner returns (bool) {
+        emit PricePerBuildingInWeiChanged(priceStepInWei, _newPriceStepInWei);
+
+        priceStepInWei = _newPriceStepInWei;
 
         return true;
     }

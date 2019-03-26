@@ -7,7 +7,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
 
     const firstTokenId = new BN(1);
     const secondTokenId = new BN(2);
@@ -16,7 +16,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
     const firstURI = 'abc123';
     const baseURI = 'https://api.blockcities.co/';
 
-    before(async function () {
+    beforeEach(async function () {
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
@@ -42,15 +42,13 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         (await this.blockCities.isWhitelisted(whitelisted)).should.be.true;
 
         this.basePrice = await this.vendingMachine.pricePerBuildingInWei();
-        this.basePrice.should.be.bignumber.equal('100');
 
         (await this.blockCities.totalBuildings()).should.be.bignumber.equal('0');
         (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal('0');
     });
 
     context('ensure counters are functional', function () {
-        before(async function () {
-
+        beforeEach(async function () {
             // mint a single building
             const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.basePrice});
 
@@ -144,14 +142,14 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             const price = await this.vendingMachine.totalPrice(new BN(5));
 
             // 20% off
-            price.should.be.bignumber.equal(new BN(400));
+            price.should.be.bignumber.equal(new BN('200000000000000000'));
         });
 
         it('returns total price for ten', async function () {
             const price = await this.vendingMachine.totalPrice(new BN(10));
 
             // 30% off
-            price.should.be.bignumber.equal(new BN(700));
+            price.should.be.bignumber.equal(new BN('350000000000000000'));
         });
 
         it('adjusts percentage bands', async function () {
@@ -159,11 +157,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
             // 15% off
             let price = await this.vendingMachine.totalPrice(new BN(5));
-            price.should.be.bignumber.equal(new BN(425));
+            price.should.be.bignumber.equal(new BN('212500000000000000'));
 
             // 25% off
             price = await this.vendingMachine.totalPrice(new BN(10));
-            price.should.be.bignumber.equal(new BN(750));
+            price.should.be.bignumber.equal(new BN('375000000000000000'));
         });
 
         it('adjusts percentage bands can only be done be owner', async function () {
@@ -177,16 +175,27 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
 
         it('should set price if owner', async function () {
+            const priceNow = await this.vendingMachine.pricePerBuildingInWei();
             const {logs} = await this.vendingMachine.setPricePerBuildingInWei(123, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `PricePerBuildingInWeiChanged`,
-                {_oldPricePerBuildingInWei: new BN(100), _newPricePerBuildingInWei: new BN(123)}
+                {_oldPricePerBuildingInWei: priceNow, _newPricePerBuildingInWei: new BN(123)}
             );
         });
     });
 
     context('ensure only owner can burn', function () {
+        beforeEach(async function () {
+            // mint a single building
+            const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.basePrice});
+
+            expectEvent.inLogs(
+                logs,
+                `VendingMachineTriggered`,
+                {_tokenId: new BN(1), _architect: tokenOwner}
+            );
+        });
 
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.blockCities.burn(firstTokenId, {from: tokenOwner}));
