@@ -43,7 +43,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public basePricePerBuildingInWei = 0.05 ether;
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
-    uint256 public pricePerBuildingInWei = basePricePerBuildingInWei;
+    // use totalPrice() to calculate current weighted price
+    uint256 internal pricePerBuildingInWei = basePricePerBuildingInWei;
 
     uint256 public priceStepInWei = 0.01 ether;
     uint256 public lastSale = 0;

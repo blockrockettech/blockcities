@@ -41,7 +41,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         await this.blockCities.addWhitelisted(whitelisted, {from: creator});
         (await this.blockCities.isWhitelisted(whitelisted)).should.be.true;
 
-        this.basePrice = await this.vendingMachine.pricePerBuildingInWei();
+        this.basePrice = await this.vendingMachine.totalPrice(new BN(1));
 
         (await this.blockCities.totalBuildings()).should.be.bignumber.equal('0');
         (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal('0');
@@ -175,7 +175,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
 
         it('should set price if owner', async function () {
-            const priceNow = await this.vendingMachine.pricePerBuildingInWei();
+            const priceNow = await this.vendingMachine.totalPrice(new BN(1));
             const {logs} = await this.vendingMachine.setPricePerBuildingInWei(123, {from: creator});
             expectEvent.inLogs(
                 logs,
