@@ -6,33 +6,35 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract FundsSplitter is Ownable {
     using SafeMath for uint256;
 
-    // TODO configure this
+    address payable public blockcities;
+    address payable public partner;
 
-    address payable public blockCities = address(0x0);
-    address payable public techPartner = address(0x0);
+    uint256 public partnerRate = 25;
 
-    uint256 public techPartnerRate = 40;
+    constructor (address payable _blockcities, address payable _partner) public {
+        blockcities = _blockcities;
+        partner = _partner;
+    }
 
-    // TODO add new test for this
     function splitFunds() internal {
         // work out the amount to split and send it
-        uint256 partnerAmount = msg.value.div(100).mul(techPartnerRate);
-        techPartner.transfer(partnerAmount);
+        uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+        partner.transfer(partnerAmount);
 
         // Sending remaining amount to blockCities wallet
         uint256 remaining = msg.value.sub(partnerAmount);
-        blockCities.transfer(remaining);
+        blockcities.transfer(remaining);
     }
 
-    function updateTechPartnerAddress(address payable _techPartner) onlyOwner public {
-        techPartner = _techPartner;
+    function updatePartnerAddress(address payable _partner) onlyOwner public {
+        partner = _partner;
     }
 
-    function updateTechPartnerRate(uint256 _techPartnerRate) onlyOwner public {
-        techPartnerRate = _techPartnerRate;
+    function updatePartnerRate(uint256 _techPartnerRate) onlyOwner public {
+        partnerRate = _techPartnerRate;
     }
 
-    function updateBlockCitiesAddress(address payable _blockCities) onlyOwner public {
-        blockCities = _blockCities;
+    function updateBlockcitiesAddress(address payable _blockcities) onlyOwner public {
+        blockcities = _blockcities;
     }
 }

@@ -98,7 +98,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
 
     });
 
-    context.only('total price and adjusting bands', function () {
+    context('total price and adjusting bands', function () {
 
         it('returns total price for one', async function () {
             const price = await this.vendingMachine.totalPrice(new BN(1));
@@ -119,7 +119,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
             price.should.be.bignumber.equal(new BN(400));
         });
 
-
         it('returns total price for ten', async function () {
             const price = await this.vendingMachine.totalPrice(new BN(10));
 
@@ -128,16 +127,19 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
         });
 
         it('adjusts percentage bands', async function () {
-            await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)],  {from: creator});
-
+            await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: creator});
 
             // 15% off
             let price = await this.vendingMachine.totalPrice(new BN(5));
             price.should.be.bignumber.equal(new BN(425));
 
             // 25% off
-            price = await this.vendingMachine.totalPrice(new BN(10))
+            price = await this.vendingMachine.totalPrice(new BN(10));
             price.should.be.bignumber.equal(new BN(750));
+        });
+
+        it('adjusts percentage bands can only be done be owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: tokenOwner}));
         });
     });
 
@@ -198,19 +200,10 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, ...a
                 logs,
                 `BuildingMinted`,
                 {
-                    _tokenId: new BN(2),
                     _to: anyone,
                     _architect: anyone
                 }
             );
-
-            const attrs = await this.blockCities.attributes(new BN(2));
-            attrs[0].should.be.bignumber.equal('1');
-            attrs[1].should.be.bignumber.equal('1');
-            attrs[2].should.be.bignumber.equal('1');
-            attrs[3].should.be.bignumber.equal('1');
-            attrs[4].should.be.bignumber.equal('1');
-            attrs[5].should.be.bignumber.equal('1');
         });
     });
 

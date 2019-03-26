@@ -27,3 +27,4 @@ allFiredEvents
 /analyzer/
 /build
 package-lock.json
+/coverageEnv

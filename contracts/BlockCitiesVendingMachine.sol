@@ -46,7 +46,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         LogicGenerator _logicGenerator,
         ColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities
-    ) public {
+    ) public FundsSplitter(msg.sender, msg.sender) {
 
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
@@ -67,9 +67,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         }
 
         splitFunds();
-
-        (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
-        (uint256 exteriorColorway, uint256 windowColorway) = colourGenerator.generate(msg.sender);
 
         return _generate();
     }

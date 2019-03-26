@@ -6,7 +6,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "test": "truffle test",
+    "coverage": "./node_modules/.bin/solidity-coverage"
   },
   "author": "BlockRocket.tech",
   "license": "ISC",
@@ -14,7 +15,8 @@
     "openzeppelin-solidity": "^2.1.2",
     "openzeppelin-test-helpers": "^0.1.1",
     "truffle-flattener": "^1.2.5",
-    "svgo": "^1.1.1"
+    "svgo": "^1.1.1",
+    "solidity-coverage": "github:rotcivegaf/solidity-coverage"
   },
   "engines": {
     "node": ">= 8.0.0",

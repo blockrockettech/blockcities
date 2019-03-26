@@ -4,7 +4,7 @@ const LogicGenerator = artifacts.require('LogicGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.skip('LogicGenerator tests', (accounts) => {
+contract('LogicGenerator tests', (accounts) => {
 
     before(async function () {
         console.log(accounts);

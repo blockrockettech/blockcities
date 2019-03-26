@@ -18,13 +18,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         address indexed _architect
     );
 
-    event CityAdded(
-        uint256 indexed _cityId,
-        bytes32 _cityName
-    );
-
     uint256 public totalBuildings = 0;
-    uint256 public cityPointer = 0;
     uint256 public tokenIdPointer = 0;
 
     struct Building {
@@ -40,8 +34,6 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
     }
 
     mapping(uint256 => Building) internal buildings;
-
-    mapping(uint256 => bytes32) public cities;
 
     constructor (string memory _tokenBaseURI) public CustomERC721Full("BlockCities", "BKC") {
         super.addWhitelisted(msg.sender);
@@ -127,20 +119,6 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     function tokensOfOwner(address owner) public view returns (uint256[] memory) {
         return _tokensOfOwner(owner);
-    }
-
-    function totalCities() public view returns (uint256 _total) {
-        return cityPointer;
-    }
-
-    function addCity(bytes32 _cityName) public onlyWhitelisted returns (bool) {
-        cities[cityPointer] = _cityName;
-
-        emit CityAdded(cityPointer, _cityName);
-
-        cityPointer = cityPointer.add(1);
-
-        return true;
     }
 
     function burn(uint256 _tokenId) public onlyWhitelisted returns (bool) {
