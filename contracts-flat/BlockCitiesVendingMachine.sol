@@ -139,223 +139,151 @@ library SafeMath {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/generators/CityGenerator.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/ColourGenerator.sol
 
-contract CityGenerator is Ownable {
-    using SafeMath for uint256;
-
-    //| NAME          |  | %  | ID
-    //----------------------------
-    //| San Francisco |  | 5  | 1
-    //| Atlanta       |  | 15 | 2
-    //| Chicago       |  | 30 | 3
-    //| New York City |  | 50 | 4
-
-    uint256 public MAX_VALUE = 100;
-
-    struct Config {
-        uint256 id;
-        uint256 weight;
-    }
-
-    Config[] public configs;
-
-    // Assumes the configs are added in the correct order from lowest probability to highest
-
-    // Downsides:
-    // have to add to this in order to use new cities in the main contracts
-    // manual config required
-    // have to config things in order of least likely to happen
-    // is detached from 721 contract (is this needed)
-
-    // Plus side:
-    // simple to understand
-    // simple to config add/remove/changes
-    // cheapish in gas costs (needs more tests)
-    // doesnt require knowledge of number of cities in the main contract
-
-
-    // FIXME add cities via migration
-    constructor () public {
-        // San Francisco
-        configs.push(Config(1, 5));
-
-        // Atlanta
-        configs.push(Config(2, 15));
-
-        // Chicago
-        configs.push(Config(3, 30));
-
-        // New York City
-        configs.push(Config(4, 50));
-    }
-
-    uint256 internal nonce = 0;
-
-    event Matched(uint256 id, uint256 weight, uint256 random);
-
-    function generate(address _sender) external returns (uint256) {
-
-        // bump nonce
-        nonce++;
-
-        // generate random seed
-        bytes memory packed = abi.encodePacked(blockhash(block.number), _sender, nonce);
-
-        // randomise value
-        uint256 random = uint256(keccak256(packed)) % MAX_VALUE;
-
-        uint256 marker = 0;
-
-        // find weighting
-        for (uint i = 0; i < configs.length; i++) {
-            marker = marker.add(configs[i].weight);
-
-            if (random < marker) {
-                emit Matched(configs[i].id, configs[i].weight, random);
-                return configs[i].id;
-            }
-        }
-
-        revert("Unable to find match");
-    }
-
-    function getConfigSize() public view returns (uint256) {
-        return configs.length;
-    }
-
-    function getConfig(uint256 index) public view returns (uint256 value, uint256 weight) {
-        return (configs[index].id, configs[index].weight);
-    }
-
-    // Dangerous method but needed
-    function updateConfig(uint256 configIndex, uint256 weight) public onlyOwner {
-        configs[configIndex].weight = weight;
-    }
-
-    // This is a kind of hack to make sure it will never match
-    function deleteConfig(uint256 configIndex) public onlyOwner {
-        configs[configIndex].weight = MAX_VALUE.add(1);
-    }
-
-    function updateMaxConfig(uint256 _MAX_VALUE) public onlyOwner {
-        MAX_VALUE = _MAX_VALUE;
-    }
-}
-
-// File: /Users/andy/workspace/blockcities/contracts/generators/BaseGenerator.sol
-
-contract BaseGenerator is Ownable {
+contract ColourGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
-    function generate(uint256 _city, address _sender)
-    external
-    returns (uint256 base) {
-        return generate(_sender, 3);
-    }
+    event Colours(uint256 exteriorColorway, uint256 windowColorway);
 
-    function generate(address _sender, uint256 _max) internal returns (uint256) {
-        randNonce++;
-        bytes memory packed = abi.encodePacked(blockhash(block.number), _sender, randNonce);
-        return uint256(keccak256(packed)) % _max;
-    }
-}
-
-// File: /Users/andy/workspace/blockcities/contracts/generators/BodyGenerator.sol
-
-contract BodyGenerator is Ownable {
-
-    uint256 internal randNonce = 0;
-
-    event Body(uint256 body, uint256 exteriorColorway, uint256 windowColorway);
-
-    function generate(uint256 _city, address _sender)
+    function generate(address _sender)
     external
     returns (
-        uint256 body,
         uint256 exteriorColorway,
         uint256 windowColorway
     ) {
+        bytes32 hash = blockhash(block.number);
 
-        // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
+        uint256 exteriorColorwayRandom = generate(hash, _sender, 7);
+        uint256 windowColorwayRandom = generate(hash, _sender, 3);
 
-        // INCLUDES COLORWAYS
-        uint256 bodyRandom = generate(_sender, 12);
-        uint256 exteriorColorwayRandom = generate(_sender, 7);
-        uint256 windowColorwayRandom = generate(_sender, 3);
+        emit Colours(exteriorColorway,  windowColorway);
 
-        emit Body(bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
-
-        return (bodyRandom, exteriorColorwayRandom, windowColorwayRandom);
+        return (exteriorColorwayRandom, windowColorwayRandom);
     }
 
-    function generate(address _sender, uint256 _max) internal returns (uint256) {
+    function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
         randNonce++;
-        bytes memory packed = abi.encodePacked(blockhash(block.number), _sender, randNonce);
+        bytes memory packed = abi.encodePacked(_hash, _sender, randNonce);
         return uint256(keccak256(packed)) % _max;
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/generators/RoofGenerator.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/LogicGenerator.sol
 
-contract RoofGenerator is Ownable {
+contract LogicGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
-    function generate(uint256 _city, address _sender)
-    external
-    returns (uint256 base) {
+    event Generated(
+        uint256 city,
+        uint256 building,
+        uint256 base,
+        uint256 body,
+        uint256 roof,
+        uint256 special
+    );
 
-        // TODO THIS IS DUMB FOR NOW, JUST TO PROVE THE POINT
+    mapping(uint256 => uint256[]) internal cityMappings;
+    mapping(uint256 => uint256[]) internal buildingMappings;
 
-        return generate(_sender, 6);
+    uint256 constant specialModulo = 3;
+
+    constructor () public {
+        cityMappings[0] = [2, 5];
+        // ATL
+        cityMappings[1] = [0, 4, 6, 7, 8];
+        // NYC
+        cityMappings[2] = [1, 3, 9];
+        // CHI
+
+        buildingMappings[0] = [5, 9, 7];
+        buildingMappings[1] = [6, 3, 5];
+        buildingMappings[2] = [6, 3, 6];
+        buildingMappings[3] = [3, 9, 6];
+        buildingMappings[4] = [6, 6, 7];
+        buildingMappings[5] = [6, 12, 3];
+        buildingMappings[6] = [5, 4, 1];
+        buildingMappings[7] = [4, 5, 3];
+        buildingMappings[8] = [5, 8, 1];
+        buildingMappings[9] = [2, 6, 4];
     }
 
-    function generate(address _sender, uint256 _max) internal returns (uint256) {
+    function generate(address _sender)
+    external
+    returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
+        bytes32 hash = blockhash(block.number);
+
+        uint256 aCity = generate(hash, _sender, 3);
+
+        uint256 aBuilding = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
+        uint256 aBase = generate(hash, _sender, buildingMappings[building][0]);
+        uint256 aBody = generate(hash, _sender, buildingMappings[building][1]);
+        uint256 aRoof = generate(hash, _sender, buildingMappings[building][2]);
+        uint256 aSpecial = 0;
+
+        // 1 in 3 roughly
+        if (isSpecial(block.number)) {
+            aSpecial = generate(hash, _sender, 11);
+        }
+
+        emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+        return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+    }
+
+    function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
         randNonce++;
-        bytes memory packed = abi.encodePacked(blockhash(block.number), _sender, randNonce);
+        bytes memory packed = abi.encodePacked(_hash, _sender, randNonce);
         return uint256(keccak256(packed)) % _max;
+    }
+
+    function isSpecial(uint256 _blocknumber) public pure returns (bool) {
+        return _blocknumber % specialModulo == 0;
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/FundsSplitter.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/FundsSplitter.sol
 
 contract FundsSplitter is Ownable {
     using SafeMath for uint256;
 
-    // TODO configure this
+    address payable public blockcities;
+    address payable public partner;
 
-    address payable public blockCities = address(0x0);
-    address payable public techPartner = address(0x0);
+    uint256 public partnerRate = 25;
 
-    uint256 public techPartnerRate = 20;
+    constructor (address payable _blockcities, address payable _partner) public {
+        blockcities = _blockcities;
+        partner = _partner;
+    }
 
-    // TODO add new test for this
     function splitFunds() internal {
-        // work out the amount to split and send it
-        uint256 partnerAmount = msg.value.div(100).mul(techPartnerRate);
-        techPartner.transfer(partnerAmount);
+        if (msg.value > 0) {
+            // work out the amount to split and send it
+            uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+            partner.transfer(partnerAmount);
 
-        // Sending remaining amount to blockCities wallet
-        uint256 remaining = msg.value.sub(partnerAmount);
-        blockCities.transfer(remaining);
+            // Sending remaining amount to blockCities wallet
+            uint256 remaining = msg.value.sub(partnerAmount);
+            blockcities.transfer(remaining);
+        }
     }
 
-    function updateTechPartnerAddress(address payable _techPartner) onlyOwner public {
-        techPartner = _techPartner;
+    function updatePartnerAddress(address payable _partner) onlyOwner public {
+        partner = _partner;
     }
 
-    function updateTechPartnerRate(uint256 _techPartnerRate) onlyOwner public {
-        techPartnerRate = _techPartnerRate;
+    function updatePartnerRate(uint256 _techPartnerRate) onlyOwner public {
+        partnerRate = _techPartnerRate;
     }
 
-    function updateBlockCitiesAddress(address payable _blockCities) onlyOwner public {
-        blockCities = _blockCities;
+    function updateBlockcitiesAddress(address payable _blockcities) onlyOwner public {
+        blockcities = _blockcities;
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/libs/Strings.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/libs/Strings.sol
 
 library Strings {
 
@@ -416,16 +344,18 @@ library Strings {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/IBlockCitiesCreator.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/IBlockCitiesCreator.sol
 
 interface IBlockCitiesCreator {
     function createBuilding(
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     ) external returns (uint256 _tokenId);
 }
@@ -440,6 +370,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 _newPricePerBuildingInWei
     );
 
+    event PriceStepInWeiChanged(
+        uint256 _oldPriceStepInWei,
+        uint256 _newPriceStepInWei
+    );
+
     event VendingMachineTriggered(
         uint256 indexed _tokenId,
         address indexed _architect
@@ -449,73 +384,215 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         address indexed _to
     );
 
-    // TODO allow these to be changed
-    CityGenerator public cityGenerator;
-    BaseGenerator public baseGenerator;
-    BodyGenerator public bodyGenerator;
-    RoofGenerator public roofGenerator;
+    event PriceDiscountBandsChanged(
+        uint256[2] _priceDiscountBands
+    );
+
+    struct Colour {
+        uint256 exteriorColorway;
+        uint256 windowColorway;
+    }
+
+    struct Building {
+        uint256 city;
+        uint256 building;
+        uint256 base;
+        uint256 body;
+        uint256 roof;
+        uint256 special;
+    }
+
+    LogicGenerator public logicGenerator;
+    ColourGenerator public colourGenerator;
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
 
     uint256 public totalPurchasesInWei = 0;
-    uint256 public pricePerBuildingInWei = 100;
+    uint256[2] public priceDiscountBands = [80, 70];
+
+    uint256 public basePricePerBuildingInWei = 0.05 ether;
+    uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
+
+    // use totalPrice() to calculate current weighted price
+    uint256 internal pricePerBuildingInWei = basePricePerBuildingInWei;
+
+    uint256 public priceStepInWei = 0.01 ether;
+    uint256 public lastSale = 0;
 
     constructor (
-        CityGenerator _cityGenerator,
-        BaseGenerator _baseGenerator,
-        BodyGenerator _bodyGenerator,
-        RoofGenerator _roofGenerator,
+        LogicGenerator _logicGenerator,
+        ColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities
-    ) public {
-        baseGenerator = _baseGenerator;
-        bodyGenerator = _bodyGenerator;
-        roofGenerator = _roofGenerator;
-        cityGenerator = _cityGenerator;
+    ) public FundsSplitter(msg.sender, msg.sender) {
+
+        logicGenerator = _logicGenerator;
+        colourGenerator = _colourGenerator;
         blockCities = _blockCities;
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
         require(
-            credits[msg.sender] > 0 || msg.value >= pricePerBuildingInWei,
+            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        uint256 city = cityGenerator.generate(msg.sender);
+        _adjustCredits(1);
+        splitFunds();
 
-        (uint256 body, uint256 exteriorColorway, uint256 windowColorway) = bodyGenerator.generate(city, msg.sender);
-        uint256 base = baseGenerator.generate(city, msg.sender);
-        uint256 roof = roofGenerator.generate(city, msg.sender);
+        uint256 tokenId = _generate(msg.sender);
 
-        uint256 tokenId = blockCities.createBuilding(
-            exteriorColorway,
-            windowColorway,
-            city,
-            base,
-            body,
-            roof,
-            msg.sender
+        _stepIncrease();
+
+        return tokenId;
+    }
+
+    function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
+        require(
+            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            "Must supply at least the required minimum purchase value or have credit"
         );
 
+        _adjustCredits(1);
+        splitFunds();
+
+        uint256 tokenId = _generate(_to);
+
+        _stepIncrease();
+
+        return tokenId;
+    }
+
+    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+        require(
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            "Must supply at least the required minimum purchase value or have credit"
+        );
+
+        _adjustCredits(_numberOfBuildings);
+        splitFunds();
+
+        uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
+
+        for (uint i = 0; i < _numberOfBuildings; i++) {
+            generatedTokenIds[i] = _generate(msg.sender);
+        }
+
+        _stepIncrease();
+
+        return generatedTokenIds;
+    }
+
+    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+        require(
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            "Must supply at least the required minimum purchase value or have credit"
+        );
+
+        _adjustCredits(_numberOfBuildings);
+        splitFunds();
+
+        uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
+
+        for (uint i = 0; i < _numberOfBuildings; i++) {
+            generatedTokenIds[i] = _generate(_to);
+        }
+
+        _stepIncrease();
+
+        return generatedTokenIds;
+    }
+
+    function _generate(address _to) internal returns (uint256 _tokenId) {
+        Building memory building = _generateBuilding();
+        Colour memory colour = _generateColours();
+
+        uint256 tokenId = blockCities.createBuilding(
+            colour.exteriorColorway,
+            colour.windowColorway,
+            building.city,
+            building.building,
+            building.base,
+            building.body,
+            building.roof,
+            building.special,
+            _to
+        );
+
+        emit VendingMachineTriggered(tokenId, _to);
+
+        return tokenId;
+    }
+
+    function _generateColours() internal returns (Colour memory){
+        (uint256 _exteriorColorway, uint256 _windowColorway) = colourGenerator.generate(msg.sender);
+
+        return Colour({
+            exteriorColorway : _exteriorColorway,
+            windowColorway : _windowColorway
+            });
+    }
+
+    function _generateBuilding() internal returns (Building memory){
+        (uint256 _city, uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special) = logicGenerator.generate(msg.sender);
+
+        return Building({
+            city : _city,
+            building : _building,
+            base : _base,
+            body : _body,
+            roof : _roof,
+            special : _special
+            });
+    }
+
+    function _stepIncrease() internal {
+        if (pricePerBuildingInWei.add(priceStepInWei) >= ceilingPricePerBuildingInWei) {
+            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
+        } else {
+            pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
+        }
+    }
+
+    function _adjustCredits(uint256 _numberOfBuildings) internal {
         // use credits first
         if (credits[msg.sender] > 0) {
-            credits[msg.sender] = credits[msg.sender].sub(1);
+            credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
         } else {
             totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
         }
+    }
 
-        // Split funds accordingly
-        splitFunds();
-
-        emit VendingMachineTriggered(tokenId, msg.sender);
-
-        return tokenId;
+    function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
+        if (_numberOfBuildings < 5) {
+            return _numberOfBuildings.mul(pricePerBuildingInWei);
+        }
+        else if (_numberOfBuildings < 10) {
+            return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[0]);
+        }
+        return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[1]);
     }
 
     function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
         emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
 
         pricePerBuildingInWei = _newPricePerBuildingInWei;
+
+        return true;
+    }
+
+    function setPriceStepInWei(uint256 _newPriceStepInWei) public onlyOwner returns (bool) {
+        emit PricePerBuildingInWeiChanged(priceStepInWei, _newPriceStepInWei);
+
+        priceStepInWei = _newPriceStepInWei;
+
+        return true;
+    }
+
+    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyOwner returns (bool) {
+        priceDiscountBands = _newPriceDiscountBands;
+
+        emit PriceDiscountBandsChanged(_newPriceDiscountBands);
 
         return true;
     }
