@@ -22,5 +22,7 @@ module.exports = async function (deployer, network, accounts) {
         tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/4/token/";
     }
 
+    console.log(`Deploying BlockCities contract with token base URI [${tokenBaseURI}]`);
+
     await deployer.deploy(BlockCities, tokenBaseURI, {from: _owner});
 };
