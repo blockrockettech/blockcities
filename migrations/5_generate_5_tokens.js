@@ -1,5 +1,5 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
-const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
+const {INFURA_KEY} = require('../constants');
 
 const BlockCitiesVendingMachine = artifacts.require('./BlockCitiesVendingMachine.sol');
 
@@ -11,9 +11,9 @@ module.exports = async function (deployer, network, accounts) {
 
     // Load in other accounts for different networks
     if (network === 'ropsten' || network === 'ropsten-fork' || network === 'rinkeby' || network === 'rinkeby-fork') {
-        const PROVIDER_URL = `https://${network}.infura.io/v3/${infuraApikey}`;
-        _owner = new HDWalletProvider(require('../mnemonic'), PROVIDER_URL, 0).getAddress();
-        _buyer = new HDWalletProvider(require('../mnemonic'), PROVIDER_URL, 1, 2).getAddress();
+        const PROVIDER_URL = `https://${network}.infura.io/v3/${INFURA_KEY}`;
+        _owner = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, PROVIDER_URL, 0).getAddress();
+        _buyer = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, PROVIDER_URL, 1, 2).getAddress();
     }
 
     // // Add some credit for each account

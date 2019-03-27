@@ -1,6 +1,13 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
-const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
-let mnemonic = require('./mnemonic');
+const {INFURA_KEY} = require('./constants');
+
+const mnemonic = process.env.BLOCK_CITIES_MNEMONIC;
+if (!mnemonic) {
+    throw new Error(`
+    You are missing a environment variable called BLOCK_CITIES_MNEMONIC - please set one 
+    e.g. export BLOCK_CITIES_MNEMONIC='<your seed phrase>'
+  `);
+}
 
 // Check gas prices before live deploy - https://ethgasstation.info/
 
@@ -35,7 +42,7 @@ module.exports = {
         },
         ropsten: {
             provider: function () {
-                return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${infuraApikey}`);
+                return new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${INFURA_KEY}`);
             },
             network_id: 3,
             gas: 7000000, // default = 4712388
