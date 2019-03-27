@@ -207,6 +207,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
                 logs,
                 `Transfer`,
             );
+            await shouldFail.reverting(this.blockCities.attributes(firstTokenId));
         });
     });
 
