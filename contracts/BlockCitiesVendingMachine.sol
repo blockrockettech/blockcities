@@ -45,13 +45,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public totalPurchasesInWei = 0;
     uint256[2] public priceDiscountBands = [80, 70];
 
-    uint256 public basePricePerBuildingInWei = 0.05 ether;
+    uint256 public floorPricePerBuildingInWei = 0.05 ether;
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
-    uint256 internal pricePerBuildingInWei = basePricePerBuildingInWei;
+    uint256 internal pricePerBuildingInWei = floorPricePerBuildingInWei;
 
     uint256 public priceStepInWei = 0.01 ether;
+    uint256 public timeStep = 1 hours;
+
     uint256 public lastSale = 0;
 
     constructor (
@@ -135,6 +137,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _stepIncrease() internal returns (bool) {
+        lastSale = block.timestamp;
+
         if (pricePerBuildingInWei.add(priceStepInWei) >= ceilingPricePerBuildingInWei) {
             pricePerBuildingInWei = ceilingPricePerBuildingInWei;
             return true;
@@ -145,14 +149,22 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
-        if (_numberOfBuildings < 5) {
-            return _numberOfBuildings.mul(pricePerBuildingInWei);
-        }
-        else if (_numberOfBuildings < 10) {
-            return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[0]);
+
+        uint256 timePassed = block.timestamp - lastSale;
+        uint256 calculatedBase = pricePerBuildingInWei.minus(timePassed.div(1 hours).mul(priceStepInWei));
+
+        if (calculatedBase < floorPricePerBuildingInWei) {
+            calculatedBase = floorPricePerBuildingInWei;
         }
 
-        return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[1]);
+        if (_numberOfBuildings < 5) {
+            return _numberOfBuildings.mul(calculatedBase);
+        }
+        else if (_numberOfBuildings < 10) {
+            return _numberOfBuildings.mul(calculatedBase).div(100).mul(priceDiscountBands[0]);
+        }
+
+        return _numberOfBuildings.mul(calculatedBase).div(100).mul(priceDiscountBands[1]);
     }
 
     function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {

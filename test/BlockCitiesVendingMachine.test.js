@@ -88,6 +88,26 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
+    context('price increases in steps', function () {
+
+        it('price adjusts on invocation', async function () {
+            const priceStep = await this.vendingMachine.priceStepInWei();
+
+            const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
+
+            const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
+
+            // should move step up once
+            await this.vendingMachine.mintBatch(new BN(2), {from: tokenOwner, value: priceAfter.add(priceAfter) });
+
+            const priceAfterBatch = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterBatch.should.be.bignumber.equal(priceAfter.add(priceStep));
+        });
+    });
+
     context('batch mint buildings', function () {
 
         it('returns total buildings', async function () {
