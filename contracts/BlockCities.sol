@@ -123,6 +123,9 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     function burn(uint256 _tokenId) public onlyWhitelisted returns (bool) {
         _burn(_tokenId);
+
+        delete buildings[_tokenId];
+
         return true;
     }
 

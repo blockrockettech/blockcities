@@ -1,6 +1,6 @@
 const BlockCities = artifacts.require('./BlockCities.sol');
 const HDWalletProvider = require('truffle-hdwallet-provider');
-const infuraApikey = '8d878f1ce20b4e2fa9eea01668281193';
+const {INFURA_KEY} = require('../constants');
 
 module.exports = async function (deployer, network, accounts) {
 
@@ -8,7 +8,7 @@ module.exports = async function (deployer, network, accounts) {
 
     // Load in other accounts for different networks
     if (network === 'ropsten' || network === 'ropsten-fork' || network === 'rinkeby' || network === 'rinkeby-fork') {
-        _owner = new HDWalletProvider(require('../mnemonic'), `https://${network}.infura.io/v3/${infuraApikey}`, 0).getAddress();
+        _owner = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, `https://${network}.infura.io/v3/${INFURA_KEY}`, 0).getAddress();
     }
 
     let tokenBaseURI = "http://localhost:5000/block-cities/us-central1/api/network/5777/token/";
@@ -21,6 +21,8 @@ module.exports = async function (deployer, network, accounts) {
     } else if (network === 'rinkeby') {
         tokenBaseURI = "https://us-central1-block-cities.cloudfunctions.net/api/network/4/token/";
     }
+
+    console.log(`Deploying BlockCities contract with token base URI [${tokenBaseURI}]`);
 
     await deployer.deploy(BlockCities, tokenBaseURI, {from: _owner});
 };

@@ -1,3 +1,5 @@
+const lodash = require('lodash');
+
 const BlockCities = artifacts.require('BlockCities');
 
 const LogicGenerator = artifacts.require('LogicGenerator');
@@ -93,11 +95,13 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         it('price adjusts on invocation', async function () {
             const priceStep = await this.vendingMachine.priceStepInWei();
 
+            const blockSale = await this.vendingMachine.lastSaleBlock();
             const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
 
             const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+            // console.log(blockSale.toString(), priceBefore.toString(), priceAfter.toString());
             priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
 
             // should move step up once
@@ -227,6 +231,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
                 logs,
                 `Transfer`,
             );
+            await shouldFail.reverting(this.blockCities.attributes(firstTokenId));
         });
     });
 
@@ -321,5 +326,43 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
             const base = await this.blockCities.tokenBaseURI();
             base.should.be.equal(firstURI);
         });
+    });
+
+    context('should be able to mintBuildingTo() and define the recipient of the building', async function () {
+
+        it('mintBuildingTo() succeeds', async function () {
+            const _to = tokenOwner;
+            const tokenId = new BN(1);
+
+            const {logs} = await this.vendingMachine.mintBuildingTo(_to, {from: creator, value: this.basePrice});
+            expectEvent.inLogs(
+                logs,
+                `VendingMachineTriggered`,
+                {_tokenId: tokenId, _architect: _to}
+            );
+
+            const tokensOfOwner = await this.blockCities.tokensOfOwner(_to);
+            tokensOfOwner.map(lodash.toNumber).should.be.deep.equal([tokenId.toNumber()]);
+        });
+
+    });
+
+    context('should be able to mintBatchTo() and define the recipient of the building', async function () {
+
+        it('mintBatchTo() succeeds', async function () {
+            const _to = tokenOwner;
+            const tokenId = new BN(1);
+
+            const {logs} = await this.vendingMachine.mintBatchTo(_to, 1, {from: creator, value: this.basePrice});
+            expectEvent.inLogs(
+                logs,
+                `VendingMachineTriggered`,
+                {_tokenId: tokenId, _architect: _to}
+            );
+
+            const tokensOfOwner = await this.blockCities.tokensOfOwner(_to);
+            tokensOfOwner.map(lodash.toNumber).should.be.deep.equal([tokenId.toNumber()]);
+        });
+
     });
 });

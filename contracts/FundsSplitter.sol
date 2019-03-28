@@ -17,13 +17,15 @@ contract FundsSplitter is Ownable {
     }
 
     function splitFunds() internal {
-        // work out the amount to split and send it
-        uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
-        partner.transfer(partnerAmount);
+        if (msg.value > 0) {
+            // work out the amount to split and send it
+            uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+            partner.transfer(partnerAmount);
 
-        // Sending remaining amount to blockCities wallet
-        uint256 remaining = msg.value.sub(partnerAmount);
-        blockcities.transfer(remaining);
+            // Sending remaining amount to blockCities wallet
+            uint256 remaining = msg.value.sub(partnerAmount);
+            blockcities.transfer(remaining);
+        }
     }
 
     function updatePartnerAddress(address payable _partner) onlyOwner public {

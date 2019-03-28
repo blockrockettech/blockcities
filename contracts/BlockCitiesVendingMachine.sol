@@ -36,6 +36,20 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256[2] _priceDiscountBands
     );
 
+    struct Colour {
+        uint256 exteriorColorway;
+        uint256 windowColorway;
+    }
+
+    struct Building {
+        uint256 city;
+        uint256 building;
+        uint256 base;
+        uint256 body;
+        uint256 roof;
+        uint256 special;
+    }
+
     LogicGenerator public logicGenerator;
     ColourGenerator public colourGenerator;
     IBlockCitiesCreator public blockCities;
@@ -49,12 +63,12 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
-    uint256 internal pricePerBuildingInWei = floorPricePerBuildingInWei;
+    uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
 
     uint256 public priceStepInWei = 0.01 ether;
-    uint256 public timeStep = 1 hours;
+    uint256 public blockStep = 120;
 
-    uint256 public lastSale = 0;
+    uint256 public lastSaleBlock = 0;
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -73,16 +87,26 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        // use credits first
-        if (credits[msg.sender] > 0) {
-            credits[msg.sender] = credits[msg.sender].sub(1);
-        } else {
-            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
-        }
-
+        _adjustCredits(1);
         splitFunds();
 
-        uint256 tokenId =  _generate();
+        uint256 tokenId = _generate(msg.sender);
+
+        _stepIncrease();
+
+        return tokenId;
+    }
+
+    function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
+        require(
+            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            "Must supply at least the required minimum purchase value or have credit"
+        );
+
+        _adjustCredits(1);
+        splitFunds();
+
+        uint256 tokenId = _generate(_to);
 
         _stepIncrease();
 
@@ -95,19 +119,13 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        // use credits first
-        if (credits[msg.sender] > 0) {
-            credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
-        } else {
-            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
-        }
-
+        _adjustCredits(_numberOfBuildings);
         splitFunds();
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
         for (uint i = 0; i < _numberOfBuildings; i++) {
-            generatedTokenIds[i] = _generate();
+            generatedTokenIds[i] = _generate(msg.sender);
         }
 
         _stepIncrease();
@@ -115,56 +133,103 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return generatedTokenIds;
     }
 
-    function _generate() internal returns (uint256 _tokenId) {
-        (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) = logicGenerator.generate(msg.sender);
-        (uint256 exteriorColorway, uint256 windowColorway) = colourGenerator.generate(msg.sender);
-
-        uint256 tokenId = blockCities.createBuilding(
-            exteriorColorway,
-            windowColorway,
-            city,
-            building,
-            base,
-            body,
-            roof,
-            special,
-            msg.sender
+    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+        require(
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            "Must supply at least the required minimum purchase value or have credit"
         );
 
-        emit VendingMachineTriggered(tokenId, msg.sender);
+        _adjustCredits(_numberOfBuildings);
+        splitFunds();
+
+        uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
+
+        for (uint i = 0; i < _numberOfBuildings; i++) {
+            generatedTokenIds[i] = _generate(_to);
+        }
+
+        _stepIncrease();
+
+        return generatedTokenIds;
+    }
+
+    function _generate(address _to) internal returns (uint256 _tokenId) {
+        Building memory building = _generateBuilding();
+        Colour memory colour = _generateColours();
+
+        uint256 tokenId = blockCities.createBuilding(
+            colour.exteriorColorway,
+            colour.windowColorway,
+            building.city,
+            building.building,
+            building.base,
+            building.body,
+            building.roof,
+            building.special,
+            _to
+        );
+
+        emit VendingMachineTriggered(tokenId, _to);
 
         return tokenId;
     }
 
-    function _stepIncrease() internal returns (bool) {
-        lastSale = block.timestamp;
+    function _generateColours() internal returns (Colour memory){
+        (uint256 _exteriorColorway, uint256 _windowColorway) = colourGenerator.generate(msg.sender);
 
-        if (pricePerBuildingInWei.add(priceStepInWei) >= ceilingPricePerBuildingInWei) {
-            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
-            return true;
+        return Colour({
+            exteriorColorway : _exteriorColorway,
+            windowColorway : _windowColorway
+            });
+    }
+
+    function _generateBuilding() internal returns (Building memory){
+        (uint256 _city, uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special) = logicGenerator.generate(msg.sender);
+
+        return Building({
+            city : _city,
+            building : _building,
+            base : _base,
+            body : _body,
+            roof : _roof,
+            special : _special
+            });
+    }
+
+    function _adjustCredits(uint256 _numberOfBuildings) internal {
+        // use credits first
+        if (credits[msg.sender] > 0) {
+            credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
+        } else {
+            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
         }
+    }
 
+    function _stepIncrease() internal {
         pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
-        return true;
+
+        if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
+            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
+        }
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
 
-        uint256 timePassed = block.timestamp - lastSale;
-        uint256 calculatedBase = pricePerBuildingInWei.minus(timePassed.div(1 hours).mul(priceStepInWei));
+        uint256 blocksPassed = block.number - lastSaleBlock;
+        uint256 calculatedPrice = pricePerBuildingInWei.sub(blocksPassed.div(blockStep).mul(priceStepInWei));
 
-        if (calculatedBase < floorPricePerBuildingInWei) {
-            calculatedBase = floorPricePerBuildingInWei;
+        if (calculatedPrice < floorPricePerBuildingInWei) {
+            calculatedPrice = floorPricePerBuildingInWei;
         }
 
         if (_numberOfBuildings < 5) {
-            return _numberOfBuildings.mul(calculatedBase);
+            return _numberOfBuildings.mul(calculatedPrice);
         }
         else if (_numberOfBuildings < 10) {
-            return _numberOfBuildings.mul(calculatedBase).div(100).mul(priceDiscountBands[0]);
+            return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[0]);
         }
 
-        return _numberOfBuildings.mul(calculatedBase).div(100).mul(priceDiscountBands[1]);
+        return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
     }
 
     function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {

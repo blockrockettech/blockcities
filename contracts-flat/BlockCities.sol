@@ -73,7 +73,7 @@ contract Ownable {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/access/Roles.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/access/Roles.sol
 
 /**
  * @title Roles
@@ -114,7 +114,7 @@ library Roles {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/access/roles/WhitelistAdminRole.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/access/roles/WhitelistAdminRole.sol
 
 /**
  * @title WhitelistAdminRole
@@ -208,7 +208,7 @@ contract WhitelistedRole is WhitelistAdminRole {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/libs/Strings.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/libs/Strings.sol
 
 library Strings {
 
@@ -269,21 +269,23 @@ library Strings {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/IBlockCitiesCreator.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/IBlockCitiesCreator.sol
 
 interface IBlockCitiesCreator {
     function createBuilding(
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     ) external returns (uint256 _tokenId);
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/introspection/IERC165.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/introspection/IERC165.sol
 
 /**
  * @title IERC165
@@ -299,7 +301,7 @@ interface IERC165 {
     function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721.sol
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic interface
@@ -325,7 +327,7 @@ contract IERC721 is IERC165 {
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public;
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721Receiver.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721Receiver.sol
 
 /**
  * @title ERC721 token receiver interface
@@ -351,7 +353,7 @@ contract IERC721Receiver {
     public returns (bytes4);
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol
 
 /**
  * @title SafeMath
@@ -417,7 +419,7 @@ library SafeMath {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/utils/Address.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/utils/Address.sol
 
 /**
  * Utility library of inline functions on addresses
@@ -444,7 +446,7 @@ library Address {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/introspection/ERC165.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/introspection/ERC165.sol
 
 /**
  * @title ERC165
@@ -767,7 +769,7 @@ contract ERC721 is ERC165, IERC721 {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/IERC721Enumerable.sol
 
 /**
  * @title ERC-721 Non-Fungible Token Standard, optional enumeration extension
@@ -780,7 +782,7 @@ contract IERC721Enumerable is IERC721 {
     function tokenByIndex(uint256 index) public view returns (uint256);
 }
 
-// File: /Users/andy/workspace/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/ERC721.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/node_modules/openzeppelin-solidity/contracts/token/ERC721/ERC721.sol
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -1310,7 +1312,7 @@ contract ERC165 is IERC165 {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/erc721/ERC721MetadataWithoutTokenUri.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/erc721/ERC721MetadataWithoutTokenUri.sol
 
 contract ERC721MetadataWithoutTokenUri is ERC165, ERC721, IERC721Metadata {
     // Token name
@@ -1366,7 +1368,7 @@ contract ERC721MetadataWithoutTokenUri is ERC165, ERC721, IERC721Metadata {
     }
 }
 
-// File: /Users/andy/workspace/blockcities/contracts/erc721/CustomERC721Full.sol
+// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/erc721/CustomERC721Full.sol
 
 /**
  * @title Full ERC721 Token without token URI as this is handled in the base contract
@@ -1394,28 +1396,22 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         address indexed _architect
     );
 
-    event CityAdded(
-        uint256 indexed _cityId,
-        bytes32 _cityName
-    );
-
     uint256 public totalBuildings = 0;
-    uint256 public cityPointer = 0;
     uint256 public tokenIdPointer = 0;
 
     struct Building {
         uint256 exteriorColorway;
         uint256 windowColorway;
         uint256 city;
+        uint256 building;
         uint256 base;
         uint256 body;
         uint256 roof;
+        uint256 special;
         address architect;
     }
 
     mapping(uint256 => Building) internal buildings;
-
-    mapping(uint256 => bytes32) public cities;
 
     constructor (string memory _tokenBaseURI) public CustomERC721Full("BlockCities", "BKC") {
         super.addWhitelisted(msg.sender);
@@ -1426,9 +1422,11 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     )
     public onlyWhitelisted returns (uint256 _tokenId) {
@@ -1442,9 +1440,11 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
             exteriorColorway : _exteriorColorway,
             windowColorway : _windowColorway,
             city : _city,
+            building: _building,
             base : _base,
             body : _body,
             roof : _roof,
+            special: _special,
             architect : _architect
             });
 
@@ -1472,9 +1472,11 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         uint256 _exteriorColorway,
         uint256 _windowColorway,
         uint256 _city,
+        uint256 _building,
         uint256 _base,
         uint256 _body,
         uint256 _roof,
+        uint256 _special,
         address _architect
     ) {
         require(_exists(_tokenId), "Token ID not found");
@@ -1484,9 +1486,11 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         building.exteriorColorway,
         building.windowColorway,
         building.city,
+        building.building,
         building.base,
         building.body,
         building.roof,
+        building.special,
         building.architect
         );
     }
@@ -1495,22 +1499,11 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
         return _tokensOfOwner(owner);
     }
 
-    function totalCities() public view returns (uint256 _total) {
-        return cityPointer;
-    }
-
-    function addCity(bytes32 _cityName) public onlyWhitelisted returns (bool) {
-        cities[cityPointer] = _cityName;
-
-        emit CityAdded(cityPointer, _cityName);
-
-        cityPointer = cityPointer.add(1);
-
-        return true;
-    }
-
     function burn(uint256 _tokenId) public onlyWhitelisted returns (bool) {
         _burn(_tokenId);
+
+        delete buildings[_tokenId];
+
         return true;
     }
 
