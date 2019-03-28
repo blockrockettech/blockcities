@@ -9,8 +9,6 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-const {advanceToBlock} = require('./time');
-
 contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
 
     const firstTokenId = new BN(1);
@@ -19,6 +17,9 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
     const baseURI = 'https://api.blockcities.co/';
 
     beforeEach(async function () {
+
+        console.log(`Before each...`);
+
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
@@ -48,6 +49,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         this.priceStep = await this.vendingMachine.priceStepInWei();
 
         const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+
         const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: currentPrice});
         expectEvent.inLogs(
             logs,
@@ -109,55 +111,52 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    // context('price decreases over time in blocks', function () {
-    //
-    //     it('price adjusts on invocation', async function () {
-    //         const priceStep = await this.vendingMachine.priceStepInWei();
-    //
-    //         const blockStep = await this.vendingMachine.blockStep();
-    //         const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
-    //
-    //         await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
-    //
-    //         const blockSale = await this.vendingMachine.lastSaleBlock();
-    //         const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
-    //
-    //         priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
-    //
-    //         // advance blockstep
-    //         for (let i = 0; i < blockStep.toNumber(); i++) {
-    //             await this.vendingMachine.addCredit(tokenOwner, {from: creator});
-    //         }
-    //
-    //         const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
-    //         priceAfterBlockStep.should.be.bignumber.equal(priceBefore);
-    //     });
-    //
-    //     it('price does not drop below floor', async function () {
-    //         const priceStep = await this.vendingMachine.priceStepInWei();
-    //
-    //         const blockStep = await this.vendingMachine.blockStep();
-    //         const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
-    //
-    //         await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
-    //
-    //         const floor = await this.vendingMachine.floorPricePerBuildingInWei();
-    //         const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
-    //
-    //         priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
-    //
-    //         // advance blockstep
-    //         for (let i = 0; i < blockStep.toNumber(); i++) {
-    //             await this.vendingMachine.addCredit(tokenOwner, {from: creator});
-    //         }
-    //         for (let i = 0; i < blockStep.toNumber(); i++) {
-    //             await this.vendingMachine.addCredit(tokenOwner, {from: creator});
-    //         }
-    //
-    //         const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
-    //         priceAfterBlockStep.should.be.bignumber.equal(floor);
-    //     });
-    // });
+    context('price decreases over time in blocks', function () {
+
+        it('price adjusts on invocation', async function () {
+
+            const blockStep = await this.vendingMachine.blockStep();
+            const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
+
+            const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+
+            priceAfter.should.be.bignumber.equal(priceBefore.add(this.priceStep));
+
+            // advance blockstep
+            for (let i = 0; i < blockStep.toNumber(); i++) {
+                await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            }
+
+            const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterBlockStep.should.be.bignumber.equal(priceBefore);
+        });
+
+        it('price does not drop below floor', async function () {
+
+            const blockStep = await this.vendingMachine.blockStep();
+            const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
+
+            const floor = await this.vendingMachine.floorPricePerBuildingInWei();
+            const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+
+            priceAfter.should.be.bignumber.equal(priceBefore.add(this.priceStep));
+
+            // advance blockstep
+            for (let i = 0; i < blockStep.toNumber(); i++) {
+                await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            }
+            for (let i = 0; i < blockStep.toNumber(); i++) {
+                await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            }
+
+            const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterBlockStep.should.be.bignumber.equal(floor);
+        });
+    });
 
     context('batch mint buildings', function () {
 

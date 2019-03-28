@@ -16,6 +16,7 @@ contract FundsSplitter is Ownable {
         partner = _partner;
     }
 
+    //FIXME add refund, therefore, pass price!!
     function splitFunds() internal {
         if (msg.value > 0) {
             // work out the amount to split and send it

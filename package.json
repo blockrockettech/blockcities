@@ -16,8 +16,7 @@
     "openzeppelin-test-helpers": "^0.1.1",
     "truffle-flattener": "^1.2.5",
     "svgo": "^1.1.1",
-    "solidity-coverage": "github:rotcivegaf/solidity-coverage",
-    "web3": "^1.0.0-beta.37"
+    "solidity-coverage": "github:rotcivegaf/solidity-coverage"
   },
   "engines": {
     "node": ">= 8.0.0",

@@ -59,15 +59,22 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public totalPurchasesInWei = 0;
     uint256[2] public priceDiscountBands = [80, 70];
 
+    // FIXME setter for owner to change
     uint256 public floorPricePerBuildingInWei = 0.05 ether;
+
+    // FIXME setter for owner to change
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
     uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
 
+    // FIXME setter for owner to change
     uint256 public priceStepInWei = 0.01 ether;
+
+    // FIXME setter for owner to change
     uint256 public blockStep = 120;
 
+    // FIXME setter for owner to change
     uint256 public lastSaleBlock = 0;
 
     constructor (
@@ -217,8 +224,17 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
 
+        uint256 calculatedPrice = pricePerBuildingInWei;
+
         uint256 blocksPassed = block.number - lastSaleBlock;
-        uint256 calculatedPrice = pricePerBuildingInWei.sub(blocksPassed.div(blockStep).mul(priceStepInWei));
+        uint256 reduce = blocksPassed.div(blockStep).mul(priceStepInWei);
+
+        if (reduce > calculatedPrice) {
+            calculatedPrice = floorPricePerBuildingInWei;
+        }
+        else {
+            calculatedPrice = calculatedPrice.sub(reduce);
+        }
 
         if (calculatedPrice < floorPricePerBuildingInWei) {
             calculatedPrice = floorPricePerBuildingInWei;
