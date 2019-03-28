@@ -26,7 +26,7 @@ module.exports = async function (deployer, network, accounts) {
         _logicGenerator.address,
         _colourGenerator.address,
         _blockCities.address,
-        _owner, // FIXME switch out for BlockCities Eth account
+        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7",
         _owner,
         {
             from: _owner
