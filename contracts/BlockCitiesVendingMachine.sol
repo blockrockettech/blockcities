@@ -211,6 +211,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
             pricePerBuildingInWei = ceilingPricePerBuildingInWei;
         }
+
+        lastSaleBlock = block.number;
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
