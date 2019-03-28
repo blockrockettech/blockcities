@@ -417,7 +417,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
 
         it('all parties get the correct amounts', async function () {
             const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
-            const overpayPrice = currentPrice.add(new BN(100));
+            const overpayPrice = currentPrice.add(new BN(1000000));
 
             const blockcities = new BN((await web3.eth.getBalance(blockcitiesAccount)));
             const partner = new BN((await web3.eth.getBalance(creator)));
@@ -429,9 +429,12 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
 
             // 80% of current
             blockcitiesAfter.should.be.bignumber.equal(blockcities.add(currentPrice.div(new BN(100)).mul(new BN(80))));
-            
+
             // 20% of current
             partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(20))));
+
+            // check refund
+            //FIXME
         });
 
     });
