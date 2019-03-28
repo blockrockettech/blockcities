@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
+contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockCitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
     const secondTokenId = new BN(2);
@@ -31,6 +31,8 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             this.logicGenerator.address,
             this.colourGenerator.address,
             this.blockCities.address,
+            blockCitiesAccount,
+            creator,
             {
                 from: creator
             }
@@ -262,10 +264,10 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
 
         it('should add credit batch', async function () {
-            await this.vendingMachine.addCreditBatch([tokenOwner, anyone], {from: creator});
+            await this.vendingMachine.addCreditBatch([tokenOwner, anyone], 2, {from: creator});
 
-            (await this.vendingMachine.credits(tokenOwner)).should.be.bignumber.equal('1');
-            (await this.vendingMachine.credits(anyone)).should.be.bignumber.equal('1');
+            (await this.vendingMachine.credits(tokenOwner)).should.be.bignumber.equal('2');
+            (await this.vendingMachine.credits(anyone)).should.be.bignumber.equal('2');
         });
     });
 

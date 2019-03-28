@@ -14,7 +14,7 @@ contract('LogicGenerator tests', (accounts) => {
     it('generate me some randoms', async function () {
         for (let i = 0; i < 10; i++) {
             const {logs} = await this.generator.generate(randomAccount());
-            console.log(logs);
+            // console.log(logs);
         }
     });
 
