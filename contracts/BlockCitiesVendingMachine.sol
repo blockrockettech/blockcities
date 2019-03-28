@@ -29,7 +29,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     );
 
     event CreditAdded(
-        address indexed _to
+        address indexed _to,
+        uint256 _amount
     );
 
     event PriceDiscountBandsChanged(
@@ -80,9 +81,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     constructor (
         LogicGenerator _logicGenerator,
         ColourGenerator _colourGenerator,
-        IBlockCitiesCreator _blockCities
-    ) public FundsSplitter(msg.sender, msg.sender) {
-
+        IBlockCitiesCreator _blockCities,
+        address payable _blockCitiesAddress,
+        address payable _partnerAddress
+    ) public FundsSplitter(_blockCitiesAddress, _partnerAddress) {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
@@ -281,14 +283,22 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     function addCredit(address _to) public onlyOwner returns (bool) {
         credits[_to] = credits[_to].add(1);
 
-        emit CreditAdded(_to);
+        emit CreditAdded(_to, 1);
 
         return true;
     }
 
-    function addCreditBatch(address[] memory _addresses) public onlyOwner returns (bool) {
+    function addCreditAmount(address _to, uint256 _amount) public onlyOwner returns (bool) {
+        credits[_to] = credits[_to].add(_amount);
+
+        emit CreditAdded(_to, _amount);
+
+        return true;
+    }
+
+    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyOwner returns (bool) {
         for (uint i = 0; i < _addresses.length; i++) {
-            addCredit(_addresses[i]);
+            addCreditAmount(_addresses[i], _amount);
         }
     }
 }
