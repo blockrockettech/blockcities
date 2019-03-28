@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockCitiesAccount, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -30,7 +30,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             this.logicGenerator.address,
             this.colourGenerator.address,
             this.blockCities.address,
-            blockCitiesAccount,
+            blockcitiesAccount,
             creator,
             {
                 from: creator
@@ -205,8 +205,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         it('returns total price for three', async function () {
             const price = await this.vendingMachine.totalPrice(new BN(3));
 
-
-
             price.should.be.bignumber.equal(this.floor.add(this.priceStep).mul(new BN(3)));
         });
 
@@ -259,8 +257,8 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
     context('ensure only owner can burn', function () {
         beforeEach(async function () {
-            this.basePrice = await this.vendingMachine.totalPrice(new BN(1));
-            const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.basePrice});
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: currentPrice});
 
             expectEvent.inLogs(
                 logs,
@@ -341,10 +339,10 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
     context.skip('random buildings to console', function () {
         it('should mint random', async function () {
-            this.basePrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
 
             for (let i = 1; i < 13; i++) {
-                const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: this.basePrice});
+                const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: currentPrice});
                 const attrs = await this.blockCities.attributes(tokenId, {from: accounts[i]});
                 console.log(`
                     ID: ${tokenId},
@@ -378,11 +376,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
     context('should be able to mintBuildingTo() and define the recipient of the building', async function () {
 
         it('mintBuildingTo() succeeds', async function () {
-            this.basePrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
             const _to = tokenOwner;
             const tokenId = new BN(2);
 
-            const {logs} = await this.vendingMachine.mintBuildingTo(_to, {from: creator, value: this.basePrice});
+            const {logs} = await this.vendingMachine.mintBuildingTo(_to, {from: creator, value: currentPrice});
             expectEvent.inLogs(
                 logs,
                 `VendingMachineTriggered`,
@@ -398,11 +396,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
     context('should be able to mintBatchTo() and define the recipient of the building', async function () {
 
         it('mintBatchTo() succeeds', async function () {
-            this.basePrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
             const _to = tokenOwner;
             const tokenId = new BN(2);
 
-            const {logs} = await this.vendingMachine.mintBatchTo(_to, 1, {from: creator, value: this.basePrice});
+            const {logs} = await this.vendingMachine.mintBatchTo(_to, 1, {from: creator, value: currentPrice});
             expectEvent.inLogs(
                 logs,
                 `VendingMachineTriggered`,
@@ -411,6 +409,29 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
             const tokensOfOwner = await this.blockCities.tokensOfOwner(_to);
             tokensOfOwner.map(lodash.toNumber).should.be.deep.equal([1, tokenId.toNumber()]);
+        });
+
+    });
+
+    context.only('splitFunds', function () {
+
+        it('all parties get the correct amounts', async function () {
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const overpayPrice = currentPrice.add(new BN(100));
+
+            const blockcities = new BN((await web3.eth.getBalance(blockcitiesAccount)));
+            const partner = new BN((await web3.eth.getBalance(creator)));
+
+            await this.vendingMachine.mintBuildingTo(whitelisted, {from: whitelisted, value: overpayPrice});
+
+            const blockcitiesAfter = new BN((await web3.eth.getBalance(blockcitiesAccount)));
+            const partnerAfter = new BN((await web3.eth.getBalance(creator)));
+
+            // 80% of current
+            blockcitiesAfter.should.be.bignumber.equal(blockcities.add(currentPrice.div(new BN(100)).mul(new BN(80))));
+            
+            // 20% of current
+            partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(20))));
         });
 
     });
