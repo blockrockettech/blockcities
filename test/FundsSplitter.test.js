@@ -4,7 +4,7 @@ const FundsSplitter = artifacts.require('FundsSplitter');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('FundsSplitter tests', (accounts) => {
+contract.only('FundsSplitter tests', (accounts) => {
 
     before(async function () {
         this.splitter = await FundsSplitter.new(accounts[0], accounts[1], {from: accounts[0]});
@@ -62,4 +62,19 @@ contract('FundsSplitter tests', (accounts) => {
             await shouldFail.reverting(this.splitter.updatePartnerRate(new BN(50), {from: accounts[1]}));
         });
     });
+
+    context('splitFunds', function () {
+
+        it('all parties get the correct amounts', async function () {
+
+            const blockcities = await web3.eth.getBalance(accounts[0]);
+            const partner = await web3.eth.getBalance(accounts[1]);
+            console.log(blockcities, partner);
+
+            await this.splitter.splitFunds(new BN(100), {from: accounts[2], value: new BN(200)});
+        });
+
+    });
+
+
 });

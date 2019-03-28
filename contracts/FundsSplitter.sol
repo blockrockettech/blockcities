@@ -16,15 +16,21 @@ contract FundsSplitter is Ownable {
         partner = _partner;
     }
 
-    //FIXME add refund, therefore, pass price!!
-    function splitFunds() internal {
+    function splitFunds(uint256 _totalPrice) internal {
         if (msg.value > 0) {
+            uint256 refund = msg.value.sub(_totalPrice);
+
+            // overpaid...
+            if (refund > 0) {
+                msg.sender.transfer(refund);
+            }
+
             // work out the amount to split and send it
-            uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+            uint256 partnerAmount = _totalPrice.div(100).mul(partnerRate);
             partner.transfer(partnerAmount);
 
-            // Sending remaining amount to blockCities wallet
-            uint256 remaining = msg.value.sub(partnerAmount);
+            // send remaining amount to blockCities wallet
+            uint256 remaining = _totalPrice.sub(partnerAmount);
             blockcities.transfer(remaining);
         }
     }

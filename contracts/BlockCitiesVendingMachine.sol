@@ -89,13 +89,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice(1);
         require(
-            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(1);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -105,13 +106,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice(1);
         require(
-            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(1);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256 tokenId = _generate(_to);
 
@@ -120,14 +122,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return tokenId;
     }
 
-    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
+        uint256 currentPrice = totalPrice(_numberOfBuildings);
         require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(_numberOfBuildings);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -140,14 +143,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return generatedTokenIds;
     }
 
-    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
+        uint256 currentPrice = totalPrice(_numberOfBuildings);
         require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(_numberOfBuildings);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 

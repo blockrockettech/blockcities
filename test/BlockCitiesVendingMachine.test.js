@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
+contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -17,8 +17,6 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
     const baseURI = 'https://api.blockcities.co/';
 
     beforeEach(async function () {
-
-        console.log(`Before each...`);
 
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
@@ -224,17 +222,17 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
             price.should.be.bignumber.equal(this.floor.add(this.priceStep).mul(new BN(10)).div(new BN(100)).mul(new BN(70)));
         });
 
-        // it('adjusts percentage bands', async function () {
-        //     await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: creator});
-        //
-        //     // 15% off
-        //     let price = await this.vendingMachine.totalPrice(new BN(5));
-        //     price.should.be.bignumber.equal(new BN('212500000000000000'));
-        //
-        //     // 25% off
-        //     price = await this.vendingMachine.totalPrice(new BN(10));
-        //     price.should.be.bignumber.equal(new BN('375000000000000000'));
-        // });
+        it('adjusts percentage bands', async function () {
+            await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: creator});
+
+            // 15% off
+            let price = await this.vendingMachine.totalPrice(new BN(5));
+            price.should.be.bignumber.equal(this.floor.add(this.priceStep).mul(new BN(5)).div(new BN(100)).mul(new BN(85)));
+
+            // 25% off
+            price = await this.vendingMachine.totalPrice(new BN(10));
+            price.should.be.bignumber.equal(this.floor.add(this.priceStep).mul(new BN(10)).div(new BN(100)).mul(new BN(75)));
+        });
 
         it('adjusts percentage bands can only be done be owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: tokenOwner}));
@@ -345,7 +343,6 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
 
             for (let i = 1; i < 13; i++) {
                 const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: this.basePrice});
-                console.log(tokenId.logs);
                 const attrs = await this.blockCities.attributes(tokenId, {from: accounts[i]});
                 console.log(`
                     ID: ${tokenId},
