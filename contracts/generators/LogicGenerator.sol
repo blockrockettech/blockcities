@@ -77,4 +77,8 @@ contract LogicGenerator is Ownable {
     function isSpecial(uint256 _blocknumber) public pure returns (bool) {
         return _blocknumber % specialModulo == 0;
     }
+
+    function updateBuildingMapping(uint256 _building, uint256[3] memory _params) public onlyOwner {
+        buildingMappings[_building] = _params;
+    }
 }
