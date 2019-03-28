@@ -38,6 +38,12 @@ contract LogicGenerator is Ownable {
         buildingMappings[7] = [4, 5, 3];
         buildingMappings[8] = [5, 8, 1];
         buildingMappings[9] = [2, 6, 4];
+        buildingMappings[10] = [6, 9, 4];
+        buildingMappings[11] = [5, 3, 5];
+        buildingMappings[12] = [6, 11, 7];
+        buildingMappings[13] = [6, 8, 7];
+        buildingMappings[14] = [4, 12, 4];
+        buildingMappings[15] = [5, 5, 3];
     }
 
     function generate(address _sender)
