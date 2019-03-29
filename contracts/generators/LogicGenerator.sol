@@ -17,40 +17,41 @@ contract LogicGenerator is Ownable {
 
     uint256[] internal cityPercentages = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2];
 
-    mapping(uint256 => uint256[]) internal cityMappings;
-    mapping(uint256 => uint256[]) internal buildingMappings;
+    mapping(uint256 => uint256[]) public cityMappings;
 
-    uint256 constant specialModulo = 7;
+    mapping(uint256 => uint256[]) public buildingMappings;
+
+    uint256 public specialModulo = 7;
 
     constructor () public {
         // ATL
-        cityMappings[0] = [2, 5, 15];
+        cityMappings[0] = [2, 2, 2, 2, 2, 5, 5, 5, 15, 15];
 
         // NYC
-        cityMappings[1] = [0, 4, 6, 7, 8, 14];
+        cityMappings[1] = [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14];
 
         // CHI
-        cityMappings[2] = [1, 3, 9, 10, 11];
+        cityMappings[2] = [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11];
 
         // SF
         cityMappings[3] = [12, 13];
 
         buildingMappings[0] = [6, 9, 8];
-        buildingMappings[1] = [6, 3, 5];
-        buildingMappings[2] = [6, 3, 6];
-        buildingMappings[3] = [3, 9, 6];
-        buildingMappings[4] = [6, 6, 8];
-        buildingMappings[5] = [6, 12, 3];
-        buildingMappings[6] = [5, 4, 1];
-        buildingMappings[7] = [4, 5, 3];
-        buildingMappings[8] = [5, 8, 1];
-        buildingMappings[9] = [2, 6, 4];
-        buildingMappings[10] = [6, 9, 4];
-        buildingMappings[11] = [5, 3, 5];
-        buildingMappings[12] = [6, 11, 7];
-        buildingMappings[13] = [6, 8, 7];
-        buildingMappings[14] = [4, 12, 4];
-        buildingMappings[15] = [5, 5, 3];
+        buildingMappings[1] = [7, 3, 7];
+        buildingMappings[2] = [7, 3, 7];
+        buildingMappings[3] = [3, 9, 4];
+        buildingMappings[4] = [7, 6, 9];
+        buildingMappings[5] = [7, 12, 5];
+        buildingMappings[6] = [6, 4, 5];
+        buildingMappings[7] = [4, 5, 4];
+        buildingMappings[8] = [6, 8, 1];
+        buildingMappings[9] = [2, 6, 5];
+        buildingMappings[10] = [7, 9, 5];
+        buildingMappings[11] = [7, 3, 6];
+        buildingMappings[12] = [7, 11, 6];
+        buildingMappings[13] = [7, 8, 8];
+        buildingMappings[14] = [5, 12, 5];
+        buildingMappings[15] = [6, 5, 6];
     }
 
     function generate(address _sender)
@@ -82,7 +83,7 @@ contract LogicGenerator is Ownable {
         return uint256(keccak256(packed)) % _max;
     }
 
-    function isSpecial(uint256 _blocknumber) public pure returns (bool) {
+    function isSpecial(uint256 _blocknumber) public view returns (bool) {
         return _blocknumber % specialModulo == 0;
     }
 
