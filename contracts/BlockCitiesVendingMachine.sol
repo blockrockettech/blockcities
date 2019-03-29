@@ -39,7 +39,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     struct Colour {
         uint256 exteriorColorway;
-        uint256 windowColorway;
+        uint256 backgroundColorway;
     }
 
     struct Building {
@@ -51,8 +51,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 special;
     }
 
+    // FIXME settter
     LogicGenerator public logicGenerator;
+    // FIXME settter
     ColourGenerator public colourGenerator;
+
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -172,7 +175,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
         uint256 tokenId = blockCities.createBuilding(
             colour.exteriorColorway,
-            colour.windowColorway,
+            colour.backgroundColorway,
             building.city,
             building.building,
             building.base,
@@ -188,11 +191,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _generateColours() internal returns (Colour memory){
-        (uint256 _exteriorColorway, uint256 _windowColorway) = colourGenerator.generate(msg.sender);
+        (uint256 _exteriorColorway, uint256 _backgroundColorway) = colourGenerator.generate(msg.sender);
 
         return Colour({
             exteriorColorway : _exteriorColorway,
-            windowColorway : _windowColorway
+            backgroundColorway : _backgroundColorway
             });
     }
 

@@ -15,20 +15,27 @@ contract LogicGenerator is Ownable {
         uint256 special
     );
 
+    uint256[] internal cityPercentages = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2];
+
     mapping(uint256 => uint256[]) internal cityMappings;
     mapping(uint256 => uint256[]) internal buildingMappings;
 
-    uint256 constant specialModulo = 3;
+    uint256 constant specialModulo = 7;
 
     constructor () public {
-        cityMappings[0] = [2, 5];
         // ATL
-        cityMappings[1] = [0, 4, 6, 7, 8];
-        // NYC
-        cityMappings[2] = [1, 3, 9];
-        // CHI
+        cityMappings[0] = [2, 5, 15];
 
-        buildingMappings[0] = [5, 9, 7];
+        // NYC
+        cityMappings[1] = [0, 4, 6, 7, 8, 14];
+
+        // CHI
+        cityMappings[2] = [1, 3, 9, 10, 11];
+
+        // SF
+        cityMappings[3] = [12, 13];
+
+        buildingMappings[0] = [6, 9, 8];
         buildingMappings[1] = [6, 3, 5];
         buildingMappings[2] = [6, 3, 6];
         buildingMappings[3] = [3, 9, 6];
@@ -51,12 +58,13 @@ contract LogicGenerator is Ownable {
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 aCity = generate(hash, _sender, 3);
+        uint256 aCity = cityPercentages[generate(hash, _sender, cityPercentages.length)];
 
-        uint256 aBuilding = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
-        uint256 aBase = generate(hash, _sender, buildingMappings[building][0]);
-        uint256 aBody = generate(hash, _sender, buildingMappings[building][1]);
-        uint256 aRoof = generate(hash, _sender, buildingMappings[building][2]);
+        uint256 aBuilding = cityMappings[aCity][generate(hash, _sender, cityMappings[aCity].length)];
+
+        uint256 aBase = generate(hash, _sender, buildingMappings[aBuilding][0]);
+        uint256 aBody = generate(hash, _sender, buildingMappings[aBuilding][1]);
+        uint256 aRoof = generate(hash, _sender, buildingMappings[aBuilding][2]);
         uint256 aSpecial = 0;
 
         // 1 in 3 roughly
@@ -80,5 +88,9 @@ contract LogicGenerator is Ownable {
 
     function updateBuildingMapping(uint256 _building, uint256[3] memory _params) public onlyOwner {
         buildingMappings[_building] = _params;
+    }
+
+    function updateSpecialModulo(uint256 _specialModulo) public onlyOwner {
+        specialModulo = _specialModulo;
     }
 }
