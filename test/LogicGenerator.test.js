@@ -12,6 +12,21 @@ contract('LogicGenerator tests', (accounts) => {
     before(async function () {
         this.generator = await LogicGenerator.new({from: creator});
 
+        // Setup city variant distribution
+        await this.generator.updateCityPercentages([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2], {from: creator});
+
+        // ATL
+        await this.generator.updateCityMappings(0, [2, 2, 2, 2, 2, 5, 5, 5, 15, 15], {from: creator});
+
+        // NYC
+        await this.generator.updateCityMappings(1, [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14], {from: creator});
+
+        // CHI
+        await this.generator.updateCityMappings(2, [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11], {from: creator});
+
+        // SF
+        await this.generator.updateCityMappings(3, [12, 13], {from: creator});
+
         await this.generator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
