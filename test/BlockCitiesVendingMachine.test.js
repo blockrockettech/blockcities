@@ -304,7 +304,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change floor price per building', function () {
+    context('ensure only owner can change floor price per building', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setFloorPricePerBuildingInWei(1, {from: tokenOwner}));
         });
@@ -323,7 +323,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change ceiling price per building', function () {
+    context('ensure only owner can change ceiling price per building', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setCeilingPricePerBuildingInWei(100, {from: tokenOwner}));
         });
@@ -342,7 +342,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change price step in wei', function () {
+    context('ensure only owner can change price step in wei', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setPriceStepInWei(100, {from: tokenOwner}));
         });
@@ -361,7 +361,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change block step', function () {
+    context('ensure only owner can change block step', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setBlockStep(100, {from: tokenOwner}));
         });
@@ -380,7 +380,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change last sale block', function () {
+    context('ensure only owner can change last sale block', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setLastSaleBlock(100, {from: tokenOwner}));
         });
@@ -399,7 +399,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.only('ensure only owner can change logic generator', function () {
+    context.skip('ensure only owner can change logic generator', function () {
 
         beforeEach(async function () {
             this.newLogicGenerator = await LogicGenerator.new({from: creator});
@@ -410,19 +410,13 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
 
         it('should set if owner', async function () {
-            const {logs} = await this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: creator});
-            expectEvent.inLogs(
-                logs,
-                `LogicGeneratorChanges`,
-                {
-                    _oldLogicGenerator: this.logicGenerator,
-                    _newLogicGenerator: this.newLogicGenerator
-                }
-            );
+            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: creator});
+            const newValue = await this.vendingMachine.logicGenerator();
+            newValue.should.be.equal(this.newLogicGenerator);
         });
     });
 
-    context.only('ensure only owner can colour logic generator', function () {
+    context.skip('ensure only owner can colour logic generator', function () {
 
         beforeEach(async function () {
             this.newColourGenerator = await ColourGenerator.new({from: creator});
@@ -433,15 +427,9 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
 
         it('should set if owner', async function () {
-            const {logs} = await this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: creator});
-            expectEvent.inLogs(
-                logs,
-                `ColourGeneratorChanges`,
-                {
-                    _oldColourGenerator: this.colourGenerator,
-                    _newColourGenerator: this.newColourGenerator
-                }
-            );
+            await this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: creator});
+            const newValue = await this.vendingMachine.colourGenerator();
+            newValue.should.be.equal(this.newColourGenerator);
         });
     });
 

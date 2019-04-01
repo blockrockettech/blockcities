@@ -52,16 +52,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 _newLastSaleBlock
     );
 
-    event LogicGeneratorChanges(
-        address _oldLogicGenerator,
-        address _newLogicGenerator
-    );
-
-    event ColourGeneratorChanges(
-        address _oldColourGenerator,
-        address _newColourGenerator
-    );
-
     struct Colour {
         uint256 exteriorColorway;
         uint256 backgroundColorway;
@@ -347,13 +337,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function setLogicGenerator(LogicGenerator _logicGenerator) public onlyOwner returns (bool) {
-        emit LogicGeneratorChanges(logicGenerator, _logicGenerator);
         logicGenerator = _logicGenerator;
         return true;
     }
 
     function setColourGenerator(ColourGenerator _colourGenerator) public onlyOwner returns (bool) {
-        emit ColourGeneratorChanges(colourGenerator, _colourGenerator);
         colourGenerator = _colourGenerator;
         return true;
     }
