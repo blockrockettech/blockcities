@@ -58,7 +58,7 @@ contract('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
         this.generator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
     });
 
-    it.only('generate me some randoms', async function () {
+    it('generate me some randoms', async function () {
         for (let i = 0; i < 50; i++) {
             const {logs} = await this.generator.generate(randomAccount());
             console.log(logs);
