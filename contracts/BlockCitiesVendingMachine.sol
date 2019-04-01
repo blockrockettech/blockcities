@@ -53,6 +53,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     // FIXME settter
     LogicGenerator public logicGenerator;
+
     // FIXME settter
     ColourGenerator public colourGenerator;
 

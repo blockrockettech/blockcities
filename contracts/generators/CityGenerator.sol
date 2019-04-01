@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
+// NOT IN USE CURRENTLY
 contract CityGenerator is Ownable {
     using SafeMath for uint256;
 

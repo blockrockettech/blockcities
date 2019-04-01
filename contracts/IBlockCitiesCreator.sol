@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 interface IBlockCitiesCreator {
     function createBuilding(
         uint256 _exteriorColorway,
-        uint256 _windowColorway,
+        uint256 _backgroundColorway,
         uint256 _city,
         uint256 _building,
         uint256 _base,
