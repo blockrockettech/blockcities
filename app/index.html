@@ -54,7 +54,7 @@
                     <span class="text-muted">Body</span> <code>{{ b.data.attributes.body }}</code><br/>
                     <span class="text-muted">Roof</span> <code>{{ b.data.attributes.roof }}</code><br/>
                     <span class="text-muted">Exterior</span> <code>{{ b.data.attributes.exteriorColorway }}</code><br/>
-                    <span class="text-muted">Windows</span> <code>{{ b.data.attributes.backgroundColorway }}</code>
+                    <span class="text-muted">Background</span> <code>{{ b.data.attributes.backgroundColorway }}</code>
                 </p>
                 <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect }}</code></p>
             </div>
@@ -89,7 +89,7 @@
         el: '#vue-app',
         data: {
             rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
-            blockcitiesAddress: `0x70D0C5f857C0C57190566d45AaF53234b65B8bE9`,
+            blockcitiesAddress: `0xa29CC34Fe8C6333f31a1C9e18960D4bA8fD8b8D9`,
             blockcitiesAbi: [
                 {
                     "constant": true,
@@ -882,7 +882,7 @@
                 }
             ],
             blockcitiesContract: null,
-            vendingAddress: `0xf2E12DAc448F9BC0809f9aba8AfAd25848896f1c`,
+            vendingAddress: `0x5BbA833e33103d60f716fDCA8ac947920F909eF3`,
             vendingAbi: [
                 {
                     "constant": true,
