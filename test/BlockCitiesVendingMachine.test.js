@@ -39,6 +39,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         await this.logicGenerator.updateBuildingBaseMappings(12, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingBaseMappings(13, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingBaseMappings(14, [0, 1, 2], {from: creator});
+        await this.logicGenerator.updateBuildingBaseMappings(15, [0, 1, 2], {from: creator});
 
         await this.logicGenerator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
@@ -55,6 +56,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         await this.logicGenerator.updateBuildingBodyMappings(12, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingBodyMappings(13, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingBodyMappings(14, [0, 1, 2], {from: creator});
+        await this.logicGenerator.updateBuildingBodyMappings(15, [0, 1, 2], {from: creator});
 
         await this.logicGenerator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
@@ -71,6 +73,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         await this.logicGenerator.updateBuildingRoofMappings(12, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingRoofMappings(13, [0, 1, 2], {from: creator});
         await this.logicGenerator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
+        await this.logicGenerator.updateBuildingRoofMappings(15, [0, 1, 2], {from: creator});
 
         this.colourGenerator = await ColourGenerator.new({from: creator});
 

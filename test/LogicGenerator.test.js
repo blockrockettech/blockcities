@@ -27,6 +27,7 @@ contract('LogicGenerator tests', (accounts) => {
         await this.generator.updateBuildingBaseMappings(12, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(13, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(14, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBaseMappings(15, [0, 1, 2], {from: creator});
 
         await this.generator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
@@ -43,6 +44,7 @@ contract('LogicGenerator tests', (accounts) => {
         await this.generator.updateBuildingBodyMappings(12, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(13, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(14, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBodyMappings(15, [0, 1, 2], {from: creator});
 
         await this.generator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
@@ -59,9 +61,10 @@ contract('LogicGenerator tests', (accounts) => {
         await this.generator.updateBuildingRoofMappings(12, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(13, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingRoofMappings(15, [0, 1, 2], {from: creator});
     });
 
-    it.skip('generate me some randoms', async function () {
+    it('generate me some randoms', async function () {
         for (let i = 0; i < 50; i++) {
             const account = randomAccount();
             console.log(`Generating building [${i}] for account [${account}]`);
