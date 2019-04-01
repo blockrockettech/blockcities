@@ -9,32 +9,58 @@ import "./generators/LogicGenerator.sol";
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
+import "../contracts-flat/BlockCitiesVendingMachine.sol";
 
 contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     using SafeMath for uint256;
-
-    event PricePerBuildingInWeiChanged(
-        uint256 _oldPricePerBuildingInWei,
-        uint256 _newPricePerBuildingInWei
-    );
-
-    event PriceStepInWeiChanged(
-        uint256 _oldPriceStepInWei,
-        uint256 _newPriceStepInWei
-    );
 
     event VendingMachineTriggered(
         uint256 indexed _tokenId,
         address indexed _architect
     );
 
-    event CreditAdded(
-        address indexed _to,
-        uint256 _amount
+    event CreditAdded(address indexed _to, uint256 _amount);
+
+    event PriceDiscountBandsChanged(uint256[2] _priceDiscountBands);
+
+    event PriceStepInWeiChanged(
+        uint256 _oldPriceStepInWei,
+        uint256 _newPriceStepInWei
     );
 
-    event PriceDiscountBandsChanged(
-        uint256[2] _priceDiscountBands
+    event PricePerBuildingInWeiChanged(
+        uint256 _oldPricePerBuildingInWei,
+        uint256 _newPricePerBuildingInWei
+    );
+
+    event FloorPricePerBuildingInWeiChanged(
+        uint256 _oldFloorPricePerBuildingInWei,
+        uint256 _newFloorPricePerBuildingInWei
+    );
+
+    event CeilingPricePerBuildingInWeiChanged(
+        uint256 _oldCeilingPricePerBuildingInWei,
+        uint256 _newCeilingPricePerBuildingInWei
+    );
+
+    event BlockStepChanged(
+        uint256 _oldBlockStep,
+        uint256 _newBlockStep
+    );
+
+    event LastSaleBlockChanged(
+        uint256 _oldLastSaleBlock,
+        uint256 _newLastSaleBlock
+    );
+
+    event LogicGeneratorChanges(
+        address _oldLogicGenerator,
+        address _newLogicGenerator
+    );
+
+    event ColourGeneratorChanges(
+        address _oldColourGenerator,
+        address _newColourGenerator
     );
 
     struct Colour {
@@ -51,9 +77,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 special;
     }
 
-    // FIXME settter
     LogicGenerator public logicGenerator;
-    // FIXME settter
+
     ColourGenerator public colourGenerator;
 
     IBlockCitiesCreator public blockCities;
@@ -63,22 +88,17 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public totalPurchasesInWei = 0;
     uint256[2] public priceDiscountBands = [80, 70];
 
-    // FIXME setter for owner to change
     uint256 public floorPricePerBuildingInWei = 0.05 ether;
 
-    // FIXME setter for owner to change
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
     uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
 
-    // FIXME setter for owner to change
     uint256 public priceStepInWei = 0.01 ether;
 
-    // FIXME setter for owner to change
     uint256 public blockStep = 120;
 
-    // FIXME setter for owner to change
     uint256 public lastSaleBlock = 0;
 
     constructor (
@@ -259,19 +279,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
     }
 
-    function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
-
-        pricePerBuildingInWei = _newPricePerBuildingInWei;
-
+    function setPricePerBuildingInWei(uint256 _pricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _pricePerBuildingInWei);
+        pricePerBuildingInWei = _pricePerBuildingInWei;
         return true;
     }
 
-    function setPriceStepInWei(uint256 _newPriceStepInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(priceStepInWei, _newPriceStepInWei);
-
-        priceStepInWei = _newPriceStepInWei;
-
+    function setPriceStepInWei(uint256 _priceStepInWei) public onlyOwner returns (bool) {
+        emit PriceStepInWeiChanged(priceStepInWei, _priceStepInWei);
+        priceStepInWei = _priceStepInWei;
         return true;
     }
 
@@ -303,5 +319,43 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         for (uint i = 0; i < _addresses.length; i++) {
             addCreditAmount(_addresses[i], _amount);
         }
+
+        return true;
+    }
+
+    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit FloorPricePerBuildingInWeiChanged(floorPricePerBuildingInWei, _floorPricePerBuildingInWei);
+        floorPricePerBuildingInWei = _floorPricePerBuildingInWei;
+        return true;
+    }
+
+    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit CeilingPricePerBuildingInWeiChanged(ceilingPricePerBuildingInWei, _ceilingPricePerBuildingInWei);
+        ceilingPricePerBuildingInWei = _ceilingPricePerBuildingInWei;
+        return true;
+    }
+
+    function setBlockStep(uint256 _blockStep) public onlyOwner returns (bool) {
+        emit BlockStepChanged(blockStep, _blockStep);
+        blockStep = _blockStep;
+        return true;
+    }
+
+    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyOwner returns (bool) {
+        emit LastSaleBlockChanged(lastSaleBlock, _lastSaleBlock);
+        lastSaleBlock = _lastSaleBlock;
+        return true;
+    }
+
+    function setLogicGenerator(LogicGenerator _logicGenerator) public onlyOwner returns (bool) {
+        emit LogicGeneratorChanges(logicGenerator, _logicGenerator);
+        logicGenerator = _logicGenerator;
+        return true;
+    }
+
+    function setColourGenerator(ColourGenerator _colourGenerator) public onlyOwner returns (bool) {
+        emit ColourGeneratorChanges(colourGenerator, _colourGenerator);
+        colourGenerator = _colourGenerator;
+        return true;
     }
 }

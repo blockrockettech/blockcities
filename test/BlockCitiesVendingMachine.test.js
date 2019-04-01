@@ -244,13 +244,154 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             await shouldFail.reverting(this.vendingMachine.setPricePerBuildingInWei(1, {from: tokenOwner}));
         });
 
-        it('should set price if owner', async function () {
+        it('should set if owner', async function () {
             const priceNow = await this.vendingMachine.totalPrice(new BN(1));
             const {logs} = await this.vendingMachine.setPricePerBuildingInWei(123, {from: creator});
             expectEvent.inLogs(
                 logs,
                 `PricePerBuildingInWeiChanged`,
                 {_oldPricePerBuildingInWei: priceNow, _newPricePerBuildingInWei: new BN(123)}
+            );
+        });
+    });
+
+    context.only('ensure only owner can change floor price per building', function () {
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setFloorPricePerBuildingInWei(1, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const floorPricePerBuildingInWei = await this.vendingMachine.floorPricePerBuildingInWei();
+            const {logs} = await this.vendingMachine.setFloorPricePerBuildingInWei(123, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `FloorPricePerBuildingInWeiChanged`,
+                {
+                    _oldFloorPricePerBuildingInWei: floorPricePerBuildingInWei,
+                    _newFloorPricePerBuildingInWei: new BN(123)
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can change ceiling price per building', function () {
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setCeilingPricePerBuildingInWei(100, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const ceilingPricePerBuildingInWei = await this.vendingMachine.ceilingPricePerBuildingInWei();
+            const {logs} = await this.vendingMachine.setCeilingPricePerBuildingInWei(123, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `CeilingPricePerBuildingInWeiChanged`,
+                {
+                    _oldCeilingPricePerBuildingInWei: ceilingPricePerBuildingInWei,
+                    _newCeilingPricePerBuildingInWei: new BN(123)
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can change price step in wei', function () {
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setPriceStepInWei(100, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const priceStepInWei = await this.vendingMachine.priceStepInWei();
+            const {logs} = await this.vendingMachine.setPriceStepInWei(123, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `PriceStepInWeiChanged`,
+                {
+                    _oldPriceStepInWei: priceStepInWei,
+                    _newPriceStepInWei: new BN(123)
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can change block step', function () {
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setBlockStep(100, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const blockStep = await this.vendingMachine.blockStep();
+            const {logs} = await this.vendingMachine.setBlockStep(240, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `BlockStepChanged`,
+                {
+                    _oldBlockStep: blockStep,
+                    _newBlockStep: new BN(240)
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can change last sale block', function () {
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setLastSaleBlock(100, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const lastSaleBlock = await this.vendingMachine.lastSaleBlock();
+            const {logs} = await this.vendingMachine.setLastSaleBlock(1000, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `LastSaleBlockChanged`,
+                {
+                    _oldLastSaleBlock: lastSaleBlock,
+                    _newLastSaleBlock: new BN(1000)
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can change logic generator', function () {
+
+        beforeEach(async function () {
+            this.newLogicGenerator = await LogicGenerator.new({from: creator});
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const {logs} = await this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `LogicGeneratorChanges`,
+                {
+                    _oldLogicGenerator: this.logicGenerator,
+                    _newLogicGenerator: this.newLogicGenerator
+                }
+            );
+        });
+    });
+
+    context.only('ensure only owner can colour logic generator', function () {
+
+        beforeEach(async function () {
+            this.newColourGenerator = await ColourGenerator.new({from: creator});
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: tokenOwner}));
+        });
+
+        it('should set if owner', async function () {
+            const {logs} = await this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: creator});
+            expectEvent.inLogs(
+                logs,
+                `ColourGeneratorChanges`,
+                {
+                    _oldColourGenerator: this.colourGenerator,
+                    _newColourGenerator: this.newColourGenerator
+                }
             );
         });
     });
@@ -413,19 +554,29 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
     });
 
-    context('splitFunds', function () {
+    context.skip('splitFunds', function () {
 
         it('all parties get the correct amounts', async function () {
+            const purchaser = whitelisted;
+            const overpay = new BN(1000000);
+
             const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
-            const overpayPrice = currentPrice.add(new BN(1000000));
+            const overpayPrice = currentPrice.add(overpay);
 
             const blockcities = new BN((await web3.eth.getBalance(blockcitiesAccount)));
             const partner = new BN((await web3.eth.getBalance(creator)));
+            const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
-            await this.vendingMachine.mintBuildingTo(whitelisted, {from: whitelisted, value: overpayPrice});
+            const receipt = await this.vendingMachine.mintBuildingTo(purchaser, {
+                from: purchaser,
+                value: overpayPrice
+            });
+            const gasCosts = await getGasCosts(receipt);
 
             const blockcitiesAfter = new BN((await web3.eth.getBalance(blockcitiesAccount)));
             const partnerAfter = new BN((await web3.eth.getBalance(creator)));
+
+            const purchaserBalanceAfter = new BN((await web3.eth.getBalance(purchaser)));
 
             // 80% of current
             blockcitiesAfter.should.be.bignumber.equal(blockcities.add(currentPrice.div(new BN(100)).mul(new BN(80))));
@@ -434,8 +585,24 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(20))));
 
             // check refund
-            //FIXME
+            purchaserBalanceAfter.should.be.bignumber.equal(
+                purchaserBalanceBefore
+                    .min(gasCosts)
+                    .min(currentPrice)
+            );
+
+            // balance before txs
+            // minus gas costs
+            // minus cost
+            // plus refund = sent - overpay
         });
 
     });
+
+    async function getGasCosts(receipt) {
+        let tx = await web3.eth.getTransaction(receipt.tx);
+        let gasPrice = toBN(tx.gasPrice);
+        return gasPrice.mul(toBN(receipt.receipt.gasUsed));
+    }
+
 });

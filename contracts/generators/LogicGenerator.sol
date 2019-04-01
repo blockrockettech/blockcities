@@ -117,7 +117,7 @@ contract LogicGenerator is Ownable {
         uint256 aRoof = buildingRoofMappings[aBuilding][generate(hash, _sender, buildingRoofMappings[aBuilding].length)];
         uint256 aSpecial = 0;
 
-        // 1 in 3 roughly
+        // 1 in X roughly
         if (isSpecial(block.number)) {
             aSpecial = generate(hash, _sender, 11);
         }
