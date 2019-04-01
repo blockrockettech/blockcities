@@ -82,13 +82,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
-    uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
+    uint256 pricePerBuildingInWei = 0.075 ether;
 
-    uint256 public priceStepInWei = 0.01 ether;
+    uint256 public priceStepInWei = 0.0003 ether;
 
     uint256 public blockStep = 240;
 
     uint256 public lastSaleBlock = 0;
+    uint256 public lastSalePrice = 0;
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -231,13 +232,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _stepIncrease() internal {
+        lastSalePrice = pricePerBuildingInWei;
+        lastSaleBlock = block.number;
+
         pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
 
         if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
             pricePerBuildingInWei = ceilingPricePerBuildingInWei;
         }
-
-        lastSaleBlock = block.number;
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {

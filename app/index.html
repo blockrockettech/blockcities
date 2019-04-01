@@ -32,7 +32,7 @@
         <div class="row" v-if="buildingMetaData">
             <div class="col">
                 <code>
-                    {{ buildingMetaData}}
+                    {{ buildingMetaData }}
                 </code>
             </div>
             <div class="col text-center">
@@ -48,15 +48,15 @@
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
                 <h3 class="text-center">{{ lookupCityName(b.data.city) }}</h3>
                 <p class="small">
-                    <span class="text-muted">City</span> <code>{{ b.data.city }}</code><br/>
-                    <span class="text-muted">Building</span> <code>{{ b.data.building }}</code><br/>
-                    <span class="text-muted">Base</span> <code>{{ b.data.base }}</code><br/>
-                    <span class="text-muted">Body</span> <code>{{ b.data.body }}</code><br/>
-                    <span class="text-muted">Roof</span> <code>{{ b.data.roof }}</code><br/>
-                    <span class="text-muted">Exterior</span> <code>{{ b.data.exteriorColorway }}</code><br/>
-                    <span class="text-muted">Windows</span> <code>{{ b.data.windowColorway }}</code>
+                    <span class="text-muted">City</span> <code>{{ b.data.attributes.city }}</code><br/>
+                    <span class="text-muted">Building</span> <code>{{ b.data.attributes.building }}</code><br/>
+                    <span class="text-muted">Base</span> <code>{{ b.data.attributes.base }}</code><br/>
+                    <span class="text-muted">Body</span> <code>{{ b.data.attributes.body }}</code><br/>
+                    <span class="text-muted">Roof</span> <code>{{ b.data.attributes.roof }}</code><br/>
+                    <span class="text-muted">Exterior</span> <code>{{ b.data.attributes.exteriorColorway }}</code><br/>
+                    <span class="text-muted">Windows</span> <code>{{ b.data.attributes.backgroundColorway }}</code>
                 </p>
-                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.architect }}</code></p>
+                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect }}</code></p>
             </div>
         </div>
     </div>
@@ -1800,7 +1800,8 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}/details`);
+                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}`);
+                console.log(resp);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             }
@@ -1824,7 +1825,7 @@
             const allBuildings = [];
             for (let i = 1; i <= this.totalBuildings; i++) {
                 console.log(i);
-                allBuildings.push(axios.get(`${this.rootApi}/network/${networkId}/token/${i}/details`));
+                allBuildings.push(axios.get(`${this.rootApi}/network/${networkId}/token/${i}`));
             }
 
             this.buildings = await Promise.all(allBuildings);
