@@ -23,6 +23,19 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
         // Create generators
         this.logicGenerator = await LogicGenerator.new({from: creator});
+
+        this.logicGenerator.updateBuildingBaseMappings(0, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(1, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(2, [1,2,3], {from: creator});
+
+        this.logicGenerator.updateBuildingBodyMappings(0, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(1, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(2, [1,2,3], {from: creator});
+
+        this.logicGenerator.updateBuildingRoofMappings(0, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(1, [1,2,3], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(2, [1,2,3], {from: creator});
+
         this.colourGenerator = await ColourGenerator.new({from: creator});
 
         // Create vending machine
