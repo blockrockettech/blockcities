@@ -399,37 +399,37 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
     });
 
-    context.skip('ensure only owner can change logic generator', function () {
+    context('ensure only owner can change logic generator', function () {
 
         beforeEach(async function () {
             this.newLogicGenerator = await LogicGenerator.new({from: creator});
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: tokenOwner}));
+            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: tokenOwner}));
         });
 
         it('should set if owner', async function () {
-            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: creator});
+            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: creator});
             const newValue = await this.vendingMachine.logicGenerator();
-            newValue.should.be.equal(this.newLogicGenerator);
+            newValue.should.be.equal(this.newLogicGenerator.address);
         });
     });
 
-    context.skip('ensure only owner can colour logic generator', function () {
+    context('ensure only owner can colour generator', function () {
 
         beforeEach(async function () {
             this.newColourGenerator = await ColourGenerator.new({from: creator});
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: tokenOwner}));
+            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: tokenOwner}));
         });
 
         it('should set if owner', async function () {
-            await this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: creator});
+            await this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: creator});
             const newValue = await this.vendingMachine.colourGenerator();
-            newValue.should.be.equal(this.newColourGenerator);
+            newValue.should.be.equal(this.newColourGenerator.address);
         });
     });
 
