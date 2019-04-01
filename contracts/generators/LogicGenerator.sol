@@ -24,6 +24,7 @@ contract LogicGenerator is Ownable {
     mapping(uint256 => uint256[]) public buildingRoofMappings;
 
     uint256 public specialModulo = 7;
+    uint256 public specialNo = 11;
 
     constructor () public {
         // ATL
@@ -119,7 +120,7 @@ contract LogicGenerator is Ownable {
 
         // 1 in X roughly
         if (isSpecial(block.number)) {
-            aSpecial = generate(hash, _sender, 11);
+            aSpecial = generate(hash, _sender, specialNo);
         }
 
         emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
@@ -151,4 +152,10 @@ contract LogicGenerator is Ownable {
     function updateSpecialModulo(uint256 _specialModulo) public onlyOwner {
         specialModulo = _specialModulo;
     }
+
+    function updateSpecialNo(uint256 _specialNo) public onlyOwner {
+        specialNo = _specialNo;
+    }
+
+    //FIXME break out citymapping set and percentages
 }

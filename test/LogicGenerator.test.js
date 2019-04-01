@@ -4,7 +4,7 @@ const LogicGenerator = artifacts.require('LogicGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
+contract.only('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
 
     before(async function () {
         this.generator = await LogicGenerator.new({from: creator});
@@ -59,7 +59,7 @@ contract('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
     });
 
     it('generate me some randoms', async function () {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 50; i++) {
             const {logs} = await this.generator.generate(randomAccount());
             console.log(logs);
         }
@@ -77,21 +77,59 @@ contract('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
         });
     });
 
-    // context('updateBuildingMapping', function () {
-    //     it('only owner ', async function () {
-    //         await this.generator.updateBuildingMapping(0, [1,2,3], {from: creator});
-    //         const mappingBase = await this.generator.buildingMappings(0, 0);
-    //         const mappingBody = await this.generator.buildingMappings(0, 1);
-    //         const mappingRoof = await this.generator.buildingMappings(0, 2);
-    //         mappingBase.should.be.bignumber.equal(new BN(1));
-    //         mappingBody.should.be.bignumber.equal(new BN(2));
-    //         mappingRoof.should.be.bignumber.equal(new BN(3));
-    //     });
-    //
-    //     it('should revert if not owner', async function () {
-    //         await shouldFail.reverting(this.generator.updateBuildingMapping(1, [1,2,3], {from: other}));
-    //     });
-    // });
+    context('updateSpecialNo', function () {
+        it('only owner ', async function () {
+            await this.generator.updateSpecialNo(23, {from: creator});
+            const special = await this.generator.specialNo();
+            special.should.be.bignumber.equal(new BN(23));
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.generator.updateSpecialNo(1, {from: other}));
+        });
+    });
+
+    context('updateBuildingBaseMappings', function () {
+        it('only owner ', async function () {
+            await this.generator.updateBuildingBaseMappings(0, [1, 2], {from: creator});
+            const base0 = await this.generator.buildingBaseMappings(0, 0);
+            const base1 = await this.generator.buildingBaseMappings(0, 1);
+            base0.should.be.bignumber.equal(new BN(1));
+            base1.should.be.bignumber.equal(new BN(2));
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.generator.updateBuildingBaseMappings(1, [1,2,3], {from: other}));
+        });
+    });
+
+    context('updateBuildingBodyMappings', function () {
+        it('only owner ', async function () {
+            await this.generator.updateBuildingBodyMappings(0, [1, 2], {from: creator});
+            const body0 = await this.generator.buildingBodyMappings(0, 0);
+            const body1 = await this.generator.buildingBodyMappings(0, 1);
+            body0.should.be.bignumber.equal(new BN(1));
+            body1.should.be.bignumber.equal(new BN(2));
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.generator.updateBuildingBodyMappings(1, [1,2,3], {from: other}));
+        });
+    });
+
+    context('updateBuildingBodyMappings', function () {
+        it('only owner ', async function () {
+            await this.generator.updateBuildingRoofMappings(0, [1, 2], {from: creator});
+            const roof0 = await this.generator.buildingRoofMappings(0, 0);
+            const roof1 = await this.generator.buildingRoofMappings(0, 1);
+            roof0.should.be.bignumber.equal(new BN(1));
+            roof1.should.be.bignumber.equal(new BN(2));
+        });
+
+        it('should revert if not owner', async function () {
+            await shouldFail.reverting(this.generator.updateBuildingRoofMappings(1, [1,2,3], {from: other}));
+        });
+    });
 
     function randomAccount () {
         // Random account between 0-5
