@@ -122,9 +122,28 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
 
         it('building has attributes', async function () {
-            // 4 = base, body, roof, and architect
-            const attrs = await this.blockCities.attributes(1);
-            attrs[0].should.be.bignumber.lte('6'); // FIXME add all attrs
+            const {
+                _exteriorColorway,
+                _backgroundColorway,
+                _city,
+                _building,
+                _base,
+                _body,
+                _roof,
+                _special,
+                _architect,
+            } = await this.blockCities.attributes(1);
+
+            // Values are deterministic as based on block and nonce
+            _exteriorColorway.should.be.bignumber.equal('17');
+            _backgroundColorway.should.be.bignumber.equal('4');
+            _city.should.be.bignumber.equal('1');
+            _building.should.be.bignumber.equal('0');
+            _base.should.be.bignumber.equal('0');
+            _body.should.be.bignumber.equal('0');
+            _roof.should.be.bignumber.equal('0');
+            _special.should.be.bignumber.equal('0');
+            _architect.should.be.equal(tokenOwner);
         });
 
         // FIXME - should be in BlockCities test file - create one
@@ -248,7 +267,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         it('returns total price for one', async function () {
             // minted one
             const price = await this.vendingMachine.totalPrice(new BN(1));
-            price.should.be.bignumber.equal(this.floor.add(this.priceStep)); // FIXME - use floor + step
+            price.should.be.bignumber.equal(this.floor.add(this.priceStep));
         });
 
         it('returns total price for three', async function () {
@@ -399,37 +418,37 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
     });
 
-    context.skip('ensure only owner can change logic generator', function () {
+    context('ensure only owner can change logic generator', function () {
 
         beforeEach(async function () {
             this.newLogicGenerator = await LogicGenerator.new({from: creator});
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: tokenOwner}));
+            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: tokenOwner}));
         });
 
         it('should set if owner', async function () {
-            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator, {from: creator});
+            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: creator});
             const newValue = await this.vendingMachine.logicGenerator();
-            newValue.should.be.equal(this.newLogicGenerator);
+            newValue.should.be.equal(this.newLogicGenerator.address);
         });
     });
 
-    context.skip('ensure only owner can colour logic generator', function () {
+    context('ensure only owner can colour generator', function () {
 
         beforeEach(async function () {
             this.newColourGenerator = await ColourGenerator.new({from: creator});
         });
 
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: tokenOwner}));
+            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: tokenOwner}));
         });
 
         it('should set if owner', async function () {
-            await this.vendingMachine.setColourGenerator(this.newColourGenerator, {from: creator});
+            await this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: creator});
             const newValue = await this.vendingMachine.colourGenerator();
-            newValue.should.be.equal(this.newColourGenerator);
+            newValue.should.be.equal(this.newColourGenerator.address);
         });
     });
 
