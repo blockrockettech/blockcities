@@ -613,7 +613,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
     });
 
-    context.skip('splitFunds', function () {
+    context('splitFunds', function () {
 
         it('all parties get the correct amounts', async function () {
             const purchaser = whitelisted;
@@ -643,25 +643,20 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             // 20% of current
             partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(20))));
 
-            // check refund
+            // check refund is applied and only pay for current price, not the overpay
             purchaserBalanceAfter.should.be.bignumber.equal(
                 purchaserBalanceBefore
-                    .min(gasCosts)
-                    .min(currentPrice)
+                    .sub(gasCosts)
+                    .sub(currentPrice)
             );
-
-            // balance before txs
-            // minus gas costs
-            // minus cost
-            // plus refund = sent - overpay
         });
 
     });
 
     async function getGasCosts(receipt) {
         let tx = await web3.eth.getTransaction(receipt.tx);
-        let gasPrice = toBN(tx.gasPrice);
-        return gasPrice.mul(toBN(receipt.receipt.gasUsed));
+        let gasPrice = new BN(tx.gasPrice);
+        return gasPrice.mul(new BN(receipt.receipt.gasUsed));
     }
 
 });
