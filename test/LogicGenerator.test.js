@@ -12,71 +12,25 @@ contract('LogicGenerator tests', (accounts) => {
     before(async function () {
         this.generator = await LogicGenerator.new({from: creator});
 
-        // Setup city variant distribution
-        await this.generator.updateCityPercentages([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2], {from: creator});
+        await this.generator.updateCityPercentages([0, 1], {from: creator});
 
-        // ATL
-        await this.generator.updateCityMappings(0, [2, 2, 2, 2, 2, 5, 5, 5, 15, 15], {from: creator});
-
-        // NYC
-        await this.generator.updateCityMappings(1, [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14], {from: creator});
-
-        // CHI
-        await this.generator.updateCityMappings(2, [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11], {from: creator});
-
-        // SF
-        await this.generator.updateCityMappings(3, [12, 13], {from: creator});
+        await this.generator.updateCityMappings(0, [0, 1], {from: creator});
+        await this.generator.updateCityMappings(1, [2, 3], {from: creator});
 
         await this.generator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBaseMappings(3, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(4, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(5, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(6, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(7, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(8, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(9, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(10, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(11, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(12, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(13, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(14, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(15, [0, 1, 2], {from: creator});
 
         await this.generator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(2, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingBodyMappings(3, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(4, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(5, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(6, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(7, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(8, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(9, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(10, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(11, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(12, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(13, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(14, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(15, [0, 1, 2], {from: creator});
 
         await this.generator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(2, [0, 1, 2], {from: creator});
         await this.generator.updateBuildingRoofMappings(3, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(4, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(5, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(6, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(7, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(8, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(9, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(10, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(11, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(12, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(13, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(15, [0, 1, 2], {from: creator});
     });
 
     it('generate me some randoms', async function () {
@@ -154,7 +108,7 @@ contract('LogicGenerator tests', (accounts) => {
         });
     });
 
-    function randomAccount() {
+    function randomAccount () {
         // Random account between 0-5
         return accounts[Math.floor(Math.random() * Math.floor(5))];
     }

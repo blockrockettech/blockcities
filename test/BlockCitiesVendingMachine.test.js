@@ -22,79 +22,33 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
         // Create generators
-        this.logicGenerator = await LogicGenerator.new({from: creator});
+        this.generator = await LogicGenerator.new({from: creator});
 
-        // Setup city variant distribution
-        await this.logicGenerator.updateCityPercentages([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2], {from: creator});
+        await this.generator.updateCityPercentages([0, 1], {from: creator});
 
-        // ATL
-        await this.logicGenerator.updateCityMappings(0, [2, 2, 2, 2, 2, 5, 5, 5, 15, 15], {from: creator});
+        await this.generator.updateCityMappings(0, [0, 1], {from: creator});
+        await this.generator.updateCityMappings(1, [2, 3], {from: creator});
 
-        // NYC
-        await this.logicGenerator.updateCityMappings(1, [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14], {from: creator});
+        await this.generator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBaseMappings(3, [0, 1, 2], {from: creator});
 
-        // CHI
-        await this.logicGenerator.updateCityMappings(2, [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11], {from: creator});
+        await this.generator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBodyMappings(2, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingBodyMappings(3, [0, 1, 2], {from: creator});
 
-        // SF
-        await this.logicGenerator.updateCityMappings(3, [12, 13], {from: creator});
-
-        await this.logicGenerator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(3, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(4, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(5, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(6, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(7, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(8, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(9, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(10, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(11, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(12, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(13, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(14, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBaseMappings(15, [0, 1, 2], {from: creator});
-
-        await this.logicGenerator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(2, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(3, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(4, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(5, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(6, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(7, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(8, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(9, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(10, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(11, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(12, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(13, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(14, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingBodyMappings(15, [0, 1, 2], {from: creator});
-
-        await this.logicGenerator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(2, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(3, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(4, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(5, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(6, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(7, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(8, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(9, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(10, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(11, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(12, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(13, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
-        await this.logicGenerator.updateBuildingRoofMappings(15, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingRoofMappings(2, [0, 1, 2], {from: creator});
+        await this.generator.updateBuildingRoofMappings(3, [0, 1, 2], {from: creator});
 
         this.colourGenerator = await ColourGenerator.new({from: creator});
 
         // Create vending machine
         this.vendingMachine = await BlockCitiesVendingMachine.new(
-            this.logicGenerator.address,
+            this.generator.address,
             this.colourGenerator.address,
             this.blockCities.address,
             blockcitiesAccount,
@@ -139,7 +93,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             (await this.blockCities.tokensOfOwner(tokenOwner))[0].should.be.bignumber.equal(firstTokenId);
         });
 
-        it.skip('building has attributes', async function () {
+        it('building has attributes', async function () {
             const {
                 _exteriorColorway,
                 _backgroundColorway,
@@ -151,16 +105,15 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
                 _special,
                 _architect,
             } = await this.blockCities.attributes(1);
-
-            // Values are deterministic as based on block and nonce
-            _exteriorColorway.should.be.bignumber.equal('17');
-            _backgroundColorway.should.be.bignumber.equal('4');
-            _city.should.be.bignumber.equal('1');
-            _building.should.be.bignumber.equal('0');
-            _base.should.be.bignumber.equal('0');
-            _body.should.be.bignumber.equal('0');
-            _roof.should.be.bignumber.equal('0');
-            _special.should.be.bignumber.equal('0');
+            
+            _exteriorColorway.should.be.bignumber.gte(new BN(0));
+            _backgroundColorway.should.be.bignumber.gte(new BN(0));
+            _city.should.be.bignumber.gte(new BN(0));
+            _building.should.be.bignumber.gte(new BN(0));
+            _base.should.be.bignumber.gte(new BN(0));
+            _body.should.be.bignumber.gte(new BN(0));
+            _roof.should.be.bignumber.gte(new BN(0));
+            _special.should.be.bignumber.gte(new BN(0));
             _architect.should.be.equal(tokenOwner);
         });
 
@@ -186,7 +139,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
 
             const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
-            // console.log(blockSale.toString(), priceBefore.toString(), priceAfter.toString());
             priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
 
             // should move step up once
@@ -194,6 +146,21 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
             const priceAfterBatch = await this.vendingMachine.totalPrice(new BN(1));
             priceAfterBatch.should.be.bignumber.equal(priceAfter.add(priceStep));
+        });
+
+        it('price adjusts on invocation but not above ceiling', async function () {
+            const ceiling = await this.vendingMachine.ceilingPricePerBuildingInWei();
+            await this.vendingMachine.setPricePerBuildingInWei(ceiling, {from: creator});
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
+
+            const priceAfter0 = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfter0.should.be.bignumber.equal(ceiling);
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
+
+            const priceAfter1 = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfter1.should.be.bignumber.equal(ceiling);
         });
     });
 
