@@ -9,9 +9,8 @@ const {INFURA_KEY} = require('../constants');
 
 const logic_generator_config = require('./data/logic_generator');
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '2000000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '4000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
-
 
 function getHttpProviderUri(network) {
     if (network === 'local') {

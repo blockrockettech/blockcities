@@ -83,7 +83,7 @@
     // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
-    const networkId = 5777;
+    const networkId = 4;
 
     new Vue({
         el: '#vue-app',
@@ -92,1667 +92,1667 @@
             blockcitiesAddress: `0x70D0C5f857C0C57190566d45AaF53234b65B8bE9`,
             blockcitiesAbi: [
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "interfaceId",
-                            "type": "bytes4"
+                            'name': 'interfaceId',
+                            'type': 'bytes4'
                         }
                     ],
-                    "name": "supportsInterface",
-                    "outputs": [
+                    'name': 'supportsInterface',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x01ffc9a7"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x01ffc9a7'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "name",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'name',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "string"
+                            'name': '',
+                            'type': 'string'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x06fdde03"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x06fdde03'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "getApproved",
-                    "outputs": [
+                    'name': 'getApproved',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x081812fc"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x081812fc'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "to",
-                            "type": "address"
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "approve",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x095ea7b3"
+                    'name': 'approve',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x095ea7b3'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "account",
-                            "type": "address"
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "addWhitelisted",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x10154bad"
+                    'name': 'addWhitelisted',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x10154bad'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "totalSupply",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'totalSupply',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x18160ddd"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x18160ddd'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "from",
-                            "type": "address"
+                            'name': 'from',
+                            'type': 'address'
                         },
                         {
-                            "name": "to",
-                            "type": "address"
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "transferFrom",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x23b872dd"
+                    'name': 'transferFrom',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x23b872dd'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "account",
-                            "type": "address"
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "removeWhitelisted",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x291d9549"
+                    'name': 'removeWhitelisted',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x291d9549'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "owner",
-                            "type": "address"
+                            'name': 'owner',
+                            'type': 'address'
                         },
                         {
-                            "name": "index",
-                            "type": "uint256"
+                            'name': 'index',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "tokenOfOwnerByIndex",
-                    "outputs": [
+                    'name': 'tokenOfOwnerByIndex',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x2f745c59"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x2f745c59'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "account",
-                            "type": "address"
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "isWhitelisted",
-                    "outputs": [
+                    'name': 'isWhitelisted',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x3af32abf"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x3af32abf'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "tokenIdPointer",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'tokenIdPointer',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x3b3a1a7a"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x3b3a1a7a'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "totalBuildings",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'totalBuildings',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x3ba5c722"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x3ba5c722'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "from",
-                            "type": "address"
+                            'name': 'from',
+                            'type': 'address'
                         },
                         {
-                            "name": "to",
-                            "type": "address"
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "safeTransferFrom",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x42842e0e"
+                    'name': 'safeTransferFrom',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x42842e0e'
                 },
                 {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "renounceWhitelistAdmin",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x4c5a628c"
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'renounceWhitelistAdmin',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x4c5a628c'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "tokenBaseURI",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'tokenBaseURI',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "string"
+                            'name': '',
+                            'type': 'string'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x4e99b800"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x4e99b800'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "index",
-                            "type": "uint256"
+                            'name': 'index',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "tokenByIndex",
-                    "outputs": [
+                    'name': 'tokenByIndex',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x4f6ccce7"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x4f6ccce7'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "ownerOf",
-                    "outputs": [
+                    'name': 'ownerOf',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x6352211e"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x6352211e'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "owner",
-                            "type": "address"
+                            'name': 'owner',
+                            'type': 'address'
                         }
                     ],
-                    "name": "balanceOf",
-                    "outputs": [
+                    'name': 'balanceOf',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x70a08231"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x70a08231'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "account",
-                            "type": "address"
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "addWhitelistAdmin",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x7362d9c8"
+                    'name': 'addWhitelistAdmin',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x7362d9c8'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "symbol",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'symbol',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "string"
+                            'name': '',
+                            'type': 'string'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x95d89b41"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x95d89b41'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "to",
-                            "type": "address"
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "name": "approved",
-                            "type": "bool"
+                            'name': 'approved',
+                            'type': 'bool'
                         }
                     ],
-                    "name": "setApprovalForAll",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xa22cb465"
+                    'name': 'setApprovalForAll',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xa22cb465'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "from",
-                            "type": "address"
+                            'name': 'from',
+                            'type': 'address'
                         },
                         {
-                            "name": "to",
-                            "type": "address"
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_data",
-                            "type": "bytes"
+                            'name': '_data',
+                            'type': 'bytes'
                         }
                     ],
-                    "name": "safeTransferFrom",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xb88d4fde"
+                    'name': 'safeTransferFrom',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xb88d4fde'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "account",
-                            "type": "address"
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "isWhitelistAdmin",
-                    "outputs": [
+                    'name': 'isWhitelistAdmin',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xbb5f747b"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xbb5f747b'
                 },
                 {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "renounceWhitelisted",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xd6cd9473"
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'renounceWhitelisted',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xd6cd9473'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "owner",
-                            "type": "address"
+                            'name': 'owner',
+                            'type': 'address'
                         },
                         {
-                            "name": "operator",
-                            "type": "address"
+                            'name': 'operator',
+                            'type': 'address'
                         }
                     ],
-                    "name": "isApprovedForAll",
-                    "outputs": [
+                    'name': 'isApprovedForAll',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xe985e9c5"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xe985e9c5'
                 },
                 {
-                    "inputs": [
+                    'inputs': [
                         {
-                            "name": "_tokenBaseURI",
-                            "type": "string"
+                            'name': '_tokenBaseURI',
+                            'type': 'string'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "constructor",
-                    "signature": "constructor"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'constructor',
+                    'signature': 'constructor'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'indexed': true,
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": true,
-                            "name": "_to",
-                            "type": "address"
+                            'indexed': true,
+                            'name': '_to',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "_architect",
-                            "type": "address"
+                            'indexed': true,
+                            'name': '_architect',
+                            'type': 'address'
                         }
                     ],
-                    "name": "BuildingMinted",
-                    "type": "event",
-                    "signature": "0x90ac329ea07c00bb85a3b33470a0318e5d1a5e181fd50431248bc3c750695277"
+                    'name': 'BuildingMinted',
+                    'type': 'event',
+                    'signature': '0x90ac329ea07c00bb85a3b33470a0318e5d1a5e181fd50431248bc3c750695277'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "account",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "WhitelistedAdded",
-                    "type": "event",
-                    "signature": "0xee1504a83b6d4a361f4c1dc78ab59bfa30d6a3b6612c403e86bb01ef2984295f"
+                    'name': 'WhitelistedAdded',
+                    'type': 'event',
+                    'signature': '0xee1504a83b6d4a361f4c1dc78ab59bfa30d6a3b6612c403e86bb01ef2984295f'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "account",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "WhitelistedRemoved",
-                    "type": "event",
-                    "signature": "0x270d9b30cf5b0793bbfd54c9d5b94aeb49462b8148399000265144a8722da6b6"
+                    'name': 'WhitelistedRemoved',
+                    'type': 'event',
+                    'signature': '0x270d9b30cf5b0793bbfd54c9d5b94aeb49462b8148399000265144a8722da6b6'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "account",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "WhitelistAdminAdded",
-                    "type": "event",
-                    "signature": "0x22380c05984257a1cb900161c713dd71d39e74820f1aea43bd3f1bdd20961299"
+                    'name': 'WhitelistAdminAdded',
+                    'type': 'event',
+                    'signature': '0x22380c05984257a1cb900161c713dd71d39e74820f1aea43bd3f1bdd20961299'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "account",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'account',
+                            'type': 'address'
                         }
                     ],
-                    "name": "WhitelistAdminRemoved",
-                    "type": "event",
-                    "signature": "0x0a8eb35e5ca14b3d6f28e4abf2f128dbab231a58b56e89beb5d636115001e165"
+                    'name': 'WhitelistAdminRemoved',
+                    'type': 'event',
+                    'signature': '0x0a8eb35e5ca14b3d6f28e4abf2f128dbab231a58b56e89beb5d636115001e165'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "from",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'from',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "to",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'to',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'indexed': true,
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "Transfer",
-                    "type": "event",
-                    "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+                    'name': 'Transfer',
+                    'type': 'event',
+                    'signature': '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "owner",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'owner',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "approved",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'approved',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'indexed': true,
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "Approval",
-                    "type": "event",
-                    "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+                    'name': 'Approval',
+                    'type': 'event',
+                    'signature': '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "owner",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'owner',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "operator",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'operator',
+                            'type': 'address'
                         },
                         {
-                            "indexed": false,
-                            "name": "approved",
-                            "type": "bool"
+                            'indexed': false,
+                            'name': 'approved',
+                            'type': 'bool'
                         }
                     ],
-                    "name": "ApprovalForAll",
-                    "type": "event",
-                    "signature": "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31"
+                    'name': 'ApprovalForAll',
+                    'type': 'event',
+                    'signature': '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_exteriorColorway",
-                            "type": "uint256"
+                            'name': '_exteriorColorway',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_backgroundColorway",
-                            "type": "uint256"
+                            'name': '_backgroundColorway',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_city",
-                            "type": "uint256"
+                            'name': '_city',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_building",
-                            "type": "uint256"
+                            'name': '_building',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_base",
-                            "type": "uint256"
+                            'name': '_base',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_body",
-                            "type": "uint256"
+                            'name': '_body',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_roof",
-                            "type": "uint256"
+                            'name': '_roof',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_special",
-                            "type": "uint256"
+                            'name': '_special',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_architect",
-                            "type": "address"
+                            'name': '_architect',
+                            'type': 'address'
                         }
                     ],
-                    "name": "createBuilding",
-                    "outputs": [
+                    'name': 'createBuilding',
+                    'outputs': [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x90708008"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x90708008'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "tokenId",
-                            "type": "uint256"
+                            'name': 'tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "tokenURI",
-                    "outputs": [
+                    'name': 'tokenURI',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "string"
+                            'name': '',
+                            'type': 'string'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xc87b56dd"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xc87b56dd'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "attributes",
-                    "outputs": [
+                    'name': 'attributes',
+                    'outputs': [
                         {
-                            "name": "_exteriorColorway",
-                            "type": "uint256"
+                            'name': '_exteriorColorway',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_backgroundColorway",
-                            "type": "uint256"
+                            'name': '_backgroundColorway',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_city",
-                            "type": "uint256"
+                            'name': '_city',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_building",
-                            "type": "uint256"
+                            'name': '_building',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_base",
-                            "type": "uint256"
+                            'name': '_base',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_body",
-                            "type": "uint256"
+                            'name': '_body',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_roof",
-                            "type": "uint256"
+                            'name': '_roof',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_special",
-                            "type": "uint256"
+                            'name': '_special',
+                            'type': 'uint256'
                         },
                         {
-                            "name": "_architect",
-                            "type": "address"
+                            'name': '_architect',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xd05dcc6a"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xd05dcc6a'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "owner",
-                            "type": "address"
+                            'name': 'owner',
+                            'type': 'address'
                         }
                     ],
-                    "name": "tokensOfOwner",
-                    "outputs": [
+                    'name': 'tokensOfOwner',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256[]"
+                            'name': '',
+                            'type': 'uint256[]'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x8462151c"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x8462151c'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "burn",
-                    "outputs": [
+                    'name': 'burn',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x42966c68"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x42966c68'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_newBaseURI",
-                            "type": "string"
+                            'name': '_newBaseURI',
+                            'type': 'string'
                         }
                     ],
-                    "name": "updateTokenBaseURI",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x2295ee5b"
+                    'name': 'updateTokenBaseURI',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x2295ee5b'
                 }
             ],
             blockcitiesContract: null,
             vendingAddress: `0xf2E12DAc448F9BC0809f9aba8AfAd25848896f1c`,
             vendingAbi: [
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "floorPricePerBuildingInWei",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'floorPricePerBuildingInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x0113ddea"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x0113ddea'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "blockcities",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'blockcities',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x068cc81e"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x068cc81e'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "blockCities",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'blockCities',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x0bd3b6fd"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x0bd3b6fd'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "lastSaleBlock",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'lastSaleBlock',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x19a266ca"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x19a266ca'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "colourGenerator",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'colourGenerator',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x42b9d5e0"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x42b9d5e0'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_partner",
-                            "type": "address"
+                            'name': '_partner',
+                            'type': 'address'
                         }
                     ],
-                    "name": "updatePartnerAddress",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x44a71fbb"
+                    'name': 'updatePartnerAddress',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x44a71fbb'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "totalPurchasesInWei",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'totalPurchasesInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x5f1e98c7"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x5f1e98c7'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_techPartnerRate",
-                            "type": "uint256"
+                            'name': '_techPartnerRate',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "updatePartnerRate",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x69aa9b25"
+                    'name': 'updatePartnerRate',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x69aa9b25'
                 },
                 {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "renounceOwnership",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x715018a6"
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'renounceOwnership',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x715018a6'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "logicGenerator",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'logicGenerator',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x73fbae5a"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x73fbae5a'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "owner",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'owner',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x8da5cb5b"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x8da5cb5b'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "isOwner",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'isOwner',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x8f32d59b"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x8f32d59b'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_blockcities",
-                            "type": "address"
+                            'name': '_blockcities',
+                            'type': 'address'
                         }
                     ],
-                    "name": "updateBlockcitiesAddress",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x93f27be9"
+                    'name': 'updateBlockcitiesAddress',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x93f27be9'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "partnerRate",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'partnerRate',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xb7be867e"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xb7be867e'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "priceStepInWei",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'priceStepInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xbddd7655"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xbddd7655'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "partner",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'partner',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xbe10862b"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xbe10862b'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "blockStep",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'blockStep',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xcc11c383"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xcc11c383'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "priceDiscountBands",
-                    "outputs": [
+                    'name': 'priceDiscountBands',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xcc9a062f"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xcc9a062f'
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "ceilingPricePerBuildingInWei",
-                    "outputs": [
+                    'constant': true,
+                    'inputs': [],
+                    'name': 'ceilingPricePerBuildingInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xd9689eeb"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xd9689eeb'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "newOwner",
-                            "type": "address"
+                            'name': 'newOwner',
+                            'type': 'address'
                         }
                     ],
-                    "name": "transferOwnership",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xf2fde38b"
+                    'name': 'transferOwnership',
+                    'outputs': [],
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xf2fde38b'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "",
-                            "type": "address"
+                            'name': '',
+                            'type': 'address'
                         }
                     ],
-                    "name": "credits",
-                    "outputs": [
+                    'name': 'credits',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xfe5ff468"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0xfe5ff468'
                 },
                 {
-                    "inputs": [
+                    'inputs': [
                         {
-                            "name": "_logicGenerator",
-                            "type": "address"
+                            'name': '_logicGenerator',
+                            'type': 'address'
                         },
                         {
-                            "name": "_colourGenerator",
-                            "type": "address"
+                            'name': '_colourGenerator',
+                            'type': 'address'
                         },
                         {
-                            "name": "_blockCities",
-                            "type": "address"
+                            'name': '_blockCities',
+                            'type': 'address'
                         },
                         {
-                            "name": "_blockCitiesAddress",
-                            "type": "address"
+                            'name': '_blockCitiesAddress',
+                            'type': 'address'
                         },
                         {
-                            "name": "_partnerAddress",
-                            "type": "address"
+                            'name': '_partnerAddress',
+                            'type': 'address'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "constructor",
-                    "signature": "constructor"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'constructor',
+                    'signature': 'constructor'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'indexed': true,
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": true,
-                            "name": "_architect",
-                            "type": "address"
+                            'indexed': true,
+                            'name': '_architect',
+                            'type': 'address'
                         }
                     ],
-                    "name": "VendingMachineTriggered",
-                    "type": "event",
-                    "signature": "0x372a2d4d08206e1dfd3c166a68a3079282f2d28d305b51a31446b04522032538"
+                    'name': 'VendingMachineTriggered',
+                    'type': 'event',
+                    'signature': '0x372a2d4d08206e1dfd3c166a68a3079282f2d28d305b51a31446b04522032538'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "_to",
-                            "type": "address"
+                            'indexed': true,
+                            'name': '_to',
+                            'type': 'address'
                         },
                         {
-                            "indexed": false,
-                            "name": "_amount",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_amount',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "CreditAdded",
-                    "type": "event",
-                    "signature": "0x648ec643b30463f72debf7027a0f9ff84bbdf4dc1a2a7ab973cb77dec5326568"
+                    'name': 'CreditAdded',
+                    'type': 'event',
+                    'signature': '0x648ec643b30463f72debf7027a0f9ff84bbdf4dc1a2a7ab973cb77dec5326568'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_priceDiscountBands",
-                            "type": "uint256[2]"
+                            'indexed': false,
+                            'name': '_priceDiscountBands',
+                            'type': 'uint256[2]'
                         }
                     ],
-                    "name": "PriceDiscountBandsChanged",
-                    "type": "event",
-                    "signature": "0x3f6f57f4c984d98b526cc964d520ad73f29807ad468896e02c113d4b61725fca"
+                    'name': 'PriceDiscountBandsChanged',
+                    'type': 'event',
+                    'signature': '0x3f6f57f4c984d98b526cc964d520ad73f29807ad468896e02c113d4b61725fca'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldPriceStepInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldPriceStepInWei',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newPriceStepInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newPriceStepInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "PriceStepInWeiChanged",
-                    "type": "event",
-                    "signature": "0x37a3e83e0286b341a68ba76633b42dbb0a4a82fc4022b52a8d68fdda7a70004e"
+                    'name': 'PriceStepInWeiChanged',
+                    'type': 'event',
+                    'signature': '0x37a3e83e0286b341a68ba76633b42dbb0a4a82fc4022b52a8d68fdda7a70004e'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldPricePerBuildingInWei',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newPricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "PricePerBuildingInWeiChanged",
-                    "type": "event",
-                    "signature": "0x6eb4d51aa48070ba41a35eb953c66c728b4c501b8f861193e18c39999f0e1213"
+                    'name': 'PricePerBuildingInWeiChanged',
+                    'type': 'event',
+                    'signature': '0x6eb4d51aa48070ba41a35eb953c66c728b4c501b8f861193e18c39999f0e1213'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldFloorPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldFloorPricePerBuildingInWei',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newFloorPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newFloorPricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "FloorPricePerBuildingInWeiChanged",
-                    "type": "event",
-                    "signature": "0x38ee7c735d6320ca1146e0d0f3f487300bc2ae465f66d6d7d8bc8ae3f47f1759"
+                    'name': 'FloorPricePerBuildingInWeiChanged',
+                    'type': 'event',
+                    'signature': '0x38ee7c735d6320ca1146e0d0f3f487300bc2ae465f66d6d7d8bc8ae3f47f1759'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldCeilingPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldCeilingPricePerBuildingInWei',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newCeilingPricePerBuildingInWei",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newCeilingPricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "CeilingPricePerBuildingInWeiChanged",
-                    "type": "event",
-                    "signature": "0xe880581dd641cadbdef0f2e2356247b0c6a7dd93bb4a71729a50698f09a044a4"
+                    'name': 'CeilingPricePerBuildingInWeiChanged',
+                    'type': 'event',
+                    'signature': '0xe880581dd641cadbdef0f2e2356247b0c6a7dd93bb4a71729a50698f09a044a4'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldBlockStep",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldBlockStep',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newBlockStep",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newBlockStep',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "BlockStepChanged",
-                    "type": "event",
-                    "signature": "0x373c614e2ae93ee4d5971274986bdb8d7ce56aa7d251d6732e841fddb3c7ff84"
+                    'name': 'BlockStepChanged',
+                    'type': 'event',
+                    'signature': '0x373c614e2ae93ee4d5971274986bdb8d7ce56aa7d251d6732e841fddb3c7ff84'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": false,
-                            "name": "_oldLastSaleBlock",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_oldLastSaleBlock',
+                            'type': 'uint256'
                         },
                         {
-                            "indexed": false,
-                            "name": "_newLastSaleBlock",
-                            "type": "uint256"
+                            'indexed': false,
+                            'name': '_newLastSaleBlock',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "LastSaleBlockChanged",
-                    "type": "event",
-                    "signature": "0x86270eaaec3b663b71c4b521c94db85667cc0b17e0a595fe7d0b2e2a423b2047"
+                    'name': 'LastSaleBlockChanged',
+                    'type': 'event',
+                    'signature': '0x86270eaaec3b663b71c4b521c94db85667cc0b17e0a595fe7d0b2e2a423b2047'
                 },
                 {
-                    "anonymous": false,
-                    "inputs": [
+                    'anonymous': false,
+                    'inputs': [
                         {
-                            "indexed": true,
-                            "name": "previousOwner",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'previousOwner',
+                            'type': 'address'
                         },
                         {
-                            "indexed": true,
-                            "name": "newOwner",
-                            "type": "address"
+                            'indexed': true,
+                            'name': 'newOwner',
+                            'type': 'address'
                         }
                     ],
-                    "name": "OwnershipTransferred",
-                    "type": "event",
-                    "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+                    'name': 'OwnershipTransferred',
+                    'type': 'event',
+                    'signature': '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0'
                 },
                 {
-                    "constant": false,
-                    "inputs": [],
-                    "name": "mintBuilding",
-                    "outputs": [
+                    'constant': false,
+                    'inputs': [],
+                    'name': 'mintBuilding',
+                    'outputs': [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "function",
-                    "signature": "0x6070e053"
+                    'payable': true,
+                    'stateMutability': 'payable',
+                    'type': 'function',
+                    'signature': '0x6070e053'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_to",
-                            "type": "address"
+                            'name': '_to',
+                            'type': 'address'
                         }
                     ],
-                    "name": "mintBuildingTo",
-                    "outputs": [
+                    'name': 'mintBuildingTo',
+                    'outputs': [
                         {
-                            "name": "_tokenId",
-                            "type": "uint256"
+                            'name': '_tokenId',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "function",
-                    "signature": "0x6ff3117f"
+                    'payable': true,
+                    'stateMutability': 'payable',
+                    'type': 'function',
+                    'signature': '0x6ff3117f'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_numberOfBuildings",
-                            "type": "uint256"
+                            'name': '_numberOfBuildings',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "mintBatch",
-                    "outputs": [
+                    'name': 'mintBatch',
+                    'outputs': [
                         {
-                            "name": "_tokenIds",
-                            "type": "uint256[]"
+                            'name': '_tokenIds',
+                            'type': 'uint256[]'
                         }
                     ],
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "function",
-                    "signature": "0x20e409b4"
+                    'payable': true,
+                    'stateMutability': 'payable',
+                    'type': 'function',
+                    'signature': '0x20e409b4'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_to",
-                            "type": "address"
+                            'name': '_to',
+                            'type': 'address'
                         },
                         {
-                            "name": "_numberOfBuildings",
-                            "type": "uint256"
+                            'name': '_numberOfBuildings',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "mintBatchTo",
-                    "outputs": [
+                    'name': 'mintBatchTo',
+                    'outputs': [
                         {
-                            "name": "_tokenIds",
-                            "type": "uint256[]"
+                            'name': '_tokenIds',
+                            'type': 'uint256[]'
                         }
                     ],
-                    "payable": true,
-                    "stateMutability": "payable",
-                    "type": "function",
-                    "signature": "0xd52da3ae"
+                    'payable': true,
+                    'stateMutability': 'payable',
+                    'type': 'function',
+                    'signature': '0xd52da3ae'
                 },
                 {
-                    "constant": true,
-                    "inputs": [
+                    'constant': true,
+                    'inputs': [
                         {
-                            "name": "_numberOfBuildings",
-                            "type": "uint256"
+                            'name': '_numberOfBuildings',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "totalPrice",
-                    "outputs": [
+                    'name': 'totalPrice',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "uint256"
+                            'name': '',
+                            'type': 'uint256'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x221f2285"
+                    'payable': false,
+                    'stateMutability': 'view',
+                    'type': 'function',
+                    'signature': '0x221f2285'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_pricePerBuildingInWei",
-                            "type": "uint256"
+                            'name': '_pricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setPricePerBuildingInWei",
-                    "outputs": [
+                    'name': 'setPricePerBuildingInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x9fc1185e"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x9fc1185e'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_priceStepInWei",
-                            "type": "uint256"
+                            'name': '_priceStepInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setPriceStepInWei",
-                    "outputs": [
+                    'name': 'setPriceStepInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xc4844a87"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xc4844a87'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_newPriceDiscountBands",
-                            "type": "uint256[2]"
+                            'name': '_newPriceDiscountBands',
+                            'type': 'uint256[2]'
                         }
                     ],
-                    "name": "setPriceDiscountBands",
-                    "outputs": [
+                    'name': 'setPriceDiscountBands',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x942bfa6e"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x942bfa6e'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_to",
-                            "type": "address"
+                            'name': '_to',
+                            'type': 'address'
                         }
                     ],
-                    "name": "addCredit",
-                    "outputs": [
+                    'name': 'addCredit',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x7c334d0b"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x7c334d0b'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_to",
-                            "type": "address"
+                            'name': '_to',
+                            'type': 'address'
                         },
                         {
-                            "name": "_amount",
-                            "type": "uint256"
+                            'name': '_amount',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "addCreditAmount",
-                    "outputs": [
+                    'name': 'addCreditAmount',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x51b6bdb5"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x51b6bdb5'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_addresses",
-                            "type": "address[]"
+                            'name': '_addresses',
+                            'type': 'address[]'
                         },
                         {
-                            "name": "_amount",
-                            "type": "uint256"
+                            'name': '_amount',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "addCreditBatch",
-                    "outputs": [
+                    'name': 'addCreditBatch',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x6dd7bb4d"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x6dd7bb4d'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_floorPricePerBuildingInWei",
-                            "type": "uint256"
+                            'name': '_floorPricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setFloorPricePerBuildingInWei",
-                    "outputs": [
+                    'name': 'setFloorPricePerBuildingInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x722e9272"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x722e9272'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_ceilingPricePerBuildingInWei",
-                            "type": "uint256"
+                            'name': '_ceilingPricePerBuildingInWei',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setCeilingPricePerBuildingInWei",
-                    "outputs": [
+                    'name': 'setCeilingPricePerBuildingInWei',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x3249c527"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x3249c527'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_blockStep",
-                            "type": "uint256"
+                            'name': '_blockStep',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setBlockStep",
-                    "outputs": [
+                    'name': 'setBlockStep',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x71b8021a"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x71b8021a'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_lastSaleBlock",
-                            "type": "uint256"
+                            'name': '_lastSaleBlock',
+                            'type': 'uint256'
                         }
                     ],
-                    "name": "setLastSaleBlock",
-                    "outputs": [
+                    'name': 'setLastSaleBlock',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0xad4a6e76"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0xad4a6e76'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_logicGenerator",
-                            "type": "address"
+                            'name': '_logicGenerator',
+                            'type': 'address'
                         }
                     ],
-                    "name": "setLogicGenerator",
-                    "outputs": [
+                    'name': 'setLogicGenerator',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x8972ec6f"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x8972ec6f'
                 },
                 {
-                    "constant": false,
-                    "inputs": [
+                    'constant': false,
+                    'inputs': [
                         {
-                            "name": "_colourGenerator",
-                            "type": "address"
+                            'name': '_colourGenerator',
+                            'type': 'address'
                         }
                     ],
-                    "name": "setColourGenerator",
-                    "outputs": [
+                    'name': 'setColourGenerator',
+                    'outputs': [
                         {
-                            "name": "",
-                            "type": "bool"
+                            'name': '',
+                            'type': 'bool'
                         }
                     ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x624ab8be"
+                    'payable': false,
+                    'stateMutability': 'nonpayable',
+                    'type': 'function',
+                    'signature': '0x624ab8be'
                 }
             ],
             vendingContract: null,
@@ -1778,7 +1778,7 @@
                     gasLimit: 6721975,
 
                     // The price (in wei) per unit of gas
-                    gasPrice: 1000000000,
+                    gasPrice: 6000000000,
 
                     // The amount to send with the transaction (i.e. msg.value)
                     value: this.pricePerBuildingInWei,
@@ -1800,7 +1800,7 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}`);
+                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
                 console.log(resp);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
