@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -23,6 +23,55 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
         // Create generators
         this.logicGenerator = await LogicGenerator.new({from: creator});
+
+        this.logicGenerator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(3, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(4, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(5, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(6, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(7, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(8, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(9, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(10, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(11, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(12, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(13, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBaseMappings(14, [0, 1, 2], {from: creator});
+
+        this.logicGenerator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(2, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(3, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(4, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(5, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(6, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(7, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(8, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(9, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(10, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(11, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(12, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(13, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingBodyMappings(14, [0, 1, 2], {from: creator});
+
+        this.logicGenerator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(2, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(3, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(4, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(5, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(6, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(7, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(8, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(9, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(10, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(11, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(12, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(13, [0, 1, 2], {from: creator});
+        this.logicGenerator.updateBuildingRoofMappings(14, [0, 1, 2], {from: creator});
+
         this.colourGenerator = await ColourGenerator.new({from: creator});
 
         // Create vending machine

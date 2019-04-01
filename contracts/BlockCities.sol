@@ -54,10 +54,10 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
     public onlyWhitelisted returns (uint256 _tokenId) {
         uint256 tokenId = tokenIdPointer.add(1);
 
-        // Reset token pointer
+        // reset token pointer
         tokenIdPointer = tokenId;
 
-        // Create building
+        // create building
         buildings[tokenId] = Building({
             exteriorColorway : _exteriorColorway,
             backgroundColorway : _backgroundColorway,

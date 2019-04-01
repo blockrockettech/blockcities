@@ -9,7 +9,6 @@ import "./generators/LogicGenerator.sol";
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
-import "../contracts-flat/BlockCitiesVendingMachine.sol";
 
 contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     using SafeMath for uint256;
