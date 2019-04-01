@@ -86,7 +86,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public priceStepInWei = 0.01 ether;
 
-    uint256 public blockStep = 120;
+    uint256 public blockStep = 240;
 
     uint256 public lastSaleBlock = 0;
 
