@@ -1,43 +1,24 @@
 const _ = require('lodash');
+const Web3 = require('web3');
 const program = require('commander');
+const HDWalletProvider = require('truffle-hdwallet-provider');
 
-void async function () {
-    ////////////////////////
-    // START : Setup Args //
-    ////////////////////////
+const LogicGenerator = require('../build/contracts/LogicGenerator');
 
-    program
-        .option('-n, --network <n>', 'Network - either 1,3,4,5777', parseInt)
-        .parse(process.argv);
+const {INFURA_KEY} = require('../constants');
 
-    if (!program.network) {
-        console.log(`Please specify --network=1, 3, 4 or 5777`);
-        process.exit();
+const logic_generator_config = require('./data/logic_generator');
+
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '2000000000'};
+console.log(`gas=${gas} | gasPrice=${gasPrice}`);
+
+
+function getHttpProviderUri(network) {
+    if (network === 'local') {
+        return 'HTTP://127.0.0.1:7545';
     }
-
-    //////////////////////
-    // END : Setup Args //
-    //////////////////////
-
-    const networkString = getNetwork(program.network);
-    console.log(`Running on network [${networkString}][${program.network}]`);
-
-
-    const LOGIC_GENERATOR_ABI = require('../build/contracts/BlockCitiesVendingMachine').abi;
-    const LOGIC_GENERATOR_ADDRESS = require('../build/contracts/BlockCitiesVendingMachine').networks[_.toString(program.network)].address;
-
-    const LogicGeneratorContract = new web3.eth.Contract(LOGIC_GENERATOR_ABI, LOGIC_GENERATOR_ADDRESS);
-
-
-    // TODO
-    // load account from see in web3
-    // load contract in web3
-    // load network
-    // load csv for each section
-    // validate
-    // fire in multiple requests as once
-
-}();
+    return `https://${network}.infura.io/v3/${INFURA_KEY}`;
+}
 
 const getNetwork = (network) => {
     return networkSplitter(network, {
@@ -71,3 +52,221 @@ const networkSplitter = (network, {ropsten, rinkeby, mainnet, local}) => {
             throw new Error(`Unknown network ID ${network}`);
     }
 };
+
+void async function () {
+    ////////////////////////
+    // START : Setup Args //
+    ////////////////////////
+
+    program
+        .option('-n, --network <n>', 'Network - either 1,3,4,5777', parseInt)
+        .parse(process.argv);
+
+    if (!program.network) {
+        console.log(`Please specify --network=1, 3, 4 or 5777`);
+        process.exit();
+    }
+
+    const networkString = getNetwork(program.network);
+    console.log(`Running on network [${networkString}][${program.network}]`);
+
+    const mnemonic = process.env.BLOCK_CITIES_MNEMONIC;
+    if (!mnemonic) {
+        throw new Error(`Error missing BLOCK_CITIES_MNEMONIC`);
+    }
+
+    const LOGIC_GENERATOR_ABI = LogicGenerator.abi;
+    const LOGIC_GENERATOR_ADDRESS = LogicGenerator.networks[_.toString(program.network)].address;
+    if (!LOGIC_GENERATOR_ADDRESS || !LOGIC_GENERATOR_ABI) {
+        throw new Error(`Missing ABI or Address for logic generator`);
+    }
+
+    //////////////////////
+    // END : Setup Args //
+    //////////////////////
+
+    const httpProviderUrl = getHttpProviderUri(networkString);
+
+    const provider = new HDWalletProvider(mnemonic, httpProviderUrl, 0);
+    const fromAccount = provider.getAddress();
+
+    const web3 = new Web3(provider);
+
+    const failures = [];
+    const successes = [];
+
+    let startingNonce = await web3.eth.getTransactionCount(fromAccount);
+    console.log(`Using account [${fromAccount}] with starting nonce [${startingNonce}]`);
+
+    const LogicGeneratorContract = new web3.eth.Contract(LOGIC_GENERATOR_ABI, LOGIC_GENERATOR_ADDRESS);
+
+    ///////////////////////
+    // City Distribution //
+    ///////////////////////
+
+    const cityDistribution = logic_generator_config.data.city.distribution;
+
+    const cityPromise = web3.eth
+        .sendTransaction({
+            from: fromAccount,
+            to: LOGIC_GENERATOR_ADDRESS,
+            data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
+            gas: gas,
+            gasPrice: gasPrice,
+            nonce: startingNonce
+        })
+        .then((success) => {
+            successes.push(success.transactionHash);
+            return success;
+        })
+        .catch((e) => {
+            failures.push({error: e});
+            return e;
+        });
+
+    startingNonce++;
+
+    ///////////////////
+    // City Mappings //
+    ///////////////////
+
+    const cityConfig = logic_generator_config.data.city.config;
+    const cityConfigPromises = _.map(cityConfig, (data, city) => {
+        console.log(data, city);
+        const promise = web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .then((success) => {
+                successes.push(success.transactionHash);
+                return success;
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                return e;
+            });
+
+        startingNonce++;
+
+        return promise;
+    });
+
+    ////////////////////////
+    // Buildings Mappings //
+    ////////////////////////
+    const buildingsConfig = logic_generator_config.data.buildings;
+
+    // BASE
+    const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] base [${base}]`);
+        const basePromise = web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .then((success) => {
+                successes.push(success.transactionHash);
+                return success;
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                return e;
+            });
+
+        startingNonce++;
+
+        return basePromise;
+    });
+
+    // BODY
+    const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] body [${body}]`);
+        const bodyPromise = web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .then((success) => {
+                successes.push(success.transactionHash);
+                return success;
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                return e;
+            });
+
+        startingNonce++;
+
+        return bodyPromise;
+    });
+
+    // ROOF
+    const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] roof [${roof}]`);
+        const roofPromise = web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .then((success) => {
+                successes.push(success.transactionHash);
+                return success;
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                return e;
+            });
+
+        startingNonce++;
+
+        return roofPromise;
+    });
+
+    /////////////////////
+    // Wait and Output //
+    /////////////////////
+
+    const promises = [
+        cityPromise,
+        ...cityConfigPromises,
+        ...buildingBasePromises,
+        ...buildingBodyPromises,
+        ...buildingRoofPromises
+    ];
+    // console.log(promises);
+
+    await Promise.all(promises)
+        .then((rawTransactions) => {
+
+            console.log(`
+            Submitted transactions
+              - Success [${successes.length}]
+              - Failures [${failures.length}]
+            `);
+
+            console.log(rawTransactions.map((receipt) => receipt.transactionHash));
+
+            process.exit();
+        })
+        .catch((error) => {
+            console.log("FAILURE", error);
+        });
+
+}();
