@@ -4,7 +4,7 @@ const LogicGenerator = artifacts.require('LogicGenerator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
+contract('LogicGenerator tests', ([_, creator, other, ...accounts]) => {
 
     before(async function () {
         this.generator = await LogicGenerator.new({from: creator});
