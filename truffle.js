@@ -2,12 +2,12 @@ const HDWalletProvider = require('truffle-hdwallet-provider');
 const {INFURA_KEY} = require('./constants');
 
 const mnemonic = process.env.BLOCK_CITIES_MNEMONIC;
-if (!mnemonic) {
-    throw new Error(`
-    You are missing a environment variable called BLOCK_CITIES_MNEMONIC - please set one 
-    e.g. export BLOCK_CITIES_MNEMONIC='<your seed phrase>'
-  `);
-}
+// if (!mnemonic) {
+//     throw new Error(`
+//     You are missing a environment variable called BLOCK_CITIES_MNEMONIC - please set one
+//     e.g. export BLOCK_CITIES_MNEMONIC='<your seed phrase>'
+//   `);
+// }
 
 // Check gas prices before live deploy - https://ethgasstation.info/
 
