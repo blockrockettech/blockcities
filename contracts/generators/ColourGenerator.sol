@@ -37,7 +37,6 @@ contract ColourGenerator is Ownable {
         exteriors = _exteriors;
     }
 
-
     function updateBackgrounds(uint256 _backgrounds) public onlyOwner {
         backgrounds = _backgrounds;
     }
