@@ -36,7 +36,7 @@
                 </code>
             </div>
             <div class="col text-center">
-                <img :src="buildingMetaData.image" class="img-fluid"/>
+                <img :src="buildingMetaData.image" class="img-fluid" style="max-height: 300px"/>
             </div>
         </div>
     </div>
@@ -83,13 +83,13 @@
     // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
-    const networkId = 3;
+    const networkId = 5777;
 
     new Vue({
         el: '#vue-app',
         data: {
             rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
-            blockcitiesAddress: `0x524Af809670Fc0AEDa2dBD3a6b0936BdEb7d4Bc8`,
+            blockcitiesAddress: `0x70D0C5f857C0C57190566d45AaF53234b65B8bE9`,
             blockcitiesAbi: [
                 {
                     "constant": true,
@@ -194,21 +194,6 @@
                     "stateMutability": "view",
                     "type": "function",
                     "signature": "0x18160ddd"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "cityPointer",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x20071a12"
                 },
                 {
                     "constant": false,
@@ -414,26 +399,6 @@
                     "constant": true,
                     "inputs": [
                         {
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "cities",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "bytes32"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0x6a51b918"
-                },
-                {
-                    "constant": true,
-                    "inputs": [
-                        {
                             "name": "owner",
                             "type": "address"
                         }
@@ -620,24 +585,6 @@
                     "inputs": [
                         {
                             "indexed": true,
-                            "name": "_cityId",
-                            "type": "uint256"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "_cityName",
-                            "type": "bytes32"
-                        }
-                    ],
-                    "name": "CityAdded",
-                    "type": "event",
-                    "signature": "0xa2e4e22d1e9b0b4d3847dc1b106906a4ce32e6636b6169a9733c7f70949bbbe7"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [
-                        {
-                            "indexed": true,
                             "name": "account",
                             "type": "address"
                         }
@@ -762,7 +709,7 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "_windowColorway",
+                            "name": "_backgroundColorway",
                             "type": "uint256"
                         },
                         {
@@ -841,7 +788,7 @@
                             "type": "uint256"
                         },
                         {
-                            "name": "_windowColorway",
+                            "name": "_backgroundColorway",
                             "type": "uint256"
                         },
                         {
@@ -899,41 +846,6 @@
                     "signature": "0x8462151c"
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "totalCities",
-                    "outputs": [
-                        {
-                            "name": "_total",
-                            "type": "uint256"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xf09bea14"
-                },
-                {
-                    "constant": false,
-                    "inputs": [
-                        {
-                            "name": "_cityName",
-                            "type": "bytes32"
-                        }
-                    ],
-                    "name": "addCity",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "bool"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x567629ce"
-                },
-                {
                     "constant": false,
                     "inputs": [
                         {
@@ -970,8 +882,38 @@
                 }
             ],
             blockcitiesContract: null,
-            vendingAddress: `0x51ac936177f63930747b197FA7Ee7F81c2C1a0d3`,
+            vendingAddress: `0xf2E12DAc448F9BC0809f9aba8AfAd25848896f1c`,
             vendingAbi: [
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "floorPricePerBuildingInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0x0113ddea"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockcities",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0x068cc81e"
+                },
                 {
                     "constant": true,
                     "inputs": [],
@@ -988,49 +930,19 @@
                     "signature": "0x0bd3b6fd"
                 },
                 {
-                    "constant": false,
-                    "inputs": [
-                        {
-                            "name": "_techPartnerRate",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "updateTechPartnerRate",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x22e836b6"
-                },
-                {
                     "constant": true,
                     "inputs": [],
-                    "name": "techPartner",
+                    "name": "lastSaleBlock",
                     "outputs": [
                         {
                             "name": "",
-                            "type": "address"
+                            "type": "uint256"
                         }
                     ],
                     "payable": false,
                     "stateMutability": "view",
                     "type": "function",
-                    "signature": "0x2700c875"
-                },
-                {
-                    "constant": false,
-                    "inputs": [
-                        {
-                            "name": "_blockCities",
-                            "type": "address"
-                        }
-                    ],
-                    "name": "updateBlockCitiesAddress",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function",
-                    "signature": "0x3ee71ffc"
+                    "signature": "0x19a266ca"
                 },
                 {
                     "constant": true,
@@ -1048,6 +960,21 @@
                     "signature": "0x42b9d5e0"
                 },
                 {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_partner",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "updatePartnerAddress",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x44a71fbb"
+                },
+                {
                     "constant": true,
                     "inputs": [],
                     "name": "totalPurchasesInWei",
@@ -1061,6 +988,21 @@
                     "stateMutability": "view",
                     "type": "function",
                     "signature": "0x5f1e98c7"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_techPartnerRate",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "updatePartnerRate",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x69aa9b25"
                 },
                 {
                     "constant": false,
@@ -1118,49 +1060,114 @@
                     "signature": "0x8f32d59b"
                 },
                 {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "pricePerBuildingInWei",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xb29f3e48"
-                },
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "techPartnerRate",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function",
-                    "signature": "0xb2c80876"
-                },
-                {
                     "constant": false,
                     "inputs": [
                         {
-                            "name": "_techPartner",
+                            "name": "_blockcities",
                             "type": "address"
                         }
                     ],
-                    "name": "updateTechPartnerAddress",
+                    "name": "updateBlockcitiesAddress",
                     "outputs": [],
                     "payable": false,
                     "stateMutability": "nonpayable",
                     "type": "function",
-                    "signature": "0xeddfb745"
+                    "signature": "0x93f27be9"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partnerRate",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xb7be867e"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "priceStepInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xbddd7655"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partner",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xbe10862b"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockStep",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xcc11c383"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "priceDiscountBands",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xcc9a062f"
+                },
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "ceilingPricePerBuildingInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0xd9689eeb"
                 },
                 {
                     "constant": false,
@@ -1210,30 +1217,20 @@
                         {
                             "name": "_blockCities",
                             "type": "address"
+                        },
+                        {
+                            "name": "_blockCitiesAddress",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_partnerAddress",
+                            "type": "address"
                         }
                     ],
                     "payable": false,
                     "stateMutability": "nonpayable",
                     "type": "constructor",
                     "signature": "constructor"
-                },
-                {
-                    "anonymous": false,
-                    "inputs": [
-                        {
-                            "indexed": false,
-                            "name": "_oldPricePerBuildingInWei",
-                            "type": "uint256"
-                        },
-                        {
-                            "indexed": false,
-                            "name": "_newPricePerBuildingInWei",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "PricePerBuildingInWeiChanged",
-                    "type": "event",
-                    "signature": "0x6eb4d51aa48070ba41a35eb953c66c728b4c501b8f861193e18c39999f0e1213"
                 },
                 {
                     "anonymous": false,
@@ -1260,11 +1257,137 @@
                             "indexed": true,
                             "name": "_to",
                             "type": "address"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_amount",
+                            "type": "uint256"
                         }
                     ],
                     "name": "CreditAdded",
                     "type": "event",
-                    "signature": "0x8466168d4947c73f9fa41c3bc9a6e5efc442f28ec139dbfdbdc1ead3ab885389"
+                    "signature": "0x648ec643b30463f72debf7027a0f9ff84bbdf4dc1a2a7ab973cb77dec5326568"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_priceDiscountBands",
+                            "type": "uint256[2]"
+                        }
+                    ],
+                    "name": "PriceDiscountBandsChanged",
+                    "type": "event",
+                    "signature": "0x3f6f57f4c984d98b526cc964d520ad73f29807ad468896e02c113d4b61725fca"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldPriceStepInWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newPriceStepInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "PriceStepInWeiChanged",
+                    "type": "event",
+                    "signature": "0x37a3e83e0286b341a68ba76633b42dbb0a4a82fc4022b52a8d68fdda7a70004e"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldPricePerBuildingInWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newPricePerBuildingInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "PricePerBuildingInWeiChanged",
+                    "type": "event",
+                    "signature": "0x6eb4d51aa48070ba41a35eb953c66c728b4c501b8f861193e18c39999f0e1213"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldFloorPricePerBuildingInWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newFloorPricePerBuildingInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "FloorPricePerBuildingInWeiChanged",
+                    "type": "event",
+                    "signature": "0x38ee7c735d6320ca1146e0d0f3f487300bc2ae465f66d6d7d8bc8ae3f47f1759"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldCeilingPricePerBuildingInWei",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newCeilingPricePerBuildingInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "CeilingPricePerBuildingInWeiChanged",
+                    "type": "event",
+                    "signature": "0xe880581dd641cadbdef0f2e2356247b0c6a7dd93bb4a71729a50698f09a044a4"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldBlockStep",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newBlockStep",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "BlockStepChanged",
+                    "type": "event",
+                    "signature": "0x373c614e2ae93ee4d5971274986bdb8d7ce56aa7d251d6732e841fddb3c7ff84"
+                },
+                {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "name": "_oldLastSaleBlock",
+                            "type": "uint256"
+                        },
+                        {
+                            "indexed": false,
+                            "name": "_newLastSaleBlock",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "LastSaleBlockChanged",
+                    "type": "event",
+                    "signature": "0x86270eaaec3b663b71c4b521c94db85667cc0b17e0a595fe7d0b2e2a423b2047"
                 },
                 {
                     "anonymous": false,
@@ -1303,7 +1426,91 @@
                     "constant": false,
                     "inputs": [
                         {
-                            "name": "_newPricePerBuildingInWei",
+                            "name": "_to",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "mintBuildingTo",
+                    "outputs": [
+                        {
+                            "name": "_tokenId",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function",
+                    "signature": "0x6ff3117f"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_numberOfBuildings",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "mintBatch",
+                    "outputs": [
+                        {
+                            "name": "_tokenIds",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function",
+                    "signature": "0x20e409b4"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_to",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_numberOfBuildings",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "mintBatchTo",
+                    "outputs": [
+                        {
+                            "name": "_tokenIds",
+                            "type": "uint256[]"
+                        }
+                    ],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function",
+                    "signature": "0xd52da3ae"
+                },
+                {
+                    "constant": true,
+                    "inputs": [
+                        {
+                            "name": "_numberOfBuildings",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "totalPrice",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function",
+                    "signature": "0x221f2285"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_pricePerBuildingInWei",
                             "type": "uint256"
                         }
                     ],
@@ -1318,6 +1525,46 @@
                     "stateMutability": "nonpayable",
                     "type": "function",
                     "signature": "0x9fc1185e"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_priceStepInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setPriceStepInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0xc4844a87"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_newPriceDiscountBands",
+                            "type": "uint256[2]"
+                        }
+                    ],
+                    "name": "setPriceDiscountBands",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x942bfa6e"
                 },
                 {
                     "constant": false,
@@ -1343,8 +1590,36 @@
                     "constant": false,
                     "inputs": [
                         {
+                            "name": "_to",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_amount",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "addCreditAmount",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x51b6bdb5"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
                             "name": "_addresses",
                             "type": "address[]"
+                        },
+                        {
+                            "name": "_amount",
+                            "type": "uint256"
                         }
                     ],
                     "name": "addCreditBatch",
@@ -1357,7 +1632,127 @@
                     "payable": false,
                     "stateMutability": "nonpayable",
                     "type": "function",
-                    "signature": "0x8a105d3f"
+                    "signature": "0x6dd7bb4d"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_floorPricePerBuildingInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setFloorPricePerBuildingInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x722e9272"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_ceilingPricePerBuildingInWei",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setCeilingPricePerBuildingInWei",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x3249c527"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_blockStep",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setBlockStep",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x71b8021a"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_lastSaleBlock",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "setLastSaleBlock",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0xad4a6e76"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_logicGenerator",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setLogicGenerator",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x8972ec6f"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_colourGenerator",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "setColourGenerator",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "bool"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function",
+                    "signature": "0x624ab8be"
                 }
             ],
             vendingContract: null,
@@ -1374,6 +1769,9 @@
                 if (parseInt(id) === 2) return 'CHI';
             },
             mintBuilding: async function () {
+
+                this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
+
                 let overrides = {
 
                     // The maximum units of gas for the transaction to use
@@ -1420,7 +1818,7 @@
                 signer
             );
 
-            this.pricePerBuildingInWei = (await this.vendingContract.pricePerBuildingInWei()).toNumber();
+            this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
             this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
             const allBuildings = [];
