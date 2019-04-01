@@ -16,7 +16,7 @@ contract ColourGenerator is Ownable {
     ) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 exteriorColorwayRandom = generate(hash, _sender, 20);
+        uint256 exteriorColorwayRandom = generate(hash, _sender, 21);
         uint256 backgroundColorwayRandom = generate(hash, _sender, 8);
 
         emit Colours(exteriorColorwayRandom, backgroundColorwayRandom);
