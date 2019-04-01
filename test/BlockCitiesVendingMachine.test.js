@@ -122,9 +122,28 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         });
 
         it('building has attributes', async function () {
-            // 4 = base, body, roof, and architect
-            const attrs = await this.blockCities.attributes(1);
-            attrs[0].should.be.bignumber.lte('6'); // FIXME add all attrs
+            const {
+                _exteriorColorway,
+                _backgroundColorway,
+                _city,
+                _building,
+                _base,
+                _body,
+                _roof,
+                _special,
+                _architect,
+            } = await this.blockCities.attributes(1);
+
+            // Values are deterministic as based on block and nonce
+            _exteriorColorway.should.be.bignumber.equal('17');
+            _backgroundColorway.should.be.bignumber.equal('4');
+            _city.should.be.bignumber.equal('1');
+            _building.should.be.bignumber.equal('0');
+            _base.should.be.bignumber.equal('0');
+            _body.should.be.bignumber.equal('0');
+            _roof.should.be.bignumber.equal('0');
+            _special.should.be.bignumber.equal('0');
+            _architect.should.be.equal(tokenOwner);
         });
 
         // FIXME - should be in BlockCities test file - create one
@@ -248,7 +267,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
         it('returns total price for one', async function () {
             // minted one
             const price = await this.vendingMachine.totalPrice(new BN(1));
-            price.should.be.bignumber.equal(this.floor.add(this.priceStep)); // FIXME - use floor + step
+            price.should.be.bignumber.equal(this.floor.add(this.priceStep));
         });
 
         it('returns total price for three', async function () {
