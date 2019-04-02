@@ -25,13 +25,12 @@ module.exports = async function (deployer, network, accounts) {
     }
 
     // Deploy vending machine
-    await deployer.deploy(
-        BlockCitiesVendingMachine,
-        _logicGenerator.address,
-        _colourGenerator.address,
-        _blockCities.address,
-        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7",
-        _owner,
+    await deployer.deploy(BlockCitiesVendingMachine,
+        _logicGenerator.address,    // randomiser
+        _colourGenerator.address,   // randomiser
+        _blockCities.address,       // 721
+        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7", // Preseton
+        _owner,                                       // BR
         {
             from: _owner
         });
