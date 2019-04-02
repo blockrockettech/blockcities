@@ -86,7 +86,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public priceStepInWei = 0.0003 ether;
 
-    uint256 public blockStep = 240;
+    uint256 public blockStep = 120;
 
     uint256 public lastSaleBlock = 0;
     uint256 public lastSalePrice = 0;
@@ -110,8 +110,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(1);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, 1);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -127,8 +126,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(1);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, 1);
 
         uint256 tokenId = _generate(_to);
 
@@ -144,8 +142,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(_numberOfBuildings);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -165,8 +162,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(_numberOfBuildings);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -222,12 +218,18 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             });
     }
 
-    function _adjustCredits(uint256 _numberOfBuildings) internal {
+    function _adjustCredits(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
         // use credits first
-        if (credits[msg.sender] > 0) {
+        if (credits[msg.sender] >= _numberOfBuildings) {
             credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
+
+            // refund msg.value when using up credits
+            if (msg.value > 0) {
+                msg.sender.transfer(msg.value);
+            }
         } else {
-            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+            splitFunds(_currentPrice);
+            totalPurchasesInWei = totalPurchasesInWei.add(_currentPrice);
         }
     }
 

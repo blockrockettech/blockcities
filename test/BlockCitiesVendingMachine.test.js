@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -69,9 +69,9 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         this.floor = await this.vendingMachine.floorPricePerBuildingInWei();
         this.priceStep = await this.vendingMachine.priceStepInWei();
 
-        const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+        this.currentPrice = await this.vendingMachine.totalPrice(new BN(1));
 
-        const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: currentPrice});
+        const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.currentPrice});
         expectEvent.inLogs(
             logs,
             `VendingMachineTriggered`,
@@ -85,7 +85,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
 
         it('returns total purchases', async function () {
-            (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.floor);
+            (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.currentPrice);
         });
 
         it('building has an owner', async function () {
@@ -105,7 +105,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
                 _special,
                 _architect,
             } = await this.blockCities.attributes(1);
-            
+
             _exteriorColorway.should.be.bignumber.gte(new BN(0));
             _backgroundColorway.should.be.bignumber.gte(new BN(0));
             _city.should.be.bignumber.gte(new BN(0));
@@ -619,11 +619,11 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
             const purchaserBalanceAfter = new BN((await web3.eth.getBalance(purchaser)));
 
-            // 80% of current
-            blockcitiesAfter.should.be.bignumber.equal(blockcities.add(currentPrice.div(new BN(100)).mul(new BN(80))));
+            // 85% of current
+            blockcitiesAfter.should.be.bignumber.equal(blockcities.add(currentPrice.div(new BN(100)).mul(new BN(85))));
 
-            // 20% of current
-            partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(20))));
+            // 15% of current
+            partnerAfter.should.be.bignumber.equal(partner.add(currentPrice.div(new BN(100)).mul(new BN(15))));
 
             // check refund is applied and only pay for current price, not the overpay
             purchaserBalanceAfter.should.be.bignumber.equal(
@@ -631,6 +631,41 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
                     .sub(gasCosts)
                     .sub(currentPrice)
             );
+        });
+
+        it('does not take msg.value when consuming credits', async function () {
+            const purchaser = whitelisted;
+
+            // Add a single credit so purchaser should get monies back
+            await this.vendingMachine.addCredit(purchaser, {from: creator});
+            (await this.vendingMachine.credits(purchaser)).should.be.bignumber.equal('1');
+
+            // Check only 1 purchase made so far
+            (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.currentPrice);
+
+            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+
+            const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
+
+            // send msg.value even though we have credits
+            const receipt = await this.vendingMachine.mintBuildingTo(purchaser, {
+                from: purchaser,
+                value: currentPrice
+            });
+            const gasCosts = await getGasCosts(receipt);
+
+            const purchaserBalanceAfter = new BN((await web3.eth.getBalance(purchaser)));
+
+            // check all amount os refunded and credits consumed
+            purchaserBalanceAfter.should.be.bignumber.equal(
+                purchaserBalanceBefore
+                    .sub(gasCosts)
+            );
+
+            (await this.vendingMachine.credits(purchaser)).should.be.bignumber.equal('0');
+
+            // Check total purchases doesnt change
+            (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.currentPrice);
         });
 
     });

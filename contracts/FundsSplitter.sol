@@ -9,7 +9,7 @@ contract FundsSplitter is Ownable {
     address payable public blockcities;
     address payable public partner;
 
-    uint256 public partnerRate = 20;
+    uint256 public partnerRate = 15;
 
     constructor (address payable _blockcities, address payable _partner) public {
         blockcities = _blockcities;
