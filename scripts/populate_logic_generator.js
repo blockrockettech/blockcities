@@ -9,7 +9,7 @@ const {INFURA_KEY} = require('../constants');
 
 const logic_generator_config = require('./data/logic_generator');
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '5000000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '12500000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 function getHttpProviderUri(network) {
@@ -103,148 +103,149 @@ void async function () {
     // City Distribution //
     ///////////////////////
 
-    const cityDistribution = logic_generator_config.data.city.distribution;
+    // DONE
+    // const cityDistribution = logic_generator_config.data.city.distribution;
+    // const cityPromise = new Promise((resolve, reject) => {
+    //     web3.eth
+    //         .sendTransaction({
+    //             from: fromAccount,
+    //             to: LOGIC_GENERATOR_ADDRESS,
+    //             data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
+    //             gas: gas,
+    //             gasPrice: gasPrice,
+    //             nonce: startingNonce
+    //         })
+    //         .once('transactionHash', function (hash) {
+    //             successes.push(hash);
+    //             resolve(hash);
+    //         })
+    //         .catch((e) => {
+    //             failures.push({error: e});
+    //             reject(e);
+    //         });
+    //     startingNonce++;
+    // });
 
-    const cityPromise = new Promise((resolve, reject) => {
-        web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_ADDRESS,
-                data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .once('transactionHash', function (hash) {
-                successes.push(hash);
-                resolve(hash);
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                reject(e);
-            });
-        startingNonce++;
-    });
+    // ///////////////////
+    // // City Mappings //
+    // ///////////////////
 
-    ///////////////////
-    // City Mappings //
-    ///////////////////
+    // DONE
+    // const cityConfig = logic_generator_config.data.city.config;
+    // const cityConfigPromises = _.map(cityConfig, (data, city) => {
+    //     console.log(data, city);
+    //     return new Promise((resolve, reject) => {
+    //         web3.eth
+    //             .sendTransaction({
+    //                 from: fromAccount,
+    //                 to: LOGIC_GENERATOR_ADDRESS,
+    //                 data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
+    //                 gas: gas,
+    //                 gasPrice: gasPrice,
+    //                 nonce: startingNonce
+    //             })
+    //             .once('transactionHash', function (hash) {
+    //                 successes.push(hash);
+    //                 resolve(hash);
+    //             })
+    //             .catch((e) => {
+    //                 failures.push({error: e});
+    //                 reject(e);
+    //             });
+    //         startingNonce++;
+    //     });
+    // });
 
-    const cityConfig = logic_generator_config.data.city.config;
-    const cityConfigPromises = _.map(cityConfig, (data, city) => {
-        console.log(data, city);
-        return new Promise((resolve, reject) => {
-            web3.eth
-                .sendTransaction({
-                    from: fromAccount,
-                    to: LOGIC_GENERATOR_ADDRESS,
-                    data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
-                    gas: gas,
-                    gasPrice: gasPrice,
-                    nonce: startingNonce
-                })
-                .once('transactionHash', function (hash) {
-                    successes.push(hash);
-                    resolve(hash);
-                })
-                .catch((e) => {
-                    failures.push({error: e});
-                    reject(e);
-                });
-            startingNonce++;
-        });
-    });
-
-    ////////////////////////
-    // Buildings Mappings //
-    ////////////////////////
+    // ////////////////////////
+    // // Buildings Mappings //
+    // ////////////////////////
     const buildingsConfig = logic_generator_config.data.buildings;
 
-    // BASE
-    const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-        console.log(`Adding building [${building}] base [${base}]`);
-        return new Promise((resolve, reject) => {
-            web3.eth
-                .sendTransaction({
-                    from: fromAccount,
-                    to: LOGIC_GENERATOR_ADDRESS,
-                    data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
-                    gas: gas,
-                    gasPrice: gasPrice,
-                    nonce: startingNonce
-                })
-                .once('transactionHash', function (hash) {
-                    successes.push(hash);
-                    resolve(hash);
-                })
-                .catch((e) => {
-                    failures.push({error: e});
-                    reject(e);
-                });
-            startingNonce++;
-        });
-    });
+    // BASE - DONE
+    // const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+    //     console.log(`Adding building [${building}] base [${base}]`);
+    //     return new Promise((resolve, reject) => {
+    //         web3.eth
+    //             .sendTransaction({
+    //                 from: fromAccount,
+    //                 to: LOGIC_GENERATOR_ADDRESS,
+    //                 data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
+    //                 gas: gas,
+    //                 gasPrice: gasPrice,
+    //                 nonce: startingNonce
+    //             })
+    //             .once('transactionHash', function (hash) {
+    //                 successes.push(hash);
+    //                 resolve(hash);
+    //             })
+    //             .catch((e) => {
+    //                 failures.push({error: e});
+    //                 reject(e);
+    //             });
+    //         startingNonce++;
+    //     });
+    // });
 
-    // BODY
-    const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-        console.log(`Adding building [${building}] body [${body}]`);
-        return new Promise((resolve, reject) => {
-            web3.eth
-                .sendTransaction({
-                    from: fromAccount,
-                    to: LOGIC_GENERATOR_ADDRESS,
-                    data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
-                    gas: gas,
-                    gasPrice: gasPrice,
-                    nonce: startingNonce
-                })
-                .once('transactionHash', function (hash) {
-                    successes.push(hash);
-                    resolve(hash);
-                })
-                .catch((e) => {
-                    failures.push({error: e});
-                    reject(e);
-                });
-            startingNonce++;
-        });
-    });
+    // BODY - DONE
+    // const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+    //     console.log(`Adding building [${building}] body [${body}]`);
+    //     return new Promise((resolve, reject) => {
+    //         web3.eth
+    //             .sendTransaction({
+    //                 from: fromAccount,
+    //                 to: LOGIC_GENERATOR_ADDRESS,
+    //                 data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
+    //                 gas: gas,
+    //                 gasPrice: gasPrice,
+    //                 nonce: startingNonce
+    //             })
+    //             .once('transactionHash', function (hash) {
+    //                 successes.push(hash);
+    //                 resolve(hash);
+    //             })
+    //             .catch((e) => {
+    //                 failures.push({error: e});
+    //                 reject(e);
+    //             });
+    //         startingNonce++;
+    //     });
+    // });
 
-    // ROOF
-    const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-        console.log(`Adding building [${building}] roof [${roof}]`);
-        return new Promise((resolve, reject) => {
-            web3.eth
-                .sendTransaction({
-                    from: fromAccount,
-                    to: LOGIC_GENERATOR_ADDRESS,
-                    data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
-                    gas: gas,
-                    gasPrice: gasPrice,
-                    nonce: startingNonce
-                })
-                .once('transactionHash', function (hash) {
-                    successes.push(hash);
-                    resolve(hash);
-                })
-                .catch((e) => {
-                    failures.push({error: e});
-                    reject(e);
-                });
-            startingNonce++;
-        });
-    });
+    // // ROOF - DONE
+    // const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+    //     console.log(`Adding building [${building}] roof [${roof}]`);
+    //     return new Promise((resolve, reject) => {
+    //         web3.eth
+    //             .sendTransaction({
+    //                 from: fromAccount,
+    //                 to: LOGIC_GENERATOR_ADDRESS,
+    //                 data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
+    //                 gas: gas,
+    //                 gasPrice: gasPrice,
+    //                 nonce: startingNonce
+    //             })
+    //             .once('transactionHash', function (hash) {
+    //                 successes.push(hash);
+    //                 resolve(hash);
+    //             })
+    //             .catch((e) => {
+    //                 failures.push({error: e});
+    //                 reject(e);
+    //             });
+    //         startingNonce++;
+    //     });
+    // });
 
     /////////////////////
     // Wait and Output //
     /////////////////////
 
     const promises = [
-        cityPromise,
-        ...cityConfigPromises,
-        ...buildingBasePromises,
-        ...buildingBodyPromises,
-        ...buildingRoofPromises
+        // cityPromise, // DONE
+        // ...cityConfigPromises, // DONE
+        // ...buildingBasePromises, // DONE
+        // ...buildingBodyPromises, // DONE
+        // ...buildingRoofPromises // DONE
     ];
     // console.log(promises);
 
