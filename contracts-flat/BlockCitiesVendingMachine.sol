@@ -1,6 +1,7 @@
-pragma solidity ^0.5.0;
 
 // File: openzeppelin-solidity/contracts/ownership/Ownable.sol
+
+pragma solidity ^0.5.0;
 
 /**
  * @title Ownable
@@ -75,6 +76,8 @@ contract Ownable {
 
 // File: openzeppelin-solidity/contracts/math/SafeMath.sol
 
+pragma solidity ^0.5.0;
+
 /**
  * @title SafeMath
  * @dev Unsigned math operations with safety checks that revert on error
@@ -139,28 +142,31 @@ library SafeMath {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/ColourGenerator.sol
+// File: contracts/generators/ColourGenerator.sol
+
+pragma solidity ^0.5.0;
+
 
 contract ColourGenerator is Ownable {
 
     uint256 internal randNonce = 0;
 
-    event Colours(uint256 exteriorColorway, uint256 windowColorway);
+    event Colours(uint256 exteriorColorway, uint256 backgroundColorway);
 
     function generate(address _sender)
     external
     returns (
         uint256 exteriorColorway,
-        uint256 windowColorway
+        uint256 backgroundColorway
     ) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 exteriorColorwayRandom = generate(hash, _sender, 7);
-        uint256 windowColorwayRandom = generate(hash, _sender, 3);
+        uint256 exteriorColorwayRandom = generate(hash, _sender, 22);
+        uint256 backgroundColorwayRandom = generate(hash, _sender, 8);
 
-        emit Colours(exteriorColorway,  windowColorway);
+        emit Colours(exteriorColorwayRandom, backgroundColorwayRandom);
 
-        return (exteriorColorwayRandom, windowColorwayRandom);
+        return (exteriorColorwayRandom, backgroundColorwayRandom);
     }
 
     function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
@@ -170,7 +176,10 @@ contract ColourGenerator is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/generators/LogicGenerator.sol
+// File: contracts/generators/LogicGenerator.sol
+
+pragma solidity ^0.5.0;
+
 
 contract LogicGenerator is Ownable {
 
@@ -185,29 +194,93 @@ contract LogicGenerator is Ownable {
         uint256 special
     );
 
-    mapping(uint256 => uint256[]) internal cityMappings;
-    mapping(uint256 => uint256[]) internal buildingMappings;
+    uint256[] internal cityPercentages = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2];
 
-    uint256 constant specialModulo = 3;
+    mapping(uint256 => uint256[]) public cityMappings;
+
+    mapping(uint256 => uint256[]) public buildingBaseMappings;
+    mapping(uint256 => uint256[]) public buildingBodyMappings;
+    mapping(uint256 => uint256[]) public buildingRoofMappings;
+
+    uint256 public specialModulo = 7;
+    uint256 public specialNo = 11;
 
     constructor () public {
-        cityMappings[0] = [2, 5];
         // ATL
-        cityMappings[1] = [0, 4, 6, 7, 8];
-        // NYC
-        cityMappings[2] = [1, 3, 9];
-        // CHI
+        cityMappings[0] = [2, 2, 2, 2, 2, 5, 5, 5, 15, 15];
 
-        buildingMappings[0] = [5, 9, 7];
-        buildingMappings[1] = [6, 3, 5];
-        buildingMappings[2] = [6, 3, 6];
-        buildingMappings[3] = [3, 9, 6];
-        buildingMappings[4] = [6, 6, 7];
-        buildingMappings[5] = [6, 12, 3];
-        buildingMappings[6] = [5, 4, 1];
-        buildingMappings[7] = [4, 5, 3];
-        buildingMappings[8] = [5, 8, 1];
-        buildingMappings[9] = [2, 6, 4];
+        // NYC
+        cityMappings[1] = [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14];
+
+        // CHI
+        cityMappings[2] = [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11];
+
+        // SF
+        cityMappings[3] = [12, 13];
+
+        //        buildingBaseMappings[0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[0] = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8];
+        //        buildingRoofMappings[0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7];
+        //
+        //        buildingBaseMappings[1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[1] = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8];
+        //        buildingRoofMappings[1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7];
+        //
+        //        buildingBaseMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
+        //        buildingRoofMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5, 6, 6];
+        //
+        //        buildingBaseMappings[3] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
+        //        buildingBodyMappings[3] = [0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
+        //        buildingRoofMappings[3] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3];
+        //
+        //        buildingBaseMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5];
+        //        buildingRoofMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8];
+        //
+        //        buildingBaseMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7, 8, 8, 8, 8, 9, 10, 11];
+        //        buildingRoofMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
+        //
+        //        buildingBaseMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3];
+        //        buildingRoofMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4];
+        //
+        //        buildingBaseMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
+        //        buildingBodyMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+        //        buildingRoofMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3];
+        //
+        //        buildingBaseMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7];
+        //        buildingRoofMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        //
+        //        buildingBaseMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        //        buildingBodyMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5];
+        //        buildingRoofMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 4, 4];
+        //
+        //        buildingBaseMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 7, 8, 8];
+        //        buildingRoofMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
+        //
+        //        buildingBaseMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2];
+        //        buildingRoofMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5];
+        //
+        //        buildingBaseMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 7, 8, 9, 10];
+        //        buildingRoofMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5];
+        //
+        //        buildingBaseMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 5, 6, 6, 6, 6, 6, 6];
+        //        buildingBodyMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7];
+        //        buildingRoofMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7];
+        //
+        //        buildingBaseMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4];
+        //        buildingBodyMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 10, 10, 11];
+        //        buildingRoofMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4];
+        //
+        //        buildingBaseMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
+        //        buildingBodyMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4];
+        //        buildingRoofMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
     }
 
     function generate(address _sender)
@@ -215,20 +288,22 @@ contract LogicGenerator is Ownable {
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 aCity = generate(hash, _sender, 3);
+        uint256 aCity = cityPercentages[generate(hash, _sender, cityPercentages.length)];
 
-        uint256 aBuilding = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
-        uint256 aBase = generate(hash, _sender, buildingMappings[building][0]);
-        uint256 aBody = generate(hash, _sender, buildingMappings[building][1]);
-        uint256 aRoof = generate(hash, _sender, buildingMappings[building][2]);
+        uint256 aBuilding = cityMappings[aCity][generate(hash, _sender, cityMappings[aCity].length)];
+
+        uint256 aBase = buildingBaseMappings[aBuilding][generate(hash, _sender, buildingBaseMappings[aBuilding].length)];
+        uint256 aBody = buildingBodyMappings[aBuilding][generate(hash, _sender, buildingBodyMappings[aBuilding].length)];
+        uint256 aRoof = buildingRoofMappings[aBuilding][generate(hash, _sender, buildingRoofMappings[aBuilding].length)];
         uint256 aSpecial = 0;
 
-        // 1 in 3 roughly
+        // 1 in X roughly
         if (isSpecial(block.number)) {
-            aSpecial = generate(hash, _sender, 11);
+            aSpecial = generate(hash, _sender, specialNo);
         }
 
         emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+
         return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
     }
 
@@ -238,12 +313,38 @@ contract LogicGenerator is Ownable {
         return uint256(keccak256(packed)) % _max;
     }
 
-    function isSpecial(uint256 _blocknumber) public pure returns (bool) {
-        return _blocknumber % specialModulo == 0;
+    function isSpecial(uint256 _blocknumber) public view returns (bool) {
+        return (_blocknumber % specialModulo) == 0;
     }
+
+    function updateBuildingBaseMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingBaseMappings[_building] = _params;
+    }
+
+    function updateBuildingBodyMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingBodyMappings[_building] = _params;
+    }
+
+    function updateBuildingRoofMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingRoofMappings[_building] = _params;
+    }
+
+    function updateSpecialModulo(uint256 _specialModulo) public onlyOwner {
+        specialModulo = _specialModulo;
+    }
+
+    function updateSpecialNo(uint256 _specialNo) public onlyOwner {
+        specialNo = _specialNo;
+    }
+
+    //FIXME break out citymapping set and percentages
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/FundsSplitter.sol
+// File: contracts/FundsSplitter.sol
+
+pragma solidity ^0.5.0;
+
+
 
 contract FundsSplitter is Ownable {
     using SafeMath for uint256;
@@ -251,21 +352,28 @@ contract FundsSplitter is Ownable {
     address payable public blockcities;
     address payable public partner;
 
-    uint256 public partnerRate = 25;
+    uint256 public partnerRate = 20;
 
     constructor (address payable _blockcities, address payable _partner) public {
         blockcities = _blockcities;
         partner = _partner;
     }
 
-    function splitFunds() internal {
+    function splitFunds(uint256 _totalPrice) internal {
         if (msg.value > 0) {
+            uint256 refund = msg.value.sub(_totalPrice);
+
+            // overpaid...
+            if (refund > 0) {
+                msg.sender.transfer(refund);
+            }
+
             // work out the amount to split and send it
-            uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+            uint256 partnerAmount = _totalPrice.div(100).mul(partnerRate);
             partner.transfer(partnerAmount);
 
-            // Sending remaining amount to blockCities wallet
-            uint256 remaining = msg.value.sub(partnerAmount);
+            // send remaining amount to blockCities wallet
+            uint256 remaining = _totalPrice.sub(partnerAmount);
             blockcities.transfer(remaining);
         }
     }
@@ -283,7 +391,9 @@ contract FundsSplitter is Ownable {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/libs/Strings.sol
+// File: contracts/libs/Strings.sol
+
+pragma solidity ^0.5.0;
 
 library Strings {
 
@@ -344,12 +454,14 @@ library Strings {
     }
 }
 
-// File: /Users/jamesmorgan/Dropbox/workspace-blockrocket/blockcities/contracts/IBlockCitiesCreator.sol
+// File: contracts/IBlockCitiesCreator.sol
+
+pragma solidity ^0.5.0;
 
 interface IBlockCitiesCreator {
     function createBuilding(
         uint256 _exteriorColorway,
-        uint256 _windowColorway,
+        uint256 _backgroundColorway,
         uint256 _city,
         uint256 _building,
         uint256 _base,
@@ -362,35 +474,60 @@ interface IBlockCitiesCreator {
 
 // File: contracts/BlockCitiesVendingMachine.sol
 
+pragma solidity ^0.5.0;
+
+
+
+
+
+
+
+
 contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     using SafeMath for uint256;
-
-    event PricePerBuildingInWeiChanged(
-        uint256 _oldPricePerBuildingInWei,
-        uint256 _newPricePerBuildingInWei
-    );
-
-    event PriceStepInWeiChanged(
-        uint256 _oldPriceStepInWei,
-        uint256 _newPriceStepInWei
-    );
 
     event VendingMachineTriggered(
         uint256 indexed _tokenId,
         address indexed _architect
     );
 
-    event CreditAdded(
-        address indexed _to
+    event CreditAdded(address indexed _to, uint256 _amount);
+
+    event PriceDiscountBandsChanged(uint256[2] _priceDiscountBands);
+
+    event PriceStepInWeiChanged(
+        uint256 _oldPriceStepInWei,
+        uint256 _newPriceStepInWei
     );
 
-    event PriceDiscountBandsChanged(
-        uint256[2] _priceDiscountBands
+    event PricePerBuildingInWeiChanged(
+        uint256 _oldPricePerBuildingInWei,
+        uint256 _newPricePerBuildingInWei
+    );
+
+    event FloorPricePerBuildingInWeiChanged(
+        uint256 _oldFloorPricePerBuildingInWei,
+        uint256 _newFloorPricePerBuildingInWei
+    );
+
+    event CeilingPricePerBuildingInWeiChanged(
+        uint256 _oldCeilingPricePerBuildingInWei,
+        uint256 _newCeilingPricePerBuildingInWei
+    );
+
+    event BlockStepChanged(
+        uint256 _oldBlockStep,
+        uint256 _newBlockStep
+    );
+
+    event LastSaleBlockChanged(
+        uint256 _oldLastSaleBlock,
+        uint256 _newLastSaleBlock
     );
 
     struct Colour {
         uint256 exteriorColorway;
-        uint256 windowColorway;
+        uint256 backgroundColorway;
     }
 
     struct Building {
@@ -403,7 +540,9 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     LogicGenerator public logicGenerator;
+
     ColourGenerator public colourGenerator;
+
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -411,34 +550,40 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public totalPurchasesInWei = 0;
     uint256[2] public priceDiscountBands = [80, 70];
 
-    uint256 public basePricePerBuildingInWei = 0.05 ether;
+    uint256 public floorPricePerBuildingInWei = 0.05 ether;
+
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
-    uint256 internal pricePerBuildingInWei = basePricePerBuildingInWei;
+    uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
 
     uint256 public priceStepInWei = 0.01 ether;
-    uint256 public lastSale = 0;
+
+    uint256 public blockStep = 120;
+
+    uint256 public lastSaleBlock = 0;
 
     constructor (
         LogicGenerator _logicGenerator,
         ColourGenerator _colourGenerator,
-        IBlockCitiesCreator _blockCities
-    ) public FundsSplitter(msg.sender, msg.sender) {
-
+        IBlockCitiesCreator _blockCities,
+        address payable _blockCitiesAddress,
+        address payable _partnerAddress
+    ) public FundsSplitter(_blockCitiesAddress, _partnerAddress) {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice(1);
         require(
-            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(1);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -448,13 +593,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice(1);
         require(
-            credits[msg.sender] > 0 || msg.value >= totalPrice(1),
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(1);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256 tokenId = _generate(_to);
 
@@ -463,14 +609,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return tokenId;
     }
 
-    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
+        uint256 currentPrice = totalPrice(_numberOfBuildings);
         require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(_numberOfBuildings);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -483,14 +630,15 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return generatedTokenIds;
     }
 
-    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds){
+    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
+        uint256 currentPrice = totalPrice(_numberOfBuildings);
         require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= totalPrice(_numberOfBuildings),
+            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
         _adjustCredits(_numberOfBuildings);
-        splitFunds();
+        splitFunds(currentPrice);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -509,7 +657,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
         uint256 tokenId = blockCities.createBuilding(
             colour.exteriorColorway,
-            colour.windowColorway,
+            colour.backgroundColorway,
             building.city,
             building.building,
             building.base,
@@ -525,11 +673,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _generateColours() internal returns (Colour memory){
-        (uint256 _exteriorColorway, uint256 _windowColorway) = colourGenerator.generate(msg.sender);
+        (uint256 _exteriorColorway, uint256 _backgroundColorway) = colourGenerator.generate(msg.sender);
 
         return Colour({
             exteriorColorway : _exteriorColorway,
-            windowColorway : _windowColorway
+            backgroundColorway : _backgroundColorway
             });
     }
 
@@ -546,14 +694,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             });
     }
 
-    function _stepIncrease() internal {
-        if (pricePerBuildingInWei.add(priceStepInWei) >= ceilingPricePerBuildingInWei) {
-            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
-        } else {
-            pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
-        }
-    }
-
     function _adjustCredits(uint256 _numberOfBuildings) internal {
         // use credits first
         if (credits[msg.sender] > 0) {
@@ -563,29 +703,53 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         }
     }
 
-    function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
-        if (_numberOfBuildings < 5) {
-            return _numberOfBuildings.mul(pricePerBuildingInWei);
+    function _stepIncrease() internal {
+        pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
+
+        if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
+            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
         }
-        else if (_numberOfBuildings < 10) {
-            return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[0]);
-        }
-        return _numberOfBuildings.mul(pricePerBuildingInWei).div(100).mul(priceDiscountBands[1]);
+
+        lastSaleBlock = block.number;
     }
 
-    function setPricePerBuildingInWei(uint256 _newPricePerBuildingInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _newPricePerBuildingInWei);
+    function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
 
-        pricePerBuildingInWei = _newPricePerBuildingInWei;
+        uint256 calculatedPrice = pricePerBuildingInWei;
 
+        uint256 blocksPassed = block.number - lastSaleBlock;
+        uint256 reduce = blocksPassed.div(blockStep).mul(priceStepInWei);
+
+        if (reduce > calculatedPrice) {
+            calculatedPrice = floorPricePerBuildingInWei;
+        }
+        else {
+            calculatedPrice = calculatedPrice.sub(reduce);
+        }
+
+        if (calculatedPrice < floorPricePerBuildingInWei) {
+            calculatedPrice = floorPricePerBuildingInWei;
+        }
+
+        if (_numberOfBuildings < 5) {
+            return _numberOfBuildings.mul(calculatedPrice);
+        }
+        else if (_numberOfBuildings < 10) {
+            return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[0]);
+        }
+
+        return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
+    }
+
+    function setPricePerBuildingInWei(uint256 _pricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _pricePerBuildingInWei);
+        pricePerBuildingInWei = _pricePerBuildingInWei;
         return true;
     }
 
-    function setPriceStepInWei(uint256 _newPriceStepInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(priceStepInWei, _newPriceStepInWei);
-
-        priceStepInWei = _newPriceStepInWei;
-
+    function setPriceStepInWei(uint256 _priceStepInWei) public onlyOwner returns (bool) {
+        emit PriceStepInWeiChanged(priceStepInWei, _priceStepInWei);
+        priceStepInWei = _priceStepInWei;
         return true;
     }
 
@@ -600,14 +764,58 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     function addCredit(address _to) public onlyOwner returns (bool) {
         credits[_to] = credits[_to].add(1);
 
-        emit CreditAdded(_to);
+        emit CreditAdded(_to, 1);
 
         return true;
     }
 
-    function addCreditBatch(address[] memory _addresses) public onlyOwner returns (bool) {
+    function addCreditAmount(address _to, uint256 _amount) public onlyOwner returns (bool) {
+        credits[_to] = credits[_to].add(_amount);
+
+        emit CreditAdded(_to, _amount);
+
+        return true;
+    }
+
+    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyOwner returns (bool) {
         for (uint i = 0; i < _addresses.length; i++) {
-            addCredit(_addresses[i]);
+            addCreditAmount(_addresses[i], _amount);
         }
+
+        return true;
+    }
+
+    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit FloorPricePerBuildingInWeiChanged(floorPricePerBuildingInWei, _floorPricePerBuildingInWei);
+        floorPricePerBuildingInWei = _floorPricePerBuildingInWei;
+        return true;
+    }
+
+    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyOwner returns (bool) {
+        emit CeilingPricePerBuildingInWeiChanged(ceilingPricePerBuildingInWei, _ceilingPricePerBuildingInWei);
+        ceilingPricePerBuildingInWei = _ceilingPricePerBuildingInWei;
+        return true;
+    }
+
+    function setBlockStep(uint256 _blockStep) public onlyOwner returns (bool) {
+        emit BlockStepChanged(blockStep, _blockStep);
+        blockStep = _blockStep;
+        return true;
+    }
+
+    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyOwner returns (bool) {
+        emit LastSaleBlockChanged(lastSaleBlock, _lastSaleBlock);
+        lastSaleBlock = _lastSaleBlock;
+        return true;
+    }
+
+    function setLogicGenerator(LogicGenerator _logicGenerator) public onlyOwner returns (bool) {
+        logicGenerator = _logicGenerator;
+        return true;
+    }
+
+    function setColourGenerator(ColourGenerator _colourGenerator) public onlyOwner returns (bool) {
+        colourGenerator = _colourGenerator;
+        return true;
     }
 }

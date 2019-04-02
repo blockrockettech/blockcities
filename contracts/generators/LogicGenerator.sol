@@ -15,56 +15,38 @@ contract LogicGenerator is Ownable {
         uint256 special
     );
 
-    mapping(uint256 => uint256[]) internal cityMappings;
-    mapping(uint256 => uint256[]) internal buildingMappings;
+    uint256[] public cityPercentages;
 
-    uint256 constant specialModulo = 3;
+    mapping(uint256 => uint256[]) public cityMappings;
 
-    constructor () public {
-        cityMappings[0] = [2, 5];
-        // ATL
-        cityMappings[1] = [0, 4, 6, 7, 8];
-        // NYC
-        cityMappings[2] = [1, 3, 9];
-        // CHI
+    mapping(uint256 => uint256[]) public buildingBaseMappings;
+    mapping(uint256 => uint256[]) public buildingBodyMappings;
+    mapping(uint256 => uint256[]) public buildingRoofMappings;
 
-        buildingMappings[0] = [5, 9, 7];
-        buildingMappings[1] = [6, 3, 5];
-        buildingMappings[2] = [6, 3, 6];
-        buildingMappings[3] = [3, 9, 6];
-        buildingMappings[4] = [6, 6, 7];
-        buildingMappings[5] = [6, 12, 3];
-        buildingMappings[6] = [5, 4, 1];
-        buildingMappings[7] = [4, 5, 3];
-        buildingMappings[8] = [5, 8, 1];
-        buildingMappings[9] = [2, 6, 4];
-        buildingMappings[10] = [6, 9, 4];
-        buildingMappings[11] = [5, 3, 5];
-        buildingMappings[12] = [6, 11, 7];
-        buildingMappings[13] = [6, 8, 7];
-        buildingMappings[14] = [4, 12, 4];
-        buildingMappings[15] = [5, 5, 3];
-    }
+    uint256 public specialModulo = 7;
+    uint256 public specialNo = 11;
 
     function generate(address _sender)
     external
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 aCity = generate(hash, _sender, 3);
+        uint256 aCity = cityPercentages[generate(hash, _sender, cityPercentages.length)];
 
-        uint256 aBuilding = cityMappings[city][generate(hash, _sender, cityMappings[city].length)];
-        uint256 aBase = generate(hash, _sender, buildingMappings[building][0]);
-        uint256 aBody = generate(hash, _sender, buildingMappings[building][1]);
-        uint256 aRoof = generate(hash, _sender, buildingMappings[building][2]);
+        uint256 aBuilding = cityMappings[aCity][generate(hash, _sender, cityMappings[aCity].length)];
+
+        uint256 aBase = buildingBaseMappings[aBuilding][generate(hash, _sender, buildingBaseMappings[aBuilding].length)];
+        uint256 aBody = buildingBodyMappings[aBuilding][generate(hash, _sender, buildingBodyMappings[aBuilding].length)];
+        uint256 aRoof = buildingRoofMappings[aBuilding][generate(hash, _sender, buildingRoofMappings[aBuilding].length)];
         uint256 aSpecial = 0;
 
-        // 1 in 3 roughly
+        // 1 in X roughly
         if (isSpecial(block.number)) {
-            aSpecial = generate(hash, _sender, 11);
+            aSpecial = generate(hash, _sender, specialNo);
         }
 
         emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+
         return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
     }
 
@@ -74,11 +56,36 @@ contract LogicGenerator is Ownable {
         return uint256(keccak256(packed)) % _max;
     }
 
-    function isSpecial(uint256 _blocknumber) public pure returns (bool) {
-        return _blocknumber % specialModulo == 0;
+    function isSpecial(uint256 _blocknumber) public view returns (bool) {
+        return (_blocknumber % specialModulo) == 0;
     }
 
-    function updateBuildingMapping(uint256 _building, uint256[3] memory _params) public onlyOwner {
-        buildingMappings[_building] = _params;
+    function updateBuildingBaseMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingBaseMappings[_building] = _params;
     }
+
+    function updateBuildingBodyMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingBodyMappings[_building] = _params;
+    }
+
+    function updateBuildingRoofMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
+        buildingRoofMappings[_building] = _params;
+    }
+
+    function updateSpecialModulo(uint256 _specialModulo) public onlyOwner {
+        specialModulo = _specialModulo;
+    }
+
+    function updateSpecialNo(uint256 _specialNo) public onlyOwner {
+        specialNo = _specialNo;
+    }
+
+    function updateCityPercentages(uint256[] memory _params) public onlyOwner {
+        cityPercentages = _params;
+    }
+
+    function updateCityMappings(uint256 _cityIndex, uint256[] memory _params) public onlyOwner {
+        cityMappings[_cityIndex] = _params;
+    }
+
 }

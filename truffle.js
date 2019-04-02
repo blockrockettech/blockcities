@@ -4,7 +4,7 @@ const {INFURA_KEY} = require('./constants');
 const mnemonic = process.env.BLOCK_CITIES_MNEMONIC;
 if (!mnemonic) {
     throw new Error(`
-    You are missing a environment variable called BLOCK_CITIES_MNEMONIC - please set one 
+    You are missing a environment variable called BLOCK_CITIES_MNEMONIC - please set one
     e.g. export BLOCK_CITIES_MNEMONIC='<your seed phrase>'
   `);
 }
@@ -48,6 +48,14 @@ module.exports = {
             gas: 7000000, // default = 4712388
             gasPrice: 4000000000, // default = 100 gwei = 100000000000
             skipDryRun: true
+        },
+        rinkeby: {
+            provider: function () {
+                return new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/${INFURA_KEY}`);
+            },
+            network_id: 4,
+            gas: 6500000, // default = 4712388
+            gasPrice: 10000000000 // default = 100 gwei = 100000000000
         },
     }
 };

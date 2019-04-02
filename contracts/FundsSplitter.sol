@@ -9,21 +9,28 @@ contract FundsSplitter is Ownable {
     address payable public blockcities;
     address payable public partner;
 
-    uint256 public partnerRate = 25;
+    uint256 public partnerRate = 20;
 
     constructor (address payable _blockcities, address payable _partner) public {
         blockcities = _blockcities;
         partner = _partner;
     }
 
-    function splitFunds() internal {
+    function splitFunds(uint256 _totalPrice) internal {
         if (msg.value > 0) {
+            uint256 refund = msg.value.sub(_totalPrice);
+
+            // overpaid...
+            if (refund > 0) {
+                msg.sender.transfer(refund);
+            }
+
             // work out the amount to split and send it
-            uint256 partnerAmount = msg.value.div(100).mul(partnerRate);
+            uint256 partnerAmount = _totalPrice.div(100).mul(partnerRate);
             partner.transfer(partnerAmount);
 
-            // Sending remaining amount to blockCities wallet
-            uint256 remaining = msg.value.sub(partnerAmount);
+            // send remaining amount to blockCities wallet
+            uint256 remaining = _totalPrice.sub(partnerAmount);
             blockcities.transfer(remaining);
         }
     }

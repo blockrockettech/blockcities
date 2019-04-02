@@ -23,7 +23,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     struct Building {
         uint256 exteriorColorway;
-        uint256 windowColorway;
+        uint256 backgroundColorway;
         uint256 city;
         uint256 building;
         uint256 base;
@@ -42,7 +42,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     function createBuilding(
         uint256 _exteriorColorway,
-        uint256 _windowColorway,
+        uint256 _backgroundColorway,
         uint256 _city,
         uint256 _building,
         uint256 _base,
@@ -54,13 +54,13 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
     public onlyWhitelisted returns (uint256 _tokenId) {
         uint256 tokenId = tokenIdPointer.add(1);
 
-        // Reset token pointer
+        // reset token pointer
         tokenIdPointer = tokenId;
 
-        // Create building
+        // create building
         buildings[tokenId] = Building({
             exteriorColorway : _exteriorColorway,
-            windowColorway : _windowColorway,
+            backgroundColorway : _backgroundColorway,
             city : _city,
             building: _building,
             base : _base,
@@ -92,7 +92,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
     function attributes(uint256 _tokenId) public view returns (
         uint256 _exteriorColorway,
-        uint256 _windowColorway,
+        uint256 _backgroundColorway,
         uint256 _city,
         uint256 _building,
         uint256 _base,
@@ -106,7 +106,7 @@ contract BlockCities is CustomERC721Full, WhitelistedRole, IBlockCitiesCreator {
 
         return (
         building.exteriorColorway,
-        building.windowColorway,
+        building.backgroundColorway,
         building.city,
         building.building,
         building.base,

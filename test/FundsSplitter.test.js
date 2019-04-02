@@ -12,7 +12,7 @@ contract('FundsSplitter tests', (accounts) => {
 
     it('check setup', async function () {
         const rate = await this.splitter.partnerRate();
-        rate.should.be.bignumber.equal(new BN(25));
+        rate.should.be.bignumber.equal(new BN(20));
 
         const blockcities = await this.splitter.blockcities();
         const partner = await this.splitter.partner();
