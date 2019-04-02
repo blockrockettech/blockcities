@@ -12,7 +12,6 @@ const logic_generator_config = require('./data/logic_generator');
 const {gas, gasPrice} = {gas: 6721975, gasPrice: '5000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
-
 function getHttpProviderUri(network) {
     if (network === 'local') {
         return 'HTTP://127.0.0.1:7545';

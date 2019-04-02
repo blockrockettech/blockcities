@@ -6,6 +6,7 @@
     "test": "test"
   },
   "scripts": {
+    "start" : "firebase serve",
     "test": "truffle test",
     "coverage": "./node_modules/.bin/solidity-coverage"
   },
