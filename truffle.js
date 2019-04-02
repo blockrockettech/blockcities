@@ -57,5 +57,15 @@ module.exports = {
             gas: 6500000, // default = 4712388
             gasPrice: 10000000000 // default = 100 gwei = 100000000000
         },
+        live: {
+            provider: function () {
+                return new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${INFURA_KEY}`);
+            },
+            network_id: 1,
+            gas: 8000000,
+            gasPrice: 8000000000,
+            timeoutBlocks: 200,
+            skipDryRun: true
+        },
     }
 };

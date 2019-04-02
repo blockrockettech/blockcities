@@ -11,6 +11,10 @@ module.exports = async function (deployer, network, accounts) {
         _owner = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, `https://${network}.infura.io/v3/${INFURA_KEY}`, 0).getAddress();
     }
 
+    if (network === 'live' || network === 'live-fork') {
+        _owner = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, `https://mainnet.infura.io/${INFURA_KEY}`, 0).getAddress();
+    }
+
     let tokenBaseURI = "http://localhost:5000/block-cities/us-central1/api/network/5777/token/";
 
     // Assume all is live network unless specified
