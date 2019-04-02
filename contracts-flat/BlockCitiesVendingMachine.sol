@@ -153,6 +153,9 @@ contract ColourGenerator is Ownable {
 
     event Colours(uint256 exteriorColorway, uint256 backgroundColorway);
 
+    uint256 public exteriors = 20;
+    uint256 public backgrounds = 8;
+
     function generate(address _sender)
     external
     returns (
@@ -161,8 +164,8 @@ contract ColourGenerator is Ownable {
     ) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 exteriorColorwayRandom = generate(hash, _sender, 22);
-        uint256 backgroundColorwayRandom = generate(hash, _sender, 8);
+        uint256 exteriorColorwayRandom = generate(hash, _sender, exteriors);
+        uint256 backgroundColorwayRandom = generate(hash, _sender, backgrounds);
 
         emit Colours(exteriorColorwayRandom, backgroundColorwayRandom);
 
@@ -173,6 +176,14 @@ contract ColourGenerator is Ownable {
         randNonce++;
         bytes memory packed = abi.encodePacked(_hash, _sender, randNonce);
         return uint256(keccak256(packed)) % _max;
+    }
+
+    function updateExteriors(uint256 _exteriors) public onlyOwner {
+        exteriors = _exteriors;
+    }
+
+    function updateBackgrounds(uint256 _backgrounds) public onlyOwner {
+        backgrounds = _backgrounds;
     }
 }
 
@@ -194,7 +205,7 @@ contract LogicGenerator is Ownable {
         uint256 special
     );
 
-    uint256[] internal cityPercentages = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 3, 2, 2, 2, 2, 2, 2];
+    uint256[] public cityPercentages;
 
     mapping(uint256 => uint256[]) public cityMappings;
 
@@ -204,84 +215,6 @@ contract LogicGenerator is Ownable {
 
     uint256 public specialModulo = 7;
     uint256 public specialNo = 11;
-
-    constructor () public {
-        // ATL
-        cityMappings[0] = [2, 2, 2, 2, 2, 5, 5, 5, 15, 15];
-
-        // NYC
-        cityMappings[1] = [0, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 4, 6, 7, 8, 8, 8, 8, 14];
-
-        // CHI
-        cityMappings[2] = [1, 1, 1, 1, 1, 1, 1, 1, 3, 9, 9, 10, 10, 10, 10, 10, 10, 11, 11, 11];
-
-        // SF
-        cityMappings[3] = [12, 13];
-
-        //        buildingBaseMappings[0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[0] = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8];
-        //        buildingRoofMappings[0] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7];
-        //
-        //        buildingBaseMappings[1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[1] = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8];
-        //        buildingRoofMappings[1] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7];
-        //
-        //        buildingBaseMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
-        //        buildingRoofMappings[2] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5, 6, 6];
-        //
-        //        buildingBaseMappings[3] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
-        //        buildingBodyMappings[3] = [0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 4, 5, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
-        //        buildingRoofMappings[3] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3];
-        //
-        //        buildingBaseMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5];
-        //        buildingRoofMappings[4] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8];
-        //
-        //        buildingBaseMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7, 8, 8, 8, 8, 9, 10, 11];
-        //        buildingRoofMappings[5] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
-        //
-        //        buildingBaseMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3];
-        //        buildingRoofMappings[6] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4];
-        //
-        //        buildingBaseMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2];
-        //        buildingBodyMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
-        //        buildingRoofMappings[7] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3];
-        //
-        //        buildingBaseMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7];
-        //        buildingRoofMappings[8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        //
-        //        buildingBaseMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-        //        buildingBodyMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5];
-        //        buildingRoofMappings[9] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 4, 4];
-        //
-        //        buildingBaseMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 7, 8, 8];
-        //        buildingRoofMappings[10] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
-        //
-        //        buildingBaseMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2];
-        //        buildingRoofMappings[11] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5];
-        //
-        //        buildingBaseMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 7, 8, 9, 10];
-        //        buildingRoofMappings[12] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5];
-        //
-        //        buildingBaseMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 5, 6, 6, 6, 6, 6, 6];
-        //        buildingBodyMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 7, 7];
-        //        buildingRoofMappings[13] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7];
-        //
-        //        buildingBaseMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4];
-        //        buildingBodyMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 8, 9, 9, 9, 9, 10, 10, 11];
-        //        buildingRoofMappings[14] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4];
-        //
-        //        buildingBaseMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5];
-        //        buildingBodyMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4];
-        //        buildingRoofMappings[15] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4];
-    }
 
     function generate(address _sender)
     external
@@ -337,7 +270,14 @@ contract LogicGenerator is Ownable {
         specialNo = _specialNo;
     }
 
-    //FIXME break out citymapping set and percentages
+    function updateCityPercentages(uint256[] memory _params) public onlyOwner {
+        cityPercentages = _params;
+    }
+
+    function updateCityMappings(uint256 _cityIndex, uint256[] memory _params) public onlyOwner {
+        cityMappings[_cityIndex] = _params;
+    }
+
 }
 
 // File: contracts/FundsSplitter.sol
@@ -352,7 +292,7 @@ contract FundsSplitter is Ownable {
     address payable public blockcities;
     address payable public partner;
 
-    uint256 public partnerRate = 20;
+    uint256 public partnerRate = 15;
 
     constructor (address payable _blockcities, address payable _partner) public {
         blockcities = _blockcities;
@@ -555,13 +495,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
     // use totalPrice() to calculate current weighted price
-    uint256 pricePerBuildingInWei = floorPricePerBuildingInWei;
+    uint256 pricePerBuildingInWei = 0.075 ether;
 
-    uint256 public priceStepInWei = 0.01 ether;
+    uint256 public priceStepInWei = 0.0003 ether;
 
     uint256 public blockStep = 120;
 
     uint256 public lastSaleBlock = 0;
+    uint256 public lastSalePrice = 0;
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -582,8 +523,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(1);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, 1);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -599,8 +539,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(1);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, 1);
 
         uint256 tokenId = _generate(_to);
 
@@ -616,8 +555,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(_numberOfBuildings);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -637,8 +575,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(_numberOfBuildings);
-        splitFunds(currentPrice);
+        _adjustCredits(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -694,23 +631,30 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             });
     }
 
-    function _adjustCredits(uint256 _numberOfBuildings) internal {
+    function _adjustCredits(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
         // use credits first
-        if (credits[msg.sender] > 0) {
+        if (credits[msg.sender] >= _numberOfBuildings) {
             credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
+
+            // refund msg.value when using up credits
+            if (msg.value > 0) {
+                msg.sender.transfer(msg.value);
+            }
         } else {
-            totalPurchasesInWei = totalPurchasesInWei.add(msg.value);
+            splitFunds(_currentPrice);
+            totalPurchasesInWei = totalPurchasesInWei.add(_currentPrice);
         }
     }
 
     function _stepIncrease() internal {
+        lastSalePrice = pricePerBuildingInWei;
+        lastSaleBlock = block.number;
+
         pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
 
         if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
             pricePerBuildingInWei = ceilingPricePerBuildingInWei;
         }
-
-        lastSaleBlock = block.number;
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
