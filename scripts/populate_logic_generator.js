@@ -9,7 +9,7 @@ const {INFURA_KEY} = require('../constants');
 
 const logic_generator_config = require('./data/logic_generator');
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '2000000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '5000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 
@@ -106,25 +106,26 @@ void async function () {
 
     const cityDistribution = logic_generator_config.data.city.distribution;
 
-    const cityPromise = web3.eth
-        .sendTransaction({
-            from: fromAccount,
-            to: LOGIC_GENERATOR_ADDRESS,
-            data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
-            gas: gas,
-            gasPrice: gasPrice,
-            nonce: startingNonce
-        })
-        .then((success) => {
-            successes.push(success.transactionHash);
-            return success;
-        })
-        .catch((e) => {
-            failures.push({error: e});
-            return e;
-        });
-
-    startingNonce++;
+    const cityPromise = new Promise((resolve, reject) => {
+        web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .once('transactionHash', function (hash) {
+                successes.push(hash);
+                resolve(hash);
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                reject(e);
+            });
+        startingNonce++;
+    });
 
     ///////////////////
     // City Mappings //
@@ -133,27 +134,26 @@ void async function () {
     const cityConfig = logic_generator_config.data.city.config;
     const cityConfigPromises = _.map(cityConfig, (data, city) => {
         console.log(data, city);
-        const promise = web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_ADDRESS,
-                data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .then((success) => {
-                successes.push(success.transactionHash);
-                return success;
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                return e;
-            });
-
-        startingNonce++;
-
-        return promise;
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
     });
 
     ////////////////////////
@@ -164,79 +164,76 @@ void async function () {
     // BASE
     const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         console.log(`Adding building [${building}] base [${base}]`);
-        const basePromise = web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_ADDRESS,
-                data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .then((success) => {
-                successes.push(success.transactionHash);
-                return success;
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                return e;
-            });
-
-        startingNonce++;
-
-        return basePromise;
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
     });
 
     // BODY
     const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         console.log(`Adding building [${building}] body [${body}]`);
-        const bodyPromise = web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_ADDRESS,
-                data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .then((success) => {
-                successes.push(success.transactionHash);
-                return success;
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                return e;
-            });
-
-        startingNonce++;
-
-        return bodyPromise;
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
     });
 
     // ROOF
     const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         console.log(`Adding building [${building}] roof [${roof}]`);
-        const roofPromise = web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_ADDRESS,
-                data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .then((success) => {
-                successes.push(success.transactionHash);
-                return success;
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                return e;
-            });
-
-        startingNonce++;
-
-        return roofPromise;
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
     });
 
     /////////////////////
@@ -261,7 +258,7 @@ void async function () {
               - Failures [${failures.length}]
             `);
 
-            console.log(rawTransactions.map((receipt) => receipt.transactionHash));
+            console.log(rawTransactions);
 
             process.exit();
         })
