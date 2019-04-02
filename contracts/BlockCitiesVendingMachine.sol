@@ -86,6 +86,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public priceStepInWei = 0.0003 ether;
 
+    // 120 is approx 30 mins
     uint256 public blockStep = 120;
 
     uint256 public lastSaleBlock = 0;
