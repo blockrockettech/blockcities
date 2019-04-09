@@ -27,11 +27,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 _newPriceStepInWei
     );
 
-    event PricePerBuildingInWeiChanged(
-        uint256 _oldPricePerBuildingInWei,
-        uint256 _newPricePerBuildingInWei
-    );
-
     event FloorPricePerBuildingInWeiChanged(
         uint256 _oldFloorPricePerBuildingInWei,
         uint256 _newFloorPricePerBuildingInWei
@@ -50,6 +45,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     event LastSaleBlockChanged(
         uint256 _oldLastSaleBlock,
         uint256 _newLastSaleBlock
+    );
+
+    event LastSalePriceChanged(
+        uint256 _oldLastSalePrice,
+        uint256 _newLastSalePrice
     );
 
     struct Colour {
@@ -81,16 +81,12 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
-    // use totalPrice() to calculate current weighted price
-    uint256 pricePerBuildingInWei = 0.075 ether;
-
     uint256 public priceStepInWei = 0.0003 ether;
 
-    // 120 is approx 30 mins
-    uint256 public blockStep = 120;
+    uint256 public blockStep = 20;
 
     uint256 public lastSaleBlock = 0;
-    uint256 public lastSalePrice = 0;
+    uint256 public lastSalePrice = 0.075 ether;
 
     constructor (
         LogicGenerator _logicGenerator,
@@ -102,6 +98,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
+
+        lastSaleBlock = block.number;
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
@@ -111,7 +109,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, 1);
+        _reconcileCreditsAndFunds(currentPrice, 1);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -127,7 +125,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, 1);
+        _reconcileCreditsAndFunds(currentPrice, 1);
 
         uint256 tokenId = _generate(_to);
 
@@ -143,7 +141,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, _numberOfBuildings);
+        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -163,7 +161,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, _numberOfBuildings);
+        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -219,7 +217,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             });
     }
 
-    function _adjustCredits(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
+    function _reconcileCreditsAndFunds(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
         // use credits first
         if (credits[msg.sender] >= _numberOfBuildings) {
             credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
@@ -235,19 +233,18 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _stepIncrease() internal {
-        lastSalePrice = pricePerBuildingInWei;
+
+        lastSalePrice = totalPrice(1).add(priceStepInWei);
         lastSaleBlock = block.number;
 
-        pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
-
-        if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
-            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
+        if (lastSalePrice >= ceilingPricePerBuildingInWei) {
+            lastSalePrice = ceilingPricePerBuildingInWei;
         }
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
 
-        uint256 calculatedPrice = pricePerBuildingInWei;
+        uint256 calculatedPrice = lastSalePrice;
 
         uint256 blocksPassed = block.number - lastSaleBlock;
         uint256 reduce = blocksPassed.div(blockStep).mul(priceStepInWei);
@@ -271,12 +268,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         }
 
         return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
-    }
-
-    function setPricePerBuildingInWei(uint256 _pricePerBuildingInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _pricePerBuildingInWei);
-        pricePerBuildingInWei = _pricePerBuildingInWei;
-        return true;
     }
 
     function setPriceStepInWei(uint256 _priceStepInWei) public onlyOwner returns (bool) {
@@ -338,6 +329,12 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     function setLastSaleBlock(uint256 _lastSaleBlock) public onlyOwner returns (bool) {
         emit LastSaleBlockChanged(lastSaleBlock, _lastSaleBlock);
         lastSaleBlock = _lastSaleBlock;
+        return true;
+    }
+
+    function setLastSalePrice(uint256 _lastSalePrice) public onlyOwner returns (bool) {
+        emit LastSalePriceChanged(lastSalePrice, _lastSalePrice);
+        lastSalePrice = _lastSalePrice;
         return true;
     }
 
