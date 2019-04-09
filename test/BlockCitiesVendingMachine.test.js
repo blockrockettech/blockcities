@@ -4,6 +4,7 @@ const BlockCities = artifacts.require('BlockCities');
 
 const LogicGenerator = artifacts.require('LogicGenerator');
 const ColourGenerator = artifacts.require('ColourGenerator');
+const FundsSplitter = artifacts.require('FundsSplitter');
 
 const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
 
@@ -23,6 +24,9 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
 
         // Create generators
         this.generator = await LogicGenerator.new({from: creator});
+
+        // splitter
+        this.splitter = await FundsSplitter.new(blockcitiesAccount, creator, {from: creator});
 
         await this.generator.updateCityPercentages([0, 1], {from: creator});
 
@@ -51,8 +55,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
             this.generator.address,
             this.colourGenerator.address,
             this.blockCities.address,
-            blockcitiesAccount,
-            creator,
+            this.splitter.address,
             {
                 from: creator
             }
@@ -586,7 +589,7 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
 
     });
 
-    context('splitFunds', function () {
+    context.only('splitFunds', function () {
 
         it('all parties get the correct amounts', async function () {
             const purchaser = whitelisted;
@@ -674,7 +677,10 @@ contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone,
             priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBatch(new BN(2), {from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
+            await this.vendingMachine.mintBatch(new BN(2), {
+                from: tokenOwner,
+                value: priceAfterOneStep.add(priceAfterOneStep)
+            });
 
             const priceAfterTwoStep = await this.vendingMachine.totalPrice(new BN(1));
             priceAfterTwoStep.should.be.bignumber.equal(priceAfterOneStep.add(priceStep));

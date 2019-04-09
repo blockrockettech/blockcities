@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol";
 
 import "./generators/IColourGenerator.sol";
 import "./generators/ILogicGenerator.sol";
@@ -9,7 +10,7 @@ import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-contract BlockCitiesVendingMachine is FundsSplitter {
+contract BlockCitiesVendingMachine is WhitelistedRole {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
@@ -71,6 +72,8 @@ contract BlockCitiesVendingMachine is FundsSplitter {
 
     IBlockCitiesCreator public blockCities;
 
+    FundsSplitter internal fundsSplitter;
+
     mapping(address => uint256) public credits;
 
     uint256 public totalPurchasesInWei = 0;
@@ -91,12 +94,12 @@ contract BlockCitiesVendingMachine is FundsSplitter {
         ILogicGenerator _logicGenerator,
         IColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities,
-        address payable _blockCitiesAddress,
-        address payable _partnerAddress
-    ) public FundsSplitter(_blockCitiesAddress, _partnerAddress) {
+        FundsSplitter _fundsSplitter
+    ) public {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
+        fundsSplitter = _fundsSplitter;
 
         lastSaleBlock = block.number;
 
@@ -228,7 +231,7 @@ contract BlockCitiesVendingMachine is FundsSplitter {
                 msg.sender.transfer(msg.value);
             }
         } else {
-            splitFunds(_currentPrice);
+            fundsSplitter.splitFunds.value(msg.value)(_currentPrice);
             totalPurchasesInWei = totalPurchasesInWei.add(_currentPrice);
         }
     }

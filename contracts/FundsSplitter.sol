@@ -6,17 +6,19 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 contract FundsSplitter is WhitelistedRole {
     using SafeMath for uint256;
 
-    address payable public blockcities;
+    address payable public platform;
     address payable public partner;
 
     uint256 public partnerRate = 15;
 
-    constructor (address payable _blockcities, address payable _partner) public {
-        blockcities = _blockcities;
+    constructor (address payable _platform, address payable _partner) public {
+        platform = _platform;
         partner = _partner;
+
+        super.addWhitelisted(msg.sender);
     }
 
-    function splitFunds(uint256 _totalPrice) internal {
+    function splitFunds(uint256 _totalPrice) payable external {
         if (msg.value > 0) {
             uint256 refund = msg.value.sub(_totalPrice);
 
@@ -31,7 +33,7 @@ contract FundsSplitter is WhitelistedRole {
 
             // send remaining amount to blockCities wallet
             uint256 remaining = _totalPrice.sub(partnerAmount);
-            blockcities.transfer(remaining);
+            platform.transfer(remaining);
         }
     }
 
@@ -43,7 +45,7 @@ contract FundsSplitter is WhitelistedRole {
         partnerRate = _techPartnerRate;
     }
 
-    function updateBlockcitiesAddress(address payable _blockcities) onlyWhitelisted public {
-        blockcities = _blockcities;
+    function updatePlatformAddress(address payable _platform) onlyWhitelisted public {
+        platform = _platform;
     }
 }

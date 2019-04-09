@@ -6,10 +6,12 @@ const BlockCities = artifacts.require('./BlockCities.sol');
 
 const ColourGenerator = artifacts.require('./ColourGenerator.sol');
 const LogicGenerator = artifacts.require('./LogicGenerator.sol');
+const FundsSplitter = artifacts.require('./FundsSplitter.sol');
 
 module.exports = async function (deployer, network, accounts) {
     const _logicGenerator = await LogicGenerator.deployed();
     const _colourGenerator = await ColourGenerator.deployed();
+    const _fundsSplitter = await FundsSplitter.deployed();
 
     const _blockCities = await BlockCities.deployed();
 
@@ -29,8 +31,7 @@ module.exports = async function (deployer, network, accounts) {
         _logicGenerator.address,    // randomiser
         _colourGenerator.address,   // randomiser
         _blockCities.address,       // 721
-        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7", // Preseton
-        _owner,                                       // BR
+        _fundsSplitter.address,
         {
             from: _owner
         });
