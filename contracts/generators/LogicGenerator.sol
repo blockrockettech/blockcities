@@ -1,8 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./ILogicGenerator.sol";
 
-contract LogicGenerator is Ownable {
+contract LogicGenerator is Ownable, ILogicGenerator {
 
     uint256 internal randNonce = 0;
 

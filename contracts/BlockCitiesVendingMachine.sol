@@ -3,8 +3,8 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./generators/ColourGenerator.sol";
-import "./generators/LogicGenerator.sol";
+import "./generators/IColourGenerator.sol";
+import "./generators/ILogicGenerator.sol";
 
 import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
@@ -66,9 +66,9 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 special;
     }
 
-    LogicGenerator public logicGenerator;
+    ILogicGenerator public logicGenerator;
 
-    ColourGenerator public colourGenerator;
+    IColourGenerator public colourGenerator;
 
     IBlockCitiesCreator public blockCities;
 
@@ -83,14 +83,14 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public priceStepInWei = 0.0003 ether;
 
-    uint256 public blockStep = 20;
+    uint256 public blockStep = 10;
 
     uint256 public lastSaleBlock = 0;
     uint256 public lastSalePrice = 0.075 ether;
 
     constructor (
-        LogicGenerator _logicGenerator,
-        ColourGenerator _colourGenerator,
+        ILogicGenerator _logicGenerator,
+        IColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities,
         address payable _blockCitiesAddress,
         address payable _partnerAddress
@@ -254,10 +254,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         }
         else {
             calculatedPrice = calculatedPrice.sub(reduce);
-        }
 
-        if (calculatedPrice < floorPricePerBuildingInWei) {
-            calculatedPrice = floorPricePerBuildingInWei;
+            if (calculatedPrice < floorPricePerBuildingInWei) {
+                calculatedPrice = floorPricePerBuildingInWei;
+            }
         }
 
         if (_numberOfBuildings < 5) {
@@ -338,12 +338,12 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function setLogicGenerator(LogicGenerator _logicGenerator) public onlyOwner returns (bool) {
+    function setLogicGenerator(ILogicGenerator _logicGenerator) public onlyOwner returns (bool) {
         logicGenerator = _logicGenerator;
         return true;
     }
 
-    function setColourGenerator(ColourGenerator _colourGenerator) public onlyOwner returns (bool) {
+    function setColourGenerator(IColourGenerator _colourGenerator) public onlyOwner returns (bool) {
         colourGenerator = _colourGenerator;
         return true;
     }
