@@ -1,0 +1,201 @@
+<html>
+
+<head>
+    <title>BlockCities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+
+<body>
+
+<div id="vue-app" class="container-fluid">
+    <div class="jumbotron mt-5">
+        <h1 class="display-4">BlockCities Admin</h1>
+        <p class="lead">Be the Architect</p>
+        <hr class="my-4">
+        <div class="row">
+            <div class="col">
+                <p class="lead" v-if="pricePerBuildingInWei">
+                    Price per building: {{ pricePerBuildingInEth }} ETH<br/>
+                    Last price per building: <span class="text-muted">{{ lastPricePerBuildingInEth }} ETH</span><br/>
+                    Last Sale Block: <code>{{ lastSaleBlock }}</code><br/>
+                    Blocks since last sale: <code>{{ blocknumber - lastSaleBlock }}</code>
+                    <span class="text-muted small">roughly {{ ((blocknumber - lastSaleBlock) * 15) / 60 }} mins</span>
+                </p>
+            </div>
+            <div class="col">
+                <p class="lead">
+                    Total buildings: {{ totalBuildings }}<br/>
+                    Total ETH: {{ totalEth }}
+                </p>
+            </div>
+            <div class="col">
+                <a class="btn btn-primary btn-lg" href="#" role="button" @click="mintBuilding()">Mint building</a>
+            </div>
+        </div>
+        <div class="row" v-if="buildingMetaData">
+            <div class="col">
+                <code>
+                    {{ buildingMetaData }}
+                </code>
+            </div>
+            <div class="col text-center">
+                <img :src="buildingMetaData.image" class="img-fluid" style="max-height: 300px"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-columns" v-if="buildings">
+        <div class="card m-2 p-2" v-for="b in buildings">
+            <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
+            <div class="card-body">
+                <h3 class="card-title text-center">{{ b.data.name }}</h3>
+                <p class="text-center">{{ b.data.description }}</p>
+                <h5 class="text-center">{{ lookupCityName(b.data.city) }}</h5>
+                <p class="small">
+                    <span class="text-muted">Token ID</span> <code>{{ b.data.attributes.tokenId }}</code><br/>
+                    <span class="text-muted">Type</span> <code>{{ b.data.attributes.type }}</code><br/>
+                    <span class="text-muted">City</span> <code>{{ b.data.attributes.city }}</code><br/>
+                    <span class="text-muted">Building</span> <code>{{ b.data.attributes.building }}</code><br/>
+                    <span class="text-muted">Ground Floor</span> <code>{{ b.data.attributes.groundFloor }}</code><br/>
+                    <span class="text-muted">Body</span> <code>{{ b.data.attributes.body }}</code><br/>
+                    <span class="text-muted">Roof</span> <code>{{ b.data.attributes.roof }}</code><br/>
+                    <span class="text-muted">Exterior Colorway</span> <code>{{ b.data.attributes.exteriorColorway }}</code><br/>
+                    <span class="text-muted">Base Window Colorway</span> <code>{{ b.data.attributes.baseWindowColorway }}</code><br/>
+                    <span class="text-muted">Body Window Colorway</span> <code>{{ b.data.attributes.bodyWindowColorway }}</code><br/>
+                    <span class="text-muted">Roof Window Colorway</span> <code>{{ b.data.attributes.roofWindowColorway }}</code><br/>
+                    <span class="text-muted">Background Colorway</span> <code>{{ b.data.attributes.backgroundColorway }}</code>
+                </p>
+                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect }}</code></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://use.fontawesome.com/e88a1894a6.js" type="text/javascript"></script>
+
+<!-- This exposes the library as a global variable: ethers -->
+<script src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        charset="utf-8"
+        type="text/javascript">
+</script>
+
+<script src="https://unpkg.com/vue/dist/vue.js" type="text/javascript"></script>
+<script src="https://unpkg.com/vue-toasted"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    /* global Vue, ethers, Toasted, axios */
+    Vue.use(Toasted);
+
+    // var provider = new ethers.providers.InfuraProvider('ropsten');
+    // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
+    const provider = new ethers.providers.Web3Provider(web3.currentProvider);
+    const signer = provider.getSigner();
+    const networkId = 1;
+
+    new Vue({
+        el: '#vue-app',
+        data: {
+            rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
+            blockcitiesAddress: `0x2f2d5aa0efdb9ca3c9bb789693d06bebea88792f`,
+            blockcitiesAbi: [{"constant":true,"inputs":[{"name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newBaseURI","type":"string"}],"name":"updateTokenBaseURI","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"removeWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"},{"name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelisted","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"tokenIdPointer","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalBuildings","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_tokenId","type":"uint256"}],"name":"burn","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"tokenBaseURI","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"tokensOfOwner","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_exteriorColorway","type":"uint256"},{"name":"_backgroundColorway","type":"uint256"},{"name":"_city","type":"uint256"},{"name":"_building","type":"uint256"},{"name":"_base","type":"uint256"},{"name":"_body","type":"uint256"},{"name":"_roof","type":"uint256"},{"name":"_special","type":"uint256"},{"name":"_architect","type":"address"}],"name":"createBuilding","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"},{"name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelistAdmin","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_tokenId","type":"uint256"}],"name":"attributes","outputs":[{"name":"_exteriorColorway","type":"uint256"},{"name":"_backgroundColorway","type":"uint256"},{"name":"_city","type":"uint256"},{"name":"_building","type":"uint256"},{"name":"_base","type":"uint256"},{"name":"_body","type":"uint256"},{"name":"_roof","type":"uint256"},{"name":"_special","type":"uint256"},{"name":"_architect","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"},{"name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_tokenBaseURI","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_tokenId","type":"uint256"},{"indexed":true,"name":"_to","type":"address"},{"indexed":true,"name":"_architect","type":"address"}],"name":"BuildingMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"approved","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"operator","type":"address"},{"indexed":false,"name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"}],
+            blockcitiesContract: null,
+            vendingAddress: `0x88583556156ec0d26a54472f33eba8d55d37dd6a`,
+            vendingAbi: [{"constant":true,"inputs":[],"name":"floorPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"blockcities","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"blockCities","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastSaleBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatch","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"totalPrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_ceilingPricePerBuildingInWei","type":"uint256"}],"name":"setCeilingPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"colourGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_partner","type":"address"}],"name":"updatePartnerAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"addCreditAmount","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalPurchasesInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"mintBuilding","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_colourGenerator","type":"address"}],"name":"setColourGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_techPartnerRate","type":"uint256"}],"name":"updatePartnerRate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_addresses","type":"address[]"},{"name":"_amount","type":"uint256"}],"name":"addCreditBatch","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"mintBuildingTo","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_blockStep","type":"uint256"}],"name":"setBlockStep","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_floorPricePerBuildingInWei","type":"uint256"}],"name":"setFloorPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"logicGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"addCredit","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"lastSalePrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_logicGenerator","type":"address"}],"name":"setLogicGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_blockcities","type":"address"}],"name":"updateBlockcitiesAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newPriceDiscountBands","type":"uint256[2]"}],"name":"setPriceDiscountBands","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pricePerBuildingInWei","type":"uint256"}],"name":"setPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_lastSaleBlock","type":"uint256"}],"name":"setLastSaleBlock","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"partnerRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"priceStepInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"partner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_priceStepInWei","type":"uint256"}],"name":"setPriceStepInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"blockStep","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"priceDiscountBands","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatchTo","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"ceilingPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"credits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_logicGenerator","type":"address"},{"name":"_colourGenerator","type":"address"},{"name":"_blockCities","type":"address"},{"name":"_blockCitiesAddress","type":"address"},{"name":"_partnerAddress","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_tokenId","type":"uint256"},{"indexed":true,"name":"_architect","type":"address"}],"name":"VendingMachineTriggered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"CreditAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_priceDiscountBands","type":"uint256[2]"}],"name":"PriceDiscountBandsChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldPriceStepInWei","type":"uint256"},{"indexed":false,"name":"_newPriceStepInWei","type":"uint256"}],"name":"PriceStepInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newPricePerBuildingInWei","type":"uint256"}],"name":"PricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldFloorPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newFloorPricePerBuildingInWei","type":"uint256"}],"name":"FloorPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldCeilingPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newCeilingPricePerBuildingInWei","type":"uint256"}],"name":"CeilingPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldBlockStep","type":"uint256"},{"indexed":false,"name":"_newBlockStep","type":"uint256"}],"name":"BlockStepChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldLastSaleBlock","type":"uint256"},{"indexed":false,"name":"_newLastSaleBlock","type":"uint256"}],"name":"LastSaleBlockChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"}],
+            vendingContract: null,
+            pricePerBuildingInWei: null,
+            pricePerBuildingInEth: null,
+            lastPricePerBuildingInEth: null,
+            blocknumber: null,
+            lastSaleBlock: null,
+            totalEth: null,
+            totalBuildings: 0,
+            buildingTokenId: null,
+            buildingMetaData: null,
+            buildings: [],
+        },
+        methods: {
+            lookupCityName: (id) => {
+                if (parseInt(id) === 0) return 'ATL';
+                if (parseInt(id) === 1) return 'NYC';
+                if (parseInt(id) === 2) return 'CHI';
+                if (parseInt(id) === 3) return 'SF';
+            },
+            mintBuilding: async function () {
+
+                this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
+
+                let overrides = {
+
+                    // The maximum units of gas for the transaction to use
+                    gasLimit: 700000,
+
+                    // The price (in wei) per unit of gas
+                    gasPrice: 6000000000,
+
+                    // The amount to send with the transaction (i.e. msg.value)
+                    value: this.pricePerBuildingInWei,
+                };
+
+                // wait for tx to be mined
+                let tx = await this.vendingContract.mintBuilding(overrides);
+                let receipt = await tx.wait(1);
+                const tokenIdBN = receipt.events.pop().args[0];
+                this.buildingTokenId = tokenIdBN.toNumber();
+                console.log(`Token ID:`, this.buildingTokenId);
+
+                this.$toasted.show(`Building created: ${this.buildingTokenId}`, {
+                    theme: 'bubble',
+                    position: 'bottom-center',
+                    duration: 5000
+                });
+
+                // refresh total
+                this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
+
+                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                console.log(resp);
+                this.buildings.push(resp);
+                this.buildingMetaData = resp.data;
+            }
+        },
+        created: async function () {
+            this.blocknumber = await provider.getBlockNumber();
+
+            this.vendingContract = new ethers.Contract(
+                this.vendingAddress,
+                this.vendingAbi,
+                signer
+            );
+
+            this.blockcitiesContract = new ethers.Contract(
+                this.blockcitiesAddress,
+                this.blockcitiesAbi,
+                signer
+            );
+
+            this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
+            this.pricePerBuildingInEth = ethers.utils.formatEther(this.pricePerBuildingInWei);
+            this.lastPricePerBuildingInEth = ethers.utils.formatEther((await this.vendingContract.lastSalePrice()));
+            this.lastSaleBlock = await this.vendingContract.lastSaleBlock();
+
+            this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
+            this.totalEth = ethers.utils.formatEther((await this.vendingContract.totalPurchasesInWei()));
+
+            const allBuildings = [];
+            for (let i = 1; i <= this.totalBuildings; i++) {
+                allBuildings.push(axios.get(`${this.rootApi}/network/${networkId}/token/${i}`));
+            }
+
+            this.buildings = await Promise.all(allBuildings);
+        }
+    });
+</script>
+
+</body>
+
+</html>

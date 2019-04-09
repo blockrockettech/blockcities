@@ -1,79 +1,4 @@
 
-// File: openzeppelin-solidity/contracts/ownership/Ownable.sol
-
-pragma solidity ^0.5.0;
-
-/**
- * @title Ownable
- * @dev The Ownable contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of "user permissions".
- */
-contract Ownable {
-    address private _owner;
-
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-
-    /**
-     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-     * account.
-     */
-    constructor () internal {
-        _owner = msg.sender;
-        emit OwnershipTransferred(address(0), _owner);
-    }
-
-    /**
-     * @return the address of the owner.
-     */
-    function owner() public view returns (address) {
-        return _owner;
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        require(isOwner());
-        _;
-    }
-
-    /**
-     * @return true if `msg.sender` is the owner of the contract.
-     */
-    function isOwner() public view returns (bool) {
-        return msg.sender == _owner;
-    }
-
-    /**
-     * @dev Allows the current owner to relinquish control of the contract.
-     * @notice Renouncing to ownership will leave the contract without an owner.
-     * It will not be possible to call the functions with the `onlyOwner`
-     * modifier anymore.
-     */
-    function renounceOwnership() public onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
-    }
-
-    /**
-     * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
-     */
-    function transferOwnership(address newOwner) public onlyOwner {
-        _transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Transfers control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
-     */
-    function _transferOwnership(address newOwner) internal {
-        require(newOwner != address(0));
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
-}
-
 // File: openzeppelin-solidity/contracts/math/SafeMath.sol
 
 pragma solidity ^0.5.0;
@@ -142,142 +67,168 @@ library SafeMath {
     }
 }
 
-// File: contracts/generators/ColourGenerator.sol
+// File: contracts/generators/IColourGenerator.sol
 
 pragma solidity ^0.5.0;
 
-
-contract ColourGenerator is Ownable {
-
-    uint256 internal randNonce = 0;
-
-    event Colours(uint256 exteriorColorway, uint256 backgroundColorway);
-
-    uint256 public exteriors = 20;
-    uint256 public backgrounds = 8;
-
+interface IColourGenerator {
     function generate(address _sender)
     external
-    returns (
-        uint256 exteriorColorway,
-        uint256 backgroundColorway
-    ) {
-        bytes32 hash = blockhash(block.number);
+    returns (uint256 exteriorColorway, uint256 backgroundColorway);
+}
 
-        uint256 exteriorColorwayRandom = generate(hash, _sender, exteriors);
-        uint256 backgroundColorwayRandom = generate(hash, _sender, backgrounds);
+// File: contracts/generators/ILogicGenerator.sol
 
-        emit Colours(exteriorColorwayRandom, backgroundColorwayRandom);
+pragma solidity ^0.5.0;
 
-        return (exteriorColorwayRandom, backgroundColorwayRandom);
+interface ILogicGenerator {
+    function generate(address _sender)
+    external
+    returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special);
+}
+
+// File: openzeppelin-solidity/contracts/access/Roles.sol
+
+pragma solidity ^0.5.0;
+
+/**
+ * @title Roles
+ * @dev Library for managing addresses assigned to a Role.
+ */
+library Roles {
+    struct Role {
+        mapping (address => bool) bearer;
     }
 
-    function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
-        randNonce++;
-        bytes memory packed = abi.encodePacked(_hash, _sender, randNonce);
-        return uint256(keccak256(packed)) % _max;
+    /**
+     * @dev give an account access to this role
+     */
+    function add(Role storage role, address account) internal {
+        require(account != address(0));
+        require(!has(role, account));
+
+        role.bearer[account] = true;
     }
 
-    function updateExteriors(uint256 _exteriors) public onlyOwner {
-        exteriors = _exteriors;
+    /**
+     * @dev remove an account's access to this role
+     */
+    function remove(Role storage role, address account) internal {
+        require(account != address(0));
+        require(has(role, account));
+
+        role.bearer[account] = false;
     }
 
-    function updateBackgrounds(uint256 _backgrounds) public onlyOwner {
-        backgrounds = _backgrounds;
+    /**
+     * @dev check if an account has this role
+     * @return bool
+     */
+    function has(Role storage role, address account) internal view returns (bool) {
+        require(account != address(0));
+        return role.bearer[account];
     }
 }
 
-// File: contracts/generators/LogicGenerator.sol
+// File: openzeppelin-solidity/contracts/access/roles/WhitelistAdminRole.sol
 
 pragma solidity ^0.5.0;
 
 
-contract LogicGenerator is Ownable {
+/**
+ * @title WhitelistAdminRole
+ * @dev WhitelistAdmins are responsible for assigning and removing Whitelisted accounts.
+ */
+contract WhitelistAdminRole {
+    using Roles for Roles.Role;
 
-    uint256 internal randNonce = 0;
+    event WhitelistAdminAdded(address indexed account);
+    event WhitelistAdminRemoved(address indexed account);
 
-    event Generated(
-        uint256 city,
-        uint256 building,
-        uint256 base,
-        uint256 body,
-        uint256 roof,
-        uint256 special
-    );
+    Roles.Role private _whitelistAdmins;
 
-    uint256[] public cityPercentages;
-
-    mapping(uint256 => uint256[]) public cityMappings;
-
-    mapping(uint256 => uint256[]) public buildingBaseMappings;
-    mapping(uint256 => uint256[]) public buildingBodyMappings;
-    mapping(uint256 => uint256[]) public buildingRoofMappings;
-
-    uint256 public specialModulo = 7;
-    uint256 public specialNo = 11;
-
-    function generate(address _sender)
-    external
-    returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
-        bytes32 hash = blockhash(block.number);
-
-        uint256 aCity = cityPercentages[generate(hash, _sender, cityPercentages.length)];
-
-        uint256 aBuilding = cityMappings[aCity][generate(hash, _sender, cityMappings[aCity].length)];
-
-        uint256 aBase = buildingBaseMappings[aBuilding][generate(hash, _sender, buildingBaseMappings[aBuilding].length)];
-        uint256 aBody = buildingBodyMappings[aBuilding][generate(hash, _sender, buildingBodyMappings[aBuilding].length)];
-        uint256 aRoof = buildingRoofMappings[aBuilding][generate(hash, _sender, buildingRoofMappings[aBuilding].length)];
-        uint256 aSpecial = 0;
-
-        // 1 in X roughly
-        if (isSpecial(block.number)) {
-            aSpecial = generate(hash, _sender, specialNo);
-        }
-
-        emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
-
-        return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+    constructor () internal {
+        _addWhitelistAdmin(msg.sender);
     }
 
-    function generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {
-        randNonce++;
-        bytes memory packed = abi.encodePacked(_hash, _sender, randNonce);
-        return uint256(keccak256(packed)) % _max;
+    modifier onlyWhitelistAdmin() {
+        require(isWhitelistAdmin(msg.sender));
+        _;
     }
 
-    function isSpecial(uint256 _blocknumber) public view returns (bool) {
-        return (_blocknumber % specialModulo) == 0;
+    function isWhitelistAdmin(address account) public view returns (bool) {
+        return _whitelistAdmins.has(account);
     }
 
-    function updateBuildingBaseMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
-        buildingBaseMappings[_building] = _params;
+    function addWhitelistAdmin(address account) public onlyWhitelistAdmin {
+        _addWhitelistAdmin(account);
     }
 
-    function updateBuildingBodyMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
-        buildingBodyMappings[_building] = _params;
+    function renounceWhitelistAdmin() public {
+        _removeWhitelistAdmin(msg.sender);
     }
 
-    function updateBuildingRoofMappings(uint256 _building, uint256[] memory _params) public onlyOwner {
-        buildingRoofMappings[_building] = _params;
+    function _addWhitelistAdmin(address account) internal {
+        _whitelistAdmins.add(account);
+        emit WhitelistAdminAdded(account);
     }
 
-    function updateSpecialModulo(uint256 _specialModulo) public onlyOwner {
-        specialModulo = _specialModulo;
+    function _removeWhitelistAdmin(address account) internal {
+        _whitelistAdmins.remove(account);
+        emit WhitelistAdminRemoved(account);
+    }
+}
+
+// File: openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol
+
+pragma solidity ^0.5.0;
+
+
+
+/**
+ * @title WhitelistedRole
+ * @dev Whitelisted accounts have been approved by a WhitelistAdmin to perform certain actions (e.g. participate in a
+ * crowdsale). This role is special in that the only accounts that can add it are WhitelistAdmins (who can also remove
+ * it), and not Whitelisteds themselves.
+ */
+contract WhitelistedRole is WhitelistAdminRole {
+    using Roles for Roles.Role;
+
+    event WhitelistedAdded(address indexed account);
+    event WhitelistedRemoved(address indexed account);
+
+    Roles.Role private _whitelisteds;
+
+    modifier onlyWhitelisted() {
+        require(isWhitelisted(msg.sender));
+        _;
     }
 
-    function updateSpecialNo(uint256 _specialNo) public onlyOwner {
-        specialNo = _specialNo;
+    function isWhitelisted(address account) public view returns (bool) {
+        return _whitelisteds.has(account);
     }
 
-    function updateCityPercentages(uint256[] memory _params) public onlyOwner {
-        cityPercentages = _params;
+    function addWhitelisted(address account) public onlyWhitelistAdmin {
+        _addWhitelisted(account);
     }
 
-    function updateCityMappings(uint256 _cityIndex, uint256[] memory _params) public onlyOwner {
-        cityMappings[_cityIndex] = _params;
+    function removeWhitelisted(address account) public onlyWhitelistAdmin {
+        _removeWhitelisted(account);
     }
 
+    function renounceWhitelisted() public {
+        _removeWhitelisted(msg.sender);
+    }
+
+    function _addWhitelisted(address account) internal {
+        _whitelisteds.add(account);
+        emit WhitelistedAdded(account);
+    }
+
+    function _removeWhitelisted(address account) internal {
+        _whitelisteds.remove(account);
+        emit WhitelistedRemoved(account);
+    }
 }
 
 // File: contracts/FundsSplitter.sol
@@ -286,7 +237,7 @@ pragma solidity ^0.5.0;
 
 
 
-contract FundsSplitter is Ownable {
+contract FundsSplitter is WhitelistedRole {
     using SafeMath for uint256;
 
     address payable public blockcities;
@@ -318,15 +269,15 @@ contract FundsSplitter is Ownable {
         }
     }
 
-    function updatePartnerAddress(address payable _partner) onlyOwner public {
+    function updatePartnerAddress(address payable _partner) onlyWhitelisted public {
         partner = _partner;
     }
 
-    function updatePartnerRate(uint256 _techPartnerRate) onlyOwner public {
+    function updatePartnerRate(uint256 _techPartnerRate) onlyWhitelisted public {
         partnerRate = _techPartnerRate;
     }
 
-    function updateBlockcitiesAddress(address payable _blockcities) onlyOwner public {
+    function updateBlockcitiesAddress(address payable _blockcities) onlyWhitelisted public {
         blockcities = _blockcities;
     }
 }
@@ -422,8 +373,7 @@ pragma solidity ^0.5.0;
 
 
 
-
-contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
+contract BlockCitiesVendingMachine is FundsSplitter {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
@@ -438,11 +388,6 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     event PriceStepInWeiChanged(
         uint256 _oldPriceStepInWei,
         uint256 _newPriceStepInWei
-    );
-
-    event PricePerBuildingInWeiChanged(
-        uint256 _oldPricePerBuildingInWei,
-        uint256 _newPricePerBuildingInWei
     );
 
     event FloorPricePerBuildingInWeiChanged(
@@ -465,6 +410,11 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 _newLastSaleBlock
     );
 
+    event LastSalePriceChanged(
+        uint256 _oldLastSalePrice,
+        uint256 _newLastSalePrice
+    );
+
     struct Colour {
         uint256 exteriorColorway;
         uint256 backgroundColorway;
@@ -479,9 +429,9 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         uint256 special;
     }
 
-    LogicGenerator public logicGenerator;
+    ILogicGenerator public logicGenerator;
 
-    ColourGenerator public colourGenerator;
+    IColourGenerator public colourGenerator;
 
     IBlockCitiesCreator public blockCities;
 
@@ -494,20 +444,16 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
 
     uint256 public ceilingPricePerBuildingInWei = 0.15 ether;
 
-    // use totalPrice() to calculate current weighted price
-    uint256 pricePerBuildingInWei = 0.075 ether;
-
     uint256 public priceStepInWei = 0.0003 ether;
 
-    // 120 is approx 30 mins
-    uint256 public blockStep = 120;
+    uint256 public blockStep = 10;
 
     uint256 public lastSaleBlock = 0;
-    uint256 public lastSalePrice = 0;
+    uint256 public lastSalePrice = 0.075 ether;
 
     constructor (
-        LogicGenerator _logicGenerator,
-        ColourGenerator _colourGenerator,
+        ILogicGenerator _logicGenerator,
+        IColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities,
         address payable _blockCitiesAddress,
         address payable _partnerAddress
@@ -515,6 +461,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
+
+        lastSaleBlock = block.number;
+
+        super.addWhitelisted(msg.sender);
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
@@ -524,7 +474,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, 1);
+        _reconcileCreditsAndFunds(currentPrice, 1);
 
         uint256 tokenId = _generate(msg.sender);
 
@@ -540,7 +490,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, 1);
+        _reconcileCreditsAndFunds(currentPrice, 1);
 
         uint256 tokenId = _generate(_to);
 
@@ -556,7 +506,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, _numberOfBuildings);
+        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -576,7 +526,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _adjustCredits(currentPrice, _numberOfBuildings);
+        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
 
         uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
 
@@ -632,7 +582,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
             });
     }
 
-    function _adjustCredits(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
+    function _reconcileCreditsAndFunds(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
         // use credits first
         if (credits[msg.sender] >= _numberOfBuildings) {
             credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
@@ -648,19 +598,18 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
     }
 
     function _stepIncrease() internal {
-        lastSalePrice = pricePerBuildingInWei;
+
+        lastSalePrice = totalPrice(1).add(priceStepInWei);
         lastSaleBlock = block.number;
 
-        pricePerBuildingInWei = pricePerBuildingInWei.add(priceStepInWei);
-
-        if (pricePerBuildingInWei >= ceilingPricePerBuildingInWei) {
-            pricePerBuildingInWei = ceilingPricePerBuildingInWei;
+        if (lastSalePrice >= ceilingPricePerBuildingInWei) {
+            lastSalePrice = ceilingPricePerBuildingInWei;
         }
     }
 
     function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
 
-        uint256 calculatedPrice = pricePerBuildingInWei;
+        uint256 calculatedPrice = lastSalePrice;
 
         uint256 blocksPassed = block.number - lastSaleBlock;
         uint256 reduce = blocksPassed.div(blockStep).mul(priceStepInWei);
@@ -670,10 +619,10 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         }
         else {
             calculatedPrice = calculatedPrice.sub(reduce);
-        }
 
-        if (calculatedPrice < floorPricePerBuildingInWei) {
-            calculatedPrice = floorPricePerBuildingInWei;
+            if (calculatedPrice < floorPricePerBuildingInWei) {
+                calculatedPrice = floorPricePerBuildingInWei;
+            }
         }
 
         if (_numberOfBuildings < 5) {
@@ -686,19 +635,13 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
     }
 
-    function setPricePerBuildingInWei(uint256 _pricePerBuildingInWei) public onlyOwner returns (bool) {
-        emit PricePerBuildingInWeiChanged(pricePerBuildingInWei, _pricePerBuildingInWei);
-        pricePerBuildingInWei = _pricePerBuildingInWei;
-        return true;
-    }
-
-    function setPriceStepInWei(uint256 _priceStepInWei) public onlyOwner returns (bool) {
+    function setPriceStepInWei(uint256 _priceStepInWei) public onlyWhitelisted returns (bool) {
         emit PriceStepInWeiChanged(priceStepInWei, _priceStepInWei);
         priceStepInWei = _priceStepInWei;
         return true;
     }
 
-    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyOwner returns (bool) {
+    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyWhitelisted returns (bool) {
         priceDiscountBands = _newPriceDiscountBands;
 
         emit PriceDiscountBandsChanged(_newPriceDiscountBands);
@@ -706,7 +649,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCredit(address _to) public onlyOwner returns (bool) {
+    function addCredit(address _to) public onlyWhitelisted returns (bool) {
         credits[_to] = credits[_to].add(1);
 
         emit CreditAdded(_to, 1);
@@ -714,7 +657,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCreditAmount(address _to, uint256 _amount) public onlyOwner returns (bool) {
+    function addCreditAmount(address _to, uint256 _amount) public onlyWhitelisted returns (bool) {
         credits[_to] = credits[_to].add(_amount);
 
         emit CreditAdded(_to, _amount);
@@ -722,7 +665,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyOwner returns (bool) {
+    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyWhitelisted returns (bool) {
         for (uint i = 0; i < _addresses.length; i++) {
             addCreditAmount(_addresses[i], _amount);
         }
@@ -730,36 +673,42 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyOwner returns (bool) {
+    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyWhitelisted returns (bool) {
         emit FloorPricePerBuildingInWeiChanged(floorPricePerBuildingInWei, _floorPricePerBuildingInWei);
         floorPricePerBuildingInWei = _floorPricePerBuildingInWei;
         return true;
     }
 
-    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyOwner returns (bool) {
+    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyWhitelisted returns (bool) {
         emit CeilingPricePerBuildingInWeiChanged(ceilingPricePerBuildingInWei, _ceilingPricePerBuildingInWei);
         ceilingPricePerBuildingInWei = _ceilingPricePerBuildingInWei;
         return true;
     }
 
-    function setBlockStep(uint256 _blockStep) public onlyOwner returns (bool) {
+    function setBlockStep(uint256 _blockStep) public onlyWhitelisted returns (bool) {
         emit BlockStepChanged(blockStep, _blockStep);
         blockStep = _blockStep;
         return true;
     }
 
-    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyOwner returns (bool) {
+    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyWhitelisted returns (bool) {
         emit LastSaleBlockChanged(lastSaleBlock, _lastSaleBlock);
         lastSaleBlock = _lastSaleBlock;
         return true;
     }
 
-    function setLogicGenerator(LogicGenerator _logicGenerator) public onlyOwner returns (bool) {
+    function setLastSalePrice(uint256 _lastSalePrice) public onlyWhitelisted returns (bool) {
+        emit LastSalePriceChanged(lastSalePrice, _lastSalePrice);
+        lastSalePrice = _lastSalePrice;
+        return true;
+    }
+
+    function setLogicGenerator(ILogicGenerator _logicGenerator) public onlyWhitelisted returns (bool) {
         logicGenerator = _logicGenerator;
         return true;
     }
 
-    function setColourGenerator(ColourGenerator _colourGenerator) public onlyOwner returns (bool) {
+    function setColourGenerator(IColourGenerator _colourGenerator) public onlyWhitelisted returns (bool) {
         colourGenerator = _colourGenerator;
         return true;
     }
