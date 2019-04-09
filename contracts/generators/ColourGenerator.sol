@@ -1,8 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./IColourGenerator.sol";
 
-contract ColourGenerator is Ownable {
+contract ColourGenerator is Ownable, IColourGenerator {
 
     uint256 internal randNonce = 0;
 
@@ -13,10 +14,7 @@ contract ColourGenerator is Ownable {
 
     function generate(address _sender)
     external
-    returns (
-        uint256 exteriorColorway,
-        uint256 backgroundColorway
-    ) {
+    returns (uint256 exteriorColorway, uint256 backgroundColorway) {
         bytes32 hash = blockhash(block.number);
 
         uint256 exteriorColorwayRandom = generate(hash, _sender, exteriors);

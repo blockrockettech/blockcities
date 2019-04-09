@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-contract FundsSplitter is Ownable {
+contract FundsSplitter is WhitelistedRole {
     using SafeMath for uint256;
 
     address payable public blockcities;
@@ -35,15 +35,15 @@ contract FundsSplitter is Ownable {
         }
     }
 
-    function updatePartnerAddress(address payable _partner) onlyOwner public {
+    function updatePartnerAddress(address payable _partner) onlyWhitelisted public {
         partner = _partner;
     }
 
-    function updatePartnerRate(uint256 _techPartnerRate) onlyOwner public {
+    function updatePartnerRate(uint256 _techPartnerRate) onlyWhitelisted public {
         partnerRate = _techPartnerRate;
     }
 
-    function updateBlockcitiesAddress(address payable _blockcities) onlyOwner public {
+    function updateBlockcitiesAddress(address payable _blockcities) onlyWhitelisted public {
         blockcities = _blockcities;
     }
 }

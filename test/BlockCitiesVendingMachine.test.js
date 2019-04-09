@@ -9,7 +9,7 @@ const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine')
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -150,7 +150,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
         it('price adjusts on invocation but not above ceiling', async function () {
             const ceiling = await this.vendingMachine.ceilingPricePerBuildingInWei();
-            await this.vendingMachine.setPricePerBuildingInWei(ceiling, {from: creator});
+            await this.vendingMachine.setLastSalePrice(ceiling, {from: creator});
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
 
@@ -190,7 +190,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
 
             const blockStep = await this.vendingMachine.blockStep();
             const floor = await this.vendingMachine.floorPricePerBuildingInWei();
-            await this.vendingMachine.setPricePerBuildingInWei(floor, {from: creator});
+            await this.vendingMachine.setLastSalePrice(floor, {from: creator});
 
             // advance blockstep
             for (let i = 0; i < blockStep.mul(new BN(2)); i++) {
@@ -284,18 +284,18 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         });
     });
 
-    context('ensure only owner can change base price', function () {
+    context('ensure only owner can last sale price', function () {
         it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setPricePerBuildingInWei(1, {from: tokenOwner}));
+            await shouldFail.reverting(this.vendingMachine.setLastSalePrice(1, {from: tokenOwner}));
         });
 
         it('should set if owner', async function () {
             const priceNow = await this.vendingMachine.totalPrice(new BN(1));
-            const {logs} = await this.vendingMachine.setPricePerBuildingInWei(123, {from: creator});
+            const {logs} = await this.vendingMachine.setLastSalePrice(123, {from: creator});
             expectEvent.inLogs(
                 logs,
-                `PricePerBuildingInWeiChanged`,
-                {_oldPricePerBuildingInWei: priceNow, _newPricePerBuildingInWei: new BN(123)}
+                `LastSalePriceChanged`,
+                {_oldLastSalePrice: priceNow, _newLastSalePrice: new BN(123)}
             );
         });
     });
@@ -396,7 +396,6 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
     });
 
     context('ensure only owner can change logic generator', function () {
-
         beforeEach(async function () {
             this.newLogicGenerator = await LogicGenerator.new({from: creator});
         });
@@ -660,6 +659,49 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
             (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.currentPrice);
         });
 
+    });
+
+    context('price increases then decreases then sets step up from current price', function () {
+
+        it('price adjusts on invocation', async function () {
+            const priceStep = await this.vendingMachine.priceStepInWei();
+
+            const priceBeforeTest = await this.vendingMachine.totalPrice(new BN(1));
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
+
+            const priceAfterOneStep = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
+
+            // should move step up once
+            await this.vendingMachine.mintBatch(new BN(2), {from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
+
+            const priceAfterTwoStep = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterTwoStep.should.be.bignumber.equal(priceAfterOneStep.add(priceStep));
+
+            const blockStep = await this.vendingMachine.blockStep();
+
+            // advance blockstep
+            for (let i = 0; i < blockStep.toNumber(); i++) {
+                await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            }
+
+            const priceAfterCooldownOne = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterCooldownOne.should.be.bignumber.equal(priceAfterOneStep);
+
+            // advance blockstep
+            for (let i = 0; i < blockStep.toNumber(); i++) {
+                await this.vendingMachine.addCredit(tokenOwner, {from: creator});
+            }
+
+            const priceAfterCooldownTwo = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterCooldownTwo.should.be.bignumber.equal(priceBeforeTest);
+
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
+
+            const priceAfterThreeStep = await this.vendingMachine.totalPrice(new BN(1));
+            priceAfterThreeStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
+        });
     });
 
     async function getGasCosts (receipt) {
