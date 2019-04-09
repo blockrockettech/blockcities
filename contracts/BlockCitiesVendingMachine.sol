@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 import "./generators/IColourGenerator.sol";
@@ -10,7 +9,7 @@ import "./FundsSplitter.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
+contract BlockCitiesVendingMachine is FundsSplitter {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
@@ -100,6 +99,8 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         blockCities = _blockCities;
 
         lastSaleBlock = block.number;
+
+        super.addWhitelisted(msg.sender);
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
@@ -270,13 +271,13 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
     }
 
-    function setPriceStepInWei(uint256 _priceStepInWei) public onlyOwner returns (bool) {
+    function setPriceStepInWei(uint256 _priceStepInWei) public onlyWhitelisted returns (bool) {
         emit PriceStepInWeiChanged(priceStepInWei, _priceStepInWei);
         priceStepInWei = _priceStepInWei;
         return true;
     }
 
-    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyOwner returns (bool) {
+    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyWhitelisted returns (bool) {
         priceDiscountBands = _newPriceDiscountBands;
 
         emit PriceDiscountBandsChanged(_newPriceDiscountBands);
@@ -284,7 +285,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCredit(address _to) public onlyOwner returns (bool) {
+    function addCredit(address _to) public onlyWhitelisted returns (bool) {
         credits[_to] = credits[_to].add(1);
 
         emit CreditAdded(_to, 1);
@@ -292,7 +293,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCreditAmount(address _to, uint256 _amount) public onlyOwner returns (bool) {
+    function addCreditAmount(address _to, uint256 _amount) public onlyWhitelisted returns (bool) {
         credits[_to] = credits[_to].add(_amount);
 
         emit CreditAdded(_to, _amount);
@@ -300,7 +301,7 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyOwner returns (bool) {
+    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyWhitelisted returns (bool) {
         for (uint i = 0; i < _addresses.length; i++) {
             addCreditAmount(_addresses[i], _amount);
         }
@@ -308,42 +309,42 @@ contract BlockCitiesVendingMachine is Ownable, FundsSplitter {
         return true;
     }
 
-    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyOwner returns (bool) {
+    function setFloorPricePerBuildingInWei(uint256 _floorPricePerBuildingInWei) public onlyWhitelisted returns (bool) {
         emit FloorPricePerBuildingInWeiChanged(floorPricePerBuildingInWei, _floorPricePerBuildingInWei);
         floorPricePerBuildingInWei = _floorPricePerBuildingInWei;
         return true;
     }
 
-    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyOwner returns (bool) {
+    function setCeilingPricePerBuildingInWei(uint256 _ceilingPricePerBuildingInWei) public onlyWhitelisted returns (bool) {
         emit CeilingPricePerBuildingInWeiChanged(ceilingPricePerBuildingInWei, _ceilingPricePerBuildingInWei);
         ceilingPricePerBuildingInWei = _ceilingPricePerBuildingInWei;
         return true;
     }
 
-    function setBlockStep(uint256 _blockStep) public onlyOwner returns (bool) {
+    function setBlockStep(uint256 _blockStep) public onlyWhitelisted returns (bool) {
         emit BlockStepChanged(blockStep, _blockStep);
         blockStep = _blockStep;
         return true;
     }
 
-    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyOwner returns (bool) {
+    function setLastSaleBlock(uint256 _lastSaleBlock) public onlyWhitelisted returns (bool) {
         emit LastSaleBlockChanged(lastSaleBlock, _lastSaleBlock);
         lastSaleBlock = _lastSaleBlock;
         return true;
     }
 
-    function setLastSalePrice(uint256 _lastSalePrice) public onlyOwner returns (bool) {
+    function setLastSalePrice(uint256 _lastSalePrice) public onlyWhitelisted returns (bool) {
         emit LastSalePriceChanged(lastSalePrice, _lastSalePrice);
         lastSalePrice = _lastSalePrice;
         return true;
     }
 
-    function setLogicGenerator(ILogicGenerator _logicGenerator) public onlyOwner returns (bool) {
+    function setLogicGenerator(ILogicGenerator _logicGenerator) public onlyWhitelisted returns (bool) {
         logicGenerator = _logicGenerator;
         return true;
     }
 
-    function setColourGenerator(IColourGenerator _colourGenerator) public onlyOwner returns (bool) {
+    function setColourGenerator(IColourGenerator _colourGenerator) public onlyWhitelisted returns (bool) {
         colourGenerator = _colourGenerator;
         return true;
     }
