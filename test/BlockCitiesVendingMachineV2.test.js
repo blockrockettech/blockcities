@@ -9,7 +9,7 @@ const BlockCitiesVendingMachineV2 = artifacts.require('BlockCitiesVendingMachine
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('BlockCitiesVendingMachineV2Test', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract('BlockCitiesVendingMachineV2Test', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
