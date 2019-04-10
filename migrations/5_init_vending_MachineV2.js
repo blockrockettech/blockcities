@@ -39,4 +39,7 @@ module.exports = async function (deployer, network, accounts) {
 
     // Whitelist vending machine in the core contract
     await _blockCities.addWhitelisted(_blockCitiesVendingMachineV2.address, {from: _owner});
+
+    // Whitelist preston
+    await _blockCitiesVendingMachineV2.addWhitelisted("0x64C971d7e3c0483FA97A7714ec55d1E1943731c7", {from: _owner});
 };
