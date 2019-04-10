@@ -5,11 +5,11 @@ const BlockCities = artifacts.require('BlockCities');
 const LogicGenerator = artifacts.require('LogicGenerator');
 const ColourGenerator = artifacts.require('ColourGenerator');
 
-const BlockCitiesVendingMachine = artifacts.require('BlockCitiesVendingMachine');
+const BlockCitiesVendingMachineV2 = artifacts.require('BlockCitiesVendingMachineV2');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract.only('BlockCitiesVendingMachineV2Test', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const firstTokenId = new BN(1);
 
@@ -47,7 +47,7 @@ contract('BlockCitiesVendingMachineTest', ([_, creator, tokenOwner, anyone, whit
         this.colourGenerator = await ColourGenerator.new({from: creator});
 
         // Create vending machine
-        this.vendingMachine = await BlockCitiesVendingMachine.new(
+        this.vendingMachine = await BlockCitiesVendingMachineV2.new(
             this.generator.address,
             this.colourGenerator.address,
             this.blockCities.address,

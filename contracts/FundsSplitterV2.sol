@@ -2,18 +2,17 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/access/roles/WhitelistedRole.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract FundsSplitter is Ownable {
+contract FundsSplitterV2 is WhitelistedRole {
     using SafeMath for uint256;
 
-    address payable public blockcities;
+    address payable public platform;
     address payable public partner;
 
     uint256 public partnerRate = 15;
 
-    constructor (address payable _blockcities, address payable _partner) public {
-        blockcities = _blockcities;
+    constructor (address payable _platform, address payable _partner) public {
+        platform = _platform;
         partner = _partner;
     }
 
@@ -32,19 +31,19 @@ contract FundsSplitter is Ownable {
 
             // send remaining amount to blockCities wallet
             uint256 remaining = _totalPrice.sub(partnerAmount);
-            blockcities.transfer(remaining);
+            platform.transfer(remaining);
         }
     }
 
-    function updatePartnerAddress(address payable _partner) onlyOwner public {
+    function updatePartnerAddress(address payable _partner) onlyWhitelisted public {
         partner = _partner;
     }
 
-    function updatePartnerRate(uint256 _techPartnerRate) onlyOwner public {
+    function updatePartnerRate(uint256 _techPartnerRate) onlyWhitelisted public {
         partnerRate = _techPartnerRate;
     }
 
-    function updateBlockcitiesAddress(address payable _blockcities) onlyOwner public {
-        blockcities = _blockcities;
+    function updatePlatformAddress(address payable _platform) onlyWhitelisted public {
+        platform = _platform;
     }
 }

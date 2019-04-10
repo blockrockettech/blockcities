@@ -1,13 +1,13 @@
 const _ = require('lodash');
 
-const FundsSplitter = artifacts.require('FundsSplitter');
+const FundsSplitterV2 = artifacts.require('FundsSplitterV2');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('FundsSplitter tests', (accounts) => {
+contract.only('FundsSplitterV2 tests', (accounts) => {
 
     before(async function () {
-        this.splitter = await FundsSplitter.new(accounts[0], accounts[1], {from: accounts[0]});
+        this.splitter = await FundsSplitterV2.new(accounts[0], accounts[1], {from: accounts[0]});
         await this.splitter.addWhitelisted(accounts[0]);
     });
 
