@@ -4,7 +4,7 @@ const FundsSplitter = artifacts.require('FundsSplitter');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('FundsSplitter tests', (accounts) => {
+contract('FundsSplitter tests', (accounts) => {
 
     before(async function () {
         this.splitter = await FundsSplitter.new(accounts[0], accounts[1], {from: accounts[0]});
