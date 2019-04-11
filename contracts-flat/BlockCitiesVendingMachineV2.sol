@@ -231,22 +231,22 @@ contract WhitelistedRole is WhitelistAdminRole {
     }
 }
 
-// File: contracts/FundsSplitter.sol
+// File: contracts/FundsSplitterV2.sol
 
 pragma solidity ^0.5.0;
 
 
 
-contract FundsSplitter is WhitelistedRole {
+contract FundsSplitterV2 is WhitelistedRole {
     using SafeMath for uint256;
 
-    address payable public blockcities;
+    address payable public platform;
     address payable public partner;
 
     uint256 public partnerRate = 15;
 
-    constructor (address payable _blockcities, address payable _partner) public {
-        blockcities = _blockcities;
+    constructor (address payable _platform, address payable _partner) public {
+        platform = _platform;
         partner = _partner;
     }
 
@@ -265,7 +265,7 @@ contract FundsSplitter is WhitelistedRole {
 
             // send remaining amount to blockCities wallet
             uint256 remaining = _totalPrice.sub(partnerAmount);
-            blockcities.transfer(remaining);
+            platform.transfer(remaining);
         }
     }
 
@@ -277,8 +277,8 @@ contract FundsSplitter is WhitelistedRole {
         partnerRate = _techPartnerRate;
     }
 
-    function updateBlockcitiesAddress(address payable _blockcities) onlyWhitelisted public {
-        blockcities = _blockcities;
+    function updatePlatformAddress(address payable _platform) onlyWhitelisted public {
+        platform = _platform;
     }
 }
 
@@ -363,7 +363,7 @@ interface IBlockCitiesCreator {
     ) external returns (uint256 _tokenId);
 }
 
-// File: contracts/BlockCitiesVendingMachine.sol
+// File: contracts/BlockCitiesVendingMachineV2.sol
 
 pragma solidity ^0.5.0;
 
@@ -373,7 +373,7 @@ pragma solidity ^0.5.0;
 
 
 
-contract BlockCitiesVendingMachine is FundsSplitter {
+contract BlockCitiesVendingMachineV2 is FundsSplitterV2 {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
@@ -455,9 +455,9 @@ contract BlockCitiesVendingMachine is FundsSplitter {
         ILogicGenerator _logicGenerator,
         IColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities,
-        address payable _blockCitiesAddress,
+        address payable _platform,
         address payable _partnerAddress
-    ) public FundsSplitter(_blockCitiesAddress, _partnerAddress) {
+    ) public FundsSplitterV2(_platform, _partnerAddress) {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
         blockCities = _blockCities;
