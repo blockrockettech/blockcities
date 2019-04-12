@@ -29,9 +29,9 @@
             <div class="col">
                 <p class="lead">
                     Total buildings: {{ totalBuildings }}<br/>
-                    <span class="text-muted">Total ETH: {{ totalEth }}</span><br/>
-                    <span class="text-muted">Total ETH V2: {{ totalEthV2 }}</span><br/>
-                    <strong>Total: {{ parseFloat(totalEth) + parseFloat(totalEthV2) }}</strong>
+                    <span class="text-muted">Total: {{ totalEth }}</span><br/>
+                    <span class="text-muted">Total V2: {{ totalEthV2 }}</span><br/>
+                    <strong>Total: {{ parseFloat(totalEth) + parseFloat(totalEthV2) }} ETH</strong>
                 </p>
             </div>
             <div class="col">
@@ -60,7 +60,7 @@
                 <h5 class="text-center">{{ lookupCityName(b.data.city) }}</h5>
                 <p class="small">
                     <span class="text-muted">Token ID</span> <code>{{ b.data.attributes.tokenId }}</code><br/>
-                    <span class="text-muted">Type</span> <code>{{ b.data.attributes.type }}</code><br/>
+                    <span class="text-muted">Window Type</span> <code>{{ b.data.attributes.windowType }}</code><br/>
                     <span class="text-muted">City</span> <code>{{ b.data.attributes.city }}</code><br/>
                     <span class="text-muted">Building</span> <code>{{ b.data.attributes.building }}</code><br/>
                     <span class="text-muted">Ground Floor</span> <code>{{ b.data.attributes.groundFloor }}</code><br/>
