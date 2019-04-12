@@ -196,14 +196,15 @@
                 signer
             );
 
-            this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
+            this.pricePerBuildingInWei = (await this.vendingContractV2.totalPrice(1));
             this.pricePerBuildingInEth = ethers.utils.formatEther(this.pricePerBuildingInWei);
-            this.lastPricePerBuildingInEth = ethers.utils.formatEther((await this.vendingContract.lastSalePrice()));
-            this.lastSaleBlock = await this.vendingContract.lastSaleBlock();
+            this.lastPricePerBuildingInEth = ethers.utils.formatEther((await this.vendingContractV2.lastSalePrice()));
+            this.lastSaleBlock = await this.vendingContractV2.lastSaleBlock();
 
-            this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
             this.totalEth = ethers.utils.formatEther((await this.vendingContract.totalPurchasesInWei()));
             this.totalEthV2 = ethers.utils.formatEther((await this.vendingContractV2.totalPurchasesInWei()));
+
+            this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
             const allBuildings = [];
             for (let i = 1; i <= this.totalBuildings; i++) {
