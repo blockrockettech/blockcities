@@ -12,6 +12,7 @@
 <body>
 
 <div id="vue-app" class="container-fluid">
+
     <div class="jumbotron mt-5">
         <h1 class="display-4">BlockCities Admin</h1>
         <p class="lead">Be the Architect</p>
@@ -50,6 +51,28 @@
         </div>
     </div>
 
+    <hr/>
+
+    <h6>Mint a new Special</h6>
+
+    <div class="row">
+        <div class="col">
+            <select class="custom-select" v-model="form.selectedSpecial">
+                <option v-for="(value, key) in form.specials" :value="key">
+                    {{ value.name }} - {{ value.city }}
+                </option>
+            </select>
+        </div>
+        <div class="col">
+            <input type="text" class="form-control mb-2 mr-sm-2" placeholder="0x123..." v-model="form.recipient">
+        </div>
+        <div class="col">
+            <button class="btn btn-warning" @click="createSpecial">Mint Special</button>
+        </div>
+    </div>
+
+    <hr/>
+
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
             <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
@@ -66,13 +89,19 @@
                     <span class="text-muted">Ground Floor</span> <code>{{ b.data.attributes.groundFloor }}</code><br/>
                     <span class="text-muted">Body</span> <code>{{ b.data.attributes.body }}</code><br/>
                     <span class="text-muted">Roof</span> <code>{{ b.data.attributes.roof }}</code><br/>
-                    <span class="text-muted">Exterior Colorway</span> <code>{{ b.data.attributes.exteriorColorway }}</code><br/>
-                    <span class="text-muted">Base Window Colorway</span> <code>{{ b.data.attributes.baseWindowColorway }}</code><br/>
-                    <span class="text-muted">Body Window Colorway</span> <code>{{ b.data.attributes.bodyWindowColorway }}</code><br/>
-                    <span class="text-muted">Roof Window Colorway</span> <code>{{ b.data.attributes.roofWindowColorway }}</code><br/>
-                    <span class="text-muted">Background Colorway</span> <code>{{ b.data.attributes.backgroundColorway }}</code>
+                    <span class="text-muted">Exterior Colorway</span> <code>{{ b.data.attributes.exteriorColorway
+                    }}</code><br/>
+                    <span class="text-muted">Base Window Colorway</span> <code>{{ b.data.attributes.baseWindowColorway
+                    }}</code><br/>
+                    <span class="text-muted">Body Window Colorway</span> <code>{{ b.data.attributes.bodyWindowColorway
+                    }}</code><br/>
+                    <span class="text-muted">Roof Window Colorway</span> <code>{{ b.data.attributes.roofWindowColorway
+                    }}</code><br/>
+                    <span class="text-muted">Background Colorway</span> <code>{{ b.data.attributes.backgroundColorway
+                    }}</code>
                 </p>
-                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect }}</code></p>
+                <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect
+                    }}</code></p>
             </div>
         </div>
     </div>
@@ -103,15 +132,1203 @@
     new Vue({
         el: '#vue-app',
         data: {
-            rootApi: (networkId === 5777) ? `http://localhost:5000/block-cities/us-central1/api` : `https://us-central1-block-cities.cloudfunctions.net/api`,
-            blockcitiesAddress: `0x2f2d5aa0efdb9ca3c9bb789693d06bebea88792f`,
-            blockcitiesAbi: [{"constant":true,"inputs":[{"name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_newBaseURI","type":"string"}],"name":"updateTokenBaseURI","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"removeWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"},{"name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelisted","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"tokenIdPointer","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalBuildings","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_tokenId","type":"uint256"}],"name":"burn","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"tokenBaseURI","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"}],"name":"tokensOfOwner","outputs":[{"name":"","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_exteriorColorway","type":"uint256"},{"name":"_backgroundColorway","type":"uint256"},{"name":"_city","type":"uint256"},{"name":"_building","type":"uint256"},{"name":"_base","type":"uint256"},{"name":"_body","type":"uint256"},{"name":"_roof","type":"uint256"},{"name":"_special","type":"uint256"},{"name":"_architect","type":"address"}],"name":"createBuilding","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokenId","type":"uint256"},{"name":"_data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelistAdmin","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_tokenId","type":"uint256"}],"name":"attributes","outputs":[{"name":"_exteriorColorway","type":"uint256"},{"name":"_backgroundColorway","type":"uint256"},{"name":"_city","type":"uint256"},{"name":"_building","type":"uint256"},{"name":"_base","type":"uint256"},{"name":"_body","type":"uint256"},{"name":"_roof","type":"uint256"},{"name":"_special","type":"uint256"},{"name":"_architect","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"owner","type":"address"},{"name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_tokenBaseURI","type":"string"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_tokenId","type":"uint256"},{"indexed":true,"name":"_to","type":"address"},{"indexed":true,"name":"_architect","type":"address"}],"name":"BuildingMinted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"approved","type":"address"},{"indexed":true,"name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"operator","type":"address"},{"indexed":false,"name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"}],
+            blockcitiesAbi: [
+                {
+                    "constant": true,
+                    "inputs": [{"name": "interfaceId", "type": "bytes4"}],
+                    "name": "supportsInterface",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "name",
+                    "outputs": [{"name": "", "type": "string"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "tokenId", "type": "uint256"}],
+                    "name": "getApproved",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "to", "type": "address"}, {"name": "tokenId", "type": "uint256"}],
+                    "name": "approve",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "addWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "totalSupply",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_newBaseURI", "type": "string"}],
+                    "name": "updateTokenBaseURI",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "from", "type": "address"}, {"name": "to", "type": "address"}, {
+                        "name": "tokenId",
+                        "type": "uint256"
+                    }],
+                    "name": "transferFrom",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "removeWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "owner", "type": "address"}, {"name": "index", "type": "uint256"}],
+                    "name": "tokenOfOwnerByIndex",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "isWhitelisted",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "tokenIdPointer",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "totalBuildings",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "from", "type": "address"}, {"name": "to", "type": "address"}, {
+                        "name": "tokenId",
+                        "type": "uint256"
+                    }],
+                    "name": "safeTransferFrom",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "name": "burn",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "renounceWhitelistAdmin",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "tokenBaseURI",
+                    "outputs": [{"name": "", "type": "string"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "index", "type": "uint256"}],
+                    "name": "tokenByIndex",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "tokenId", "type": "uint256"}],
+                    "name": "ownerOf",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "owner", "type": "address"}],
+                    "name": "balanceOf",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "addWhitelistAdmin",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "owner", "type": "address"}],
+                    "name": "tokensOfOwner",
+                    "outputs": [{"name": "", "type": "uint256[]"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_exteriorColorway", "type": "uint256"}, {
+                        "name": "_backgroundColorway",
+                        "type": "uint256"
+                    }, {"name": "_city", "type": "uint256"}, {"name": "_building", "type": "uint256"}, {
+                        "name": "_base",
+                        "type": "uint256"
+                    }, {"name": "_body", "type": "uint256"}, {"name": "_roof", "type": "uint256"}, {
+                        "name": "_special",
+                        "type": "uint256"
+                    }, {"name": "_architect", "type": "address"}],
+                    "name": "createBuilding",
+                    "outputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "symbol",
+                    "outputs": [{"name": "", "type": "string"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "to", "type": "address"}, {"name": "approved", "type": "bool"}],
+                    "name": "setApprovalForAll",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "from", "type": "address"}, {"name": "to", "type": "address"}, {
+                        "name": "tokenId",
+                        "type": "uint256"
+                    }, {"name": "_data", "type": "bytes"}],
+                    "name": "safeTransferFrom",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "isWhitelistAdmin",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "tokenId", "type": "uint256"}],
+                    "name": "tokenURI",
+                    "outputs": [{"name": "", "type": "string"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "name": "attributes",
+                    "outputs": [{"name": "_exteriorColorway", "type": "uint256"}, {
+                        "name": "_backgroundColorway",
+                        "type": "uint256"
+                    }, {"name": "_city", "type": "uint256"}, {"name": "_building", "type": "uint256"}, {
+                        "name": "_base",
+                        "type": "uint256"
+                    }, {"name": "_body", "type": "uint256"}, {"name": "_roof", "type": "uint256"}, {
+                        "name": "_special",
+                        "type": "uint256"
+                    }, {"name": "_architect", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "renounceWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "owner", "type": "address"}, {"name": "operator", "type": "address"}],
+                    "name": "isApprovedForAll",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "inputs": [{"name": "_tokenBaseURI", "type": "string"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "_tokenId", "type": "uint256"}, {
+                        "indexed": true,
+                        "name": "_to",
+                        "type": "address"
+                    }, {"indexed": true, "name": "_architect", "type": "address"}],
+                    "name": "BuildingMinted",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistedAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistedRemoved",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistAdminAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistAdminRemoved",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "from", "type": "address"}, {
+                        "indexed": true,
+                        "name": "to",
+                        "type": "address"
+                    }, {"indexed": true, "name": "tokenId", "type": "uint256"}],
+                    "name": "Transfer",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "owner", "type": "address"}, {
+                        "indexed": true,
+                        "name": "approved",
+                        "type": "address"
+                    }, {"indexed": true, "name": "tokenId", "type": "uint256"}],
+                    "name": "Approval",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "owner", "type": "address"}, {
+                        "indexed": true,
+                        "name": "operator",
+                        "type": "address"
+                    }, {"indexed": false, "name": "approved", "type": "bool"}],
+                    "name": "ApprovalForAll",
+                    "type": "event"
+                }],
             blockcitiesContract: null,
-            vendingAddress: `0x88583556156ec0d26a54472f33eba8d55d37dd6a`,
-            vendingAbi: [{"constant":true,"inputs":[],"name":"floorPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"blockcities","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"blockCities","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastSaleBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatch","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"totalPrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_ceilingPricePerBuildingInWei","type":"uint256"}],"name":"setCeilingPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"colourGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_partner","type":"address"}],"name":"updatePartnerAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"addCreditAmount","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalPurchasesInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"mintBuilding","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_colourGenerator","type":"address"}],"name":"setColourGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_techPartnerRate","type":"uint256"}],"name":"updatePartnerRate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_addresses","type":"address[]"},{"name":"_amount","type":"uint256"}],"name":"addCreditBatch","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"mintBuildingTo","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_blockStep","type":"uint256"}],"name":"setBlockStep","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_floorPricePerBuildingInWei","type":"uint256"}],"name":"setFloorPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"logicGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"addCredit","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"lastSalePrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_logicGenerator","type":"address"}],"name":"setLogicGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_blockcities","type":"address"}],"name":"updateBlockcitiesAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newPriceDiscountBands","type":"uint256[2]"}],"name":"setPriceDiscountBands","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_pricePerBuildingInWei","type":"uint256"}],"name":"setPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_lastSaleBlock","type":"uint256"}],"name":"setLastSaleBlock","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"partnerRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"priceStepInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"partner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_priceStepInWei","type":"uint256"}],"name":"setPriceStepInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"blockStep","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"priceDiscountBands","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatchTo","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"ceilingPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"credits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_logicGenerator","type":"address"},{"name":"_colourGenerator","type":"address"},{"name":"_blockCities","type":"address"},{"name":"_blockCitiesAddress","type":"address"},{"name":"_partnerAddress","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_tokenId","type":"uint256"},{"indexed":true,"name":"_architect","type":"address"}],"name":"VendingMachineTriggered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"CreditAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_priceDiscountBands","type":"uint256[2]"}],"name":"PriceDiscountBandsChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldPriceStepInWei","type":"uint256"},{"indexed":false,"name":"_newPriceStepInWei","type":"uint256"}],"name":"PriceStepInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newPricePerBuildingInWei","type":"uint256"}],"name":"PricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldFloorPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newFloorPricePerBuildingInWei","type":"uint256"}],"name":"FloorPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldCeilingPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newCeilingPricePerBuildingInWei","type":"uint256"}],"name":"CeilingPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldBlockStep","type":"uint256"},{"indexed":false,"name":"_newBlockStep","type":"uint256"}],"name":"BlockStepChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldLastSaleBlock","type":"uint256"},{"indexed":false,"name":"_newLastSaleBlock","type":"uint256"}],"name":"LastSaleBlockChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"}],
+            vendingAbi: [
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "floorPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockcities",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockCities",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "lastSaleBlock",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "mintBatch",
+                    "outputs": [{"name": "_tokenIds", "type": "uint256[]"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "totalPrice",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_ceilingPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "setCeilingPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "colourGenerator",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_partner", "type": "address"}],
+                    "name": "updatePartnerAddress",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}, {"name": "_amount", "type": "uint256"}],
+                    "name": "addCreditAmount",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "totalPurchasesInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "mintBuilding",
+                    "outputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_colourGenerator", "type": "address"}],
+                    "name": "setColourGenerator",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_techPartnerRate", "type": "uint256"}],
+                    "name": "updatePartnerRate",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_addresses", "type": "address[]"}, {"name": "_amount", "type": "uint256"}],
+                    "name": "addCreditBatch",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}],
+                    "name": "mintBuildingTo",
+                    "outputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "renounceOwnership",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_blockStep", "type": "uint256"}],
+                    "name": "setBlockStep",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_floorPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "setFloorPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "logicGenerator",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}],
+                    "name": "addCredit",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "lastSalePrice",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_logicGenerator", "type": "address"}],
+                    "name": "setLogicGenerator",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "owner",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "isOwner",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_blockcities", "type": "address"}],
+                    "name": "updateBlockcitiesAddress",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_newPriceDiscountBands", "type": "uint256[2]"}],
+                    "name": "setPriceDiscountBands",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_pricePerBuildingInWei", "type": "uint256"}],
+                    "name": "setPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_lastSaleBlock", "type": "uint256"}],
+                    "name": "setLastSaleBlock",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partnerRate",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "priceStepInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partner",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_priceStepInWei", "type": "uint256"}],
+                    "name": "setPriceStepInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockStep",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "", "type": "uint256"}],
+                    "name": "priceDiscountBands",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}, {"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "mintBatchTo",
+                    "outputs": [{"name": "_tokenIds", "type": "uint256[]"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "ceilingPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "newOwner", "type": "address"}],
+                    "name": "transferOwnership",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "", "type": "address"}],
+                    "name": "credits",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "inputs": [{"name": "_logicGenerator", "type": "address"}, {
+                        "name": "_colourGenerator",
+                        "type": "address"
+                    }, {"name": "_blockCities", "type": "address"}, {
+                        "name": "_blockCitiesAddress",
+                        "type": "address"
+                    }, {"name": "_partnerAddress", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "_tokenId", "type": "uint256"}, {
+                        "indexed": true,
+                        "name": "_architect",
+                        "type": "address"
+                    }],
+                    "name": "VendingMachineTriggered",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "_to", "type": "address"}, {
+                        "indexed": false,
+                        "name": "_amount",
+                        "type": "uint256"
+                    }],
+                    "name": "CreditAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_priceDiscountBands", "type": "uint256[2]"}],
+                    "name": "PriceDiscountBandsChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldPriceStepInWei", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newPriceStepInWei",
+                        "type": "uint256"
+                    }],
+                    "name": "PriceStepInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{
+                        "indexed": false,
+                        "name": "_oldPricePerBuildingInWei",
+                        "type": "uint256"
+                    }, {"indexed": false, "name": "_newPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "PricePerBuildingInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{
+                        "indexed": false,
+                        "name": "_oldFloorPricePerBuildingInWei",
+                        "type": "uint256"
+                    }, {"indexed": false, "name": "_newFloorPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "FloorPricePerBuildingInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{
+                        "indexed": false,
+                        "name": "_oldCeilingPricePerBuildingInWei",
+                        "type": "uint256"
+                    }, {"indexed": false, "name": "_newCeilingPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "CeilingPricePerBuildingInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldBlockStep", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newBlockStep",
+                        "type": "uint256"
+                    }],
+                    "name": "BlockStepChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldLastSaleBlock", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newLastSaleBlock",
+                        "type": "uint256"
+                    }],
+                    "name": "LastSaleBlockChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "previousOwner", "type": "address"}, {
+                        "indexed": true,
+                        "name": "newOwner",
+                        "type": "address"
+                    }],
+                    "name": "OwnershipTransferred",
+                    "type": "event"
+                }],
             vendingContract: null,
-            vendingAddressV2: '0x24a896E29f79bE656F0216aE45E6cd79Bb80459b',
-            vendingAbiV2: [{"constant":true,"inputs":[],"name":"floorPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"blockCities","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"lastSaleBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatch","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"_numberOfBuildings","type":"uint256"}],"name":"totalPrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"removeWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_ceilingPricePerBuildingInWei","type":"uint256"}],"name":"setCeilingPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelisted","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"colourGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_partner","type":"address"}],"name":"updatePartnerAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"platform","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"addCreditAmount","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalPurchasesInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"mintBuilding","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_colourGenerator","type":"address"}],"name":"setColourGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_techPartnerRate","type":"uint256"}],"name":"updatePartnerRate","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_addresses","type":"address[]"},{"name":"_amount","type":"uint256"}],"name":"addCreditBatch","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"mintBuildingTo","outputs":[{"name":"_tokenId","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[{"name":"_blockStep","type":"uint256"}],"name":"setBlockStep","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_floorPricePerBuildingInWei","type":"uint256"}],"name":"setFloorPricePerBuildingInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"account","type":"address"}],"name":"addWhitelistAdmin","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"logicGenerator","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"}],"name":"addCredit","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"lastSalePrice","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_logicGenerator","type":"address"}],"name":"setLogicGenerator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_platform","type":"address"}],"name":"updatePlatformAddress","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_newPriceDiscountBands","type":"uint256[2]"}],"name":"setPriceDiscountBands","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_lastSaleBlock","type":"uint256"}],"name":"setLastSaleBlock","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"partnerRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"account","type":"address"}],"name":"isWhitelistAdmin","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"priceStepInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"partner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_priceStepInWei","type":"uint256"}],"name":"setPriceStepInWei","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"blockStep","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"priceDiscountBands","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_numberOfBuildings","type":"uint256"}],"name":"mintBatchTo","outputs":[{"name":"_tokenIds","type":"uint256[]"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":false,"inputs":[],"name":"renounceWhitelisted","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"ceilingPricePerBuildingInWei","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_lastSalePrice","type":"uint256"}],"name":"setLastSalePrice","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"credits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_logicGenerator","type":"address"},{"name":"_colourGenerator","type":"address"},{"name":"_blockCities","type":"address"},{"name":"_platform","type":"address"},{"name":"_partnerAddress","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_tokenId","type":"uint256"},{"indexed":true,"name":"_architect","type":"address"}],"name":"VendingMachineTriggered","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"CreditAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_priceDiscountBands","type":"uint256[2]"}],"name":"PriceDiscountBandsChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldPriceStepInWei","type":"uint256"},{"indexed":false,"name":"_newPriceStepInWei","type":"uint256"}],"name":"PriceStepInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldFloorPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newFloorPricePerBuildingInWei","type":"uint256"}],"name":"FloorPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldCeilingPricePerBuildingInWei","type":"uint256"},{"indexed":false,"name":"_newCeilingPricePerBuildingInWei","type":"uint256"}],"name":"CeilingPricePerBuildingInWeiChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldBlockStep","type":"uint256"},{"indexed":false,"name":"_newBlockStep","type":"uint256"}],"name":"BlockStepChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldLastSaleBlock","type":"uint256"},{"indexed":false,"name":"_newLastSaleBlock","type":"uint256"}],"name":"LastSaleBlockChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_oldLastSalePrice","type":"uint256"},{"indexed":false,"name":"_newLastSalePrice","type":"uint256"}],"name":"LastSalePriceChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistedRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"account","type":"address"}],"name":"WhitelistAdminRemoved","type":"event"}],
+            vendingAbiV2: [
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "floorPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockCities",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "addWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "lastSaleBlock",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "mintBatch",
+                    "outputs": [{"name": "_tokenIds", "type": "uint256[]"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "totalPrice",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "removeWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_ceilingPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "setCeilingPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "isWhitelisted",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "colourGenerator",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_partner", "type": "address"}],
+                    "name": "updatePartnerAddress",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "platform",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "renounceWhitelistAdmin",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}, {"name": "_amount", "type": "uint256"}],
+                    "name": "addCreditAmount",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "totalPurchasesInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "mintBuilding",
+                    "outputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_colourGenerator", "type": "address"}],
+                    "name": "setColourGenerator",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_techPartnerRate", "type": "uint256"}],
+                    "name": "updatePartnerRate",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_addresses", "type": "address[]"}, {"name": "_amount", "type": "uint256"}],
+                    "name": "addCreditBatch",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}],
+                    "name": "mintBuildingTo",
+                    "outputs": [{"name": "_tokenId", "type": "uint256"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_blockStep", "type": "uint256"}],
+                    "name": "setBlockStep",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_floorPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "setFloorPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "addWhitelistAdmin",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "logicGenerator",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}],
+                    "name": "addCredit",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "lastSalePrice",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_logicGenerator", "type": "address"}],
+                    "name": "setLogicGenerator",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_platform", "type": "address"}],
+                    "name": "updatePlatformAddress",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_newPriceDiscountBands", "type": "uint256[2]"}],
+                    "name": "setPriceDiscountBands",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_lastSaleBlock", "type": "uint256"}],
+                    "name": "setLastSaleBlock",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partnerRate",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "account", "type": "address"}],
+                    "name": "isWhitelistAdmin",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "priceStepInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "partner",
+                    "outputs": [{"name": "", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_priceStepInWei", "type": "uint256"}],
+                    "name": "setPriceStepInWei",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "blockStep",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "", "type": "uint256"}],
+                    "name": "priceDiscountBands",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_to", "type": "address"}, {"name": "_numberOfBuildings", "type": "uint256"}],
+                    "name": "mintBatchTo",
+                    "outputs": [{"name": "_tokenIds", "type": "uint256[]"}],
+                    "payable": true,
+                    "stateMutability": "payable",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [],
+                    "name": "renounceWhitelisted",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "ceilingPricePerBuildingInWei",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "constant": false,
+                    "inputs": [{"name": "_lastSalePrice", "type": "uint256"}],
+                    "name": "setLastSalePrice",
+                    "outputs": [{"name": "", "type": "bool"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }, {
+                    "constant": true,
+                    "inputs": [{"name": "", "type": "address"}],
+                    "name": "credits",
+                    "outputs": [{"name": "", "type": "uint256"}],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                }, {
+                    "inputs": [{"name": "_logicGenerator", "type": "address"}, {
+                        "name": "_colourGenerator",
+                        "type": "address"
+                    }, {"name": "_blockCities", "type": "address"}, {
+                        "name": "_platform",
+                        "type": "address"
+                    }, {"name": "_partnerAddress", "type": "address"}],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "_tokenId", "type": "uint256"}, {
+                        "indexed": true,
+                        "name": "_architect",
+                        "type": "address"
+                    }],
+                    "name": "VendingMachineTriggered",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "_to", "type": "address"}, {
+                        "indexed": false,
+                        "name": "_amount",
+                        "type": "uint256"
+                    }],
+                    "name": "CreditAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_priceDiscountBands", "type": "uint256[2]"}],
+                    "name": "PriceDiscountBandsChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldPriceStepInWei", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newPriceStepInWei",
+                        "type": "uint256"
+                    }],
+                    "name": "PriceStepInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{
+                        "indexed": false,
+                        "name": "_oldFloorPricePerBuildingInWei",
+                        "type": "uint256"
+                    }, {"indexed": false, "name": "_newFloorPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "FloorPricePerBuildingInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{
+                        "indexed": false,
+                        "name": "_oldCeilingPricePerBuildingInWei",
+                        "type": "uint256"
+                    }, {"indexed": false, "name": "_newCeilingPricePerBuildingInWei", "type": "uint256"}],
+                    "name": "CeilingPricePerBuildingInWeiChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldBlockStep", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newBlockStep",
+                        "type": "uint256"
+                    }],
+                    "name": "BlockStepChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldLastSaleBlock", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newLastSaleBlock",
+                        "type": "uint256"
+                    }],
+                    "name": "LastSaleBlockChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": false, "name": "_oldLastSalePrice", "type": "uint256"}, {
+                        "indexed": false,
+                        "name": "_newLastSalePrice",
+                        "type": "uint256"
+                    }],
+                    "name": "LastSalePriceChanged",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistedAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistedRemoved",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistAdminAdded",
+                    "type": "event"
+                }, {
+                    "anonymous": false,
+                    "inputs": [{"indexed": true, "name": "account", "type": "address"}],
+                    "name": "WhitelistAdminRemoved",
+                    "type": "event"
+                }],
             vendingContractV2: null,
             pricePerBuildingInWei: null,
             pricePerBuildingInEth: null,
@@ -124,6 +1341,11 @@
             buildingTokenId: null,
             buildingMetaData: null,
             buildings: [],
+            form: {
+                recipient: null,
+                selectedSpecial: null,
+                specials: []
+            }
         },
         methods: {
             lookupCityName: (id) => {
@@ -135,7 +1357,53 @@
             bg: (hex) => {
                 return {
                     'background-color': `#${hex}`
+                };
+            },
+            async getRootApi() {
+                const {chainId} = await provider.getNetwork();
+                if (chainId === 5777) {
+                    return "http://localhost:5000/block-cities/us-central1/api";
                 }
+                return "https://us-central1-block-cities.cloudfunctions.net/api";
+            },
+            async getVendingMachineAddress() {
+                const {chainId} = await provider.getNetwork();
+                if (chainId === 1) {
+                    return "0x88583556156ec0d26a54472f33eba8d55d37dd6a";
+                }
+                // if (networkId === 3) {
+                //     return "";
+                // }
+                // if (networkId === 4) {
+                //     return "";
+                // }
+                alert('Unknown network ID: ' + networkId);
+            },
+            async getVendingMachineV2Address() {
+                const {chainId} = await provider.getNetwork();
+                if (chainId === 1) {
+                    return "0x24a896E29f79bE656F0216aE45E6cd79Bb80459b";
+                }
+                // if (networkId === 3) {
+                //     return "";
+                // }
+                // if (networkId === 4) {
+                //     return "";
+                // }
+                alert('Unknown network ID: ' + networkId);
+            },
+            async getBlockCitiesAddress() {
+                const {chainId} = await provider.getNetwork();
+                if (chainId === 1) {
+                    return "0x2f2d5aa0efdb9ca3c9bb789693d06bebea88792f";
+                }
+                // if (networkId === 3) {
+                //     return "";
+                // }
+                // if (networkId === 4) {
+                //     return "";
+                // }
+                alert('Unknown network ID: ' + networkId);
             },
             mintBuilding: async function () {
 
@@ -169,29 +1437,71 @@
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                let resp = await axios.get(`${this.rootApi}/network/${networkId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                const rootApi = await this.getRootApi();
+
+                let resp = await axios.get(`${rootApi}/network/${networkId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
                 console.log(resp);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
+            },
+            async createSpecial() {
+                let overrides = {
+
+                    // The maximum units of gas for the transaction to use
+                    gasLimit: 700000,
+
+                    // The price (in wei) per unit of gas
+                    gasPrice: 6000000000
+                };
+
+                const special = this.form.selectedSpecial;
+                const recipient = this.form.recipient;
+                if (special !== null && recipient !== null) {
+
+                    const tx = await this.blockcitiesContract.createBuilding(0, 0, 0, 0, 0, 0, 0, special, recipient);
+
+                    const receipt = await tx.wait(1);
+                    const tokenIdBN = receipt.events.pop().args[0];
+                    this.buildingTokenId = tokenIdBN.toNumber();
+                    console.log(`Token ID:`, this.buildingTokenId);
+
+                    this.$toasted.show(`Special created: ${this.buildingTokenId}`, {
+                        theme: 'bubble',
+                        position: 'bottom-center',
+                        duration: 5000
+                    });
+                } else {
+                    alert('Please select a special and enter an account');
+                }
             }
         },
         created: async function () {
             this.blocknumber = await provider.getBlockNumber();
+            const rootApi = await this.getRootApi();
+
+            let specialsResponse = await axios.get(`${rootApi}/config/buildings/specials`, {headers: {'Access-Control-Allow-Origin': '*'}});
+            this.form.specials = specialsResponse.data;
+
+            const vendingAddress = await this.getVendingMachineAddress();
 
             this.vendingContract = new ethers.Contract(
-                this.vendingAddress,
+                vendingAddress,
                 this.vendingAbi,
                 signer
             );
 
+            const vendingAddressV2 = await this.getVendingMachineV2Address();
+
             this.vendingContractV2 = new ethers.Contract(
-                this.vendingAddressV2,
+                vendingAddressV2,
                 this.vendingAbiV2,
                 signer
             );
 
+            const blockcitiesAddress = await this.getBlockCitiesAddress();
+
             this.blockcitiesContract = new ethers.Contract(
-                this.blockcitiesAddress,
+                blockcitiesAddress,
                 this.blockcitiesAbi,
                 signer
             );
@@ -208,7 +1518,7 @@
 
             const allBuildings = [];
             for (let i = 1; i <= this.totalBuildings; i++) {
-                allBuildings.push(axios.get(`${this.rootApi}/network/${networkId}/token/${i}`));
+                allBuildings.push(axios.get(`${rootApi}/network/${networkId}/token/${i}`));
             }
 
             this.buildings = await Promise.all(allBuildings);
