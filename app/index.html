@@ -76,7 +76,7 @@
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
             <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
-            <img class="card-img-top" :src="`http://localhost:5000/block-cities/us-central1/api/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">
+            <!--<img class="card-img-top" :src="`http://localhost:5000/block-cities/us-central1/api/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">-->
             <div class="card-body">
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
                 <p class="text-center">{{ b.data.description }}</p>
@@ -1392,7 +1392,18 @@
                 // }
                 alert('Unknown network ID: ' + this.chainId);
             },
-            mintBuilding: async function () {
+            async refresh() {
+                // refresh total
+                this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
+
+                const rootApi = await this.getRootApi();
+
+                let resp = await axios.get(`${rootApi}/network/${this.chainId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                console.log(resp);
+                this.buildings.push(resp);
+                this.buildingMetaData = resp.data;
+            },
+            async mintBuilding() {
 
                 this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
 
@@ -1421,15 +1432,7 @@
                     duration: 5000
                 });
 
-                // refresh total
-                this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
-
-                const rootApi = await this.getRootApi();
-
-                let resp = await axios.get(`${rootApi}/network/${this.chainId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
-                console.log(resp);
-                this.buildings.push(resp);
-                this.buildingMetaData = resp.data;
+                await this.refresh();
             },
             async createSpecial() {
                 let overrides = {
@@ -1460,15 +1463,7 @@
                         duration: 5000
                     });
 
-                    // refresh total
-                    this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
-
-                    const rootApi = await this.getRootApi();
-
-                    let resp = await axios.get(`${rootApi}/network/${this.chainId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
-                    console.log(resp);
-                    this.buildings.push(resp);
-                    this.buildingMetaData = resp.data;
+                    await this.refresh();
                 } else {
                     alert('Please select a special and enter an account');
                 }
