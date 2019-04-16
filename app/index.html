@@ -59,7 +59,7 @@
         <div class="col">
             <select class="custom-select" v-model="form.selectedSpecial">
                 <option v-for="(value, key) in form.specials" :value="key">
-                    {{ value.name }} - {{ value.city }}
+                    {{ key }}: {{ value.name }}
                 </option>
             </select>
         </div>
@@ -76,11 +76,10 @@
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
             <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
-            <!--<img class="card-img-top" :src="`http://localhost:5000/block-cities/us-central1/api/network/1/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">-->
+            <img class="card-img-top" :src="`http://localhost:5000/block-cities/us-central1/api/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">
             <div class="card-body">
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
                 <p class="text-center">{{ b.data.description }}</p>
-                <h5 class="text-center">{{ lookupCityName(b.data.city) }}</h5>
                 <p class="small">
                     <span class="text-muted">Token ID</span> <code>{{ b.data.attributes.tokenId }}</code><br/>
                     <span class="text-muted">Window Type</span> <code>{{ b.data.attributes.windowType }}</code><br/>
@@ -123,11 +122,8 @@
     /* global Vue, ethers, Toasted, axios */
     Vue.use(Toasted);
 
-    // var provider = new ethers.providers.InfuraProvider('ropsten');
-    // const provider = new ethers.providers.JsonRpcProvider('http://127.0.0.1:7545');
     const provider = new ethers.providers.Web3Provider(web3.currentProvider);
     const signer = provider.getSigner();
-    const networkId = 1;
 
     new Vue({
         el: '#vue-app',
@@ -1341,6 +1337,7 @@
             buildingTokenId: null,
             buildingMetaData: null,
             buildings: [],
+            chainId: null,
             form: {
                 recipient: null,
                 selectedSpecial: null,
@@ -1348,62 +1345,52 @@
             }
         },
         methods: {
-            lookupCityName: (id) => {
-                if (parseInt(id) === 0) return 'ATL';
-                if (parseInt(id) === 1) return 'NYC';
-                if (parseInt(id) === 2) return 'CHI';
-                if (parseInt(id) === 3) return 'SF';
-            },
             bg: (hex) => {
                 return {
                     'background-color': `#${hex}`
                 };
             },
             async getRootApi() {
-                const {chainId} = await provider.getNetwork();
-                if (chainId === 5777) {
+                if (this.chainId === 5777) {
                     return "http://localhost:5000/block-cities/us-central1/api";
                 }
                 return "https://us-central1-block-cities.cloudfunctions.net/api";
             },
             async getVendingMachineAddress() {
-                const {chainId} = await provider.getNetwork();
-                if (chainId === 1) {
+                if (this.chainId === 1) {
                     return "0x88583556156ec0d26a54472f33eba8d55d37dd6a";
                 }
-                // if (networkId === 3) {
-                //     return "";
-                // }
+                if (this.chainId === 3) {
+                    return "0xBEa2037e7bD516Ecd2f9fCAe8bFb1EF810b19204";
+                }
                 // if (networkId === 4) {
                 //     return "";
                 // }
-                alert('Unknown network ID: ' + networkId);
+                alert('Unknown network ID: ' + this.chainId);
             },
             async getVendingMachineV2Address() {
-                const {chainId} = await provider.getNetwork();
-                if (chainId === 1) {
+                if (this.chainId === 1) {
                     return "0x24a896E29f79bE656F0216aE45E6cd79Bb80459b";
                 }
-                // if (networkId === 3) {
-                //     return "";
-                // }
+                if (this.chainId === 3) {
+                    return "0xBEa2037e7bD516Ecd2f9fCAe8bFb1EF810b19204";
+                }
                 // if (networkId === 4) {
                 //     return "";
                 // }
-                alert('Unknown network ID: ' + networkId);
+                alert('Unknown network ID: ' + this.chainId);
             },
             async getBlockCitiesAddress() {
-                const {chainId} = await provider.getNetwork();
-                if (chainId === 1) {
+                if (this.chainId === 1) {
                     return "0x2f2d5aa0efdb9ca3c9bb789693d06bebea88792f";
                 }
-                // if (networkId === 3) {
-                //     return "";
-                // }
+                if (this.chainId === 3) {
+                    return "0x86eD0a82dDc2EdEA8cC4Bc023eC2a4079DAB42c9";
+                }
                 // if (networkId === 4) {
                 //     return "";
                 // }
-                alert('Unknown network ID: ' + networkId);
+                alert('Unknown network ID: ' + this.chainId);
             },
             mintBuilding: async function () {
 
@@ -1439,7 +1426,7 @@
 
                 const rootApi = await this.getRootApi();
 
-                let resp = await axios.get(`${rootApi}/network/${networkId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                let resp = await axios.get(`${rootApi}/network/${this.chainId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
                 console.log(resp);
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
@@ -1458,6 +1445,8 @@
                 const recipient = this.form.recipient;
                 if (special !== null && recipient !== null) {
 
+                    console.log(`Special:`, special);
+
                     const tx = await this.blockcitiesContract.createBuilding(0, 0, 0, 0, 0, 0, 0, special, recipient);
 
                     const receipt = await tx.wait(1);
@@ -1470,6 +1459,16 @@
                         position: 'bottom-center',
                         duration: 5000
                     });
+
+                    // refresh total
+                    this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
+
+                    const rootApi = await this.getRootApi();
+
+                    let resp = await axios.get(`${rootApi}/network/${this.chainId}/token/${this.buildingTokenId}`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                    console.log(resp);
+                    this.buildings.push(resp);
+                    this.buildingMetaData = resp.data;
                 } else {
                     alert('Please select a special and enter an account');
                 }
@@ -1477,7 +1476,10 @@
         },
         created: async function () {
             this.blocknumber = await provider.getBlockNumber();
+            const {chainId} = await provider.getNetwork();
             const rootApi = await this.getRootApi();
+
+            this.chainId = chainId;
 
             let specialsResponse = await axios.get(`${rootApi}/config/buildings/specials`, {headers: {'Access-Control-Allow-Origin': '*'}});
             this.form.specials = specialsResponse.data;
@@ -1518,7 +1520,7 @@
 
             const allBuildings = [];
             for (let i = 1; i <= this.totalBuildings; i++) {
-                allBuildings.push(axios.get(`${rootApi}/network/${networkId}/token/${i}`));
+                allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
             }
 
             this.buildings = await Promise.all(allBuildings);
