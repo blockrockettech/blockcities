@@ -7,7 +7,7 @@ const LogicGenerator = require('../build/contracts/LogicGenerator');
 
 const {INFURA_KEY} = require('../constants');
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '1500000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '7000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 // FIXME generic way of picking this up
