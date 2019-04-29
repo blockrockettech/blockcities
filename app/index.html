@@ -14,24 +14,29 @@
 <div id="vue-app" class="container-fluid">
 
     <div class="jumbotron mt-5">
-        <h1 class="display-4">BlockCities Admin</h1>
-        <p class="lead">Be the Architect</p>
+        <h1 class="display-4">BlockCities</h1>
         <hr class="my-4">
         <div class="row">
             <div class="col">
                 <p class="lead" v-if="pricePerBuildingInWei">
-                    Total buildings: {{ totalBuildings }}<br/>
+                <h2>{{ totalBuildings }} buildings</h2>
+                <small>
                     Price per building: {{ pricePerBuildingInEth }} ETH<br/>
-                    Last price per building: <span class="text-muted">{{ lastPricePerBuildingInEth }} ETH</span><br/>
+                    Last price per building: {{ lastPricePerBuildingInEth }} ETH<br/>
+                </small>
+                <hr/>
+                <small>
                     Last Sale Block: <code>{{ lastSaleBlock }}</code><br/>
-                    Blocks since last sale: <code>{{ blocknumber - lastSaleBlock }}</code>
+                    Blocks since last sale: <code>{{ blocknumber - lastSaleBlock }}</code><br/>
                     <span class="text-muted small">roughly {{ ((blocknumber - lastSaleBlock) * 15) / 60 }} mins</span><br/>
-                    <span class="text-muted">Total: {{ totalEth }}</span><br/>
-                    <span class="text-muted">Total V2: {{ totalEthV2 }}</span><br/>
-                    <strong>Total: {{ parseFloat(totalEth) + parseFloat(totalEthV2) }} ETH</strong>
+                </small>
+                <!--<span class="text-muted">Total: {{ totalEth }}</span><br/>-->
+                <!--<span class="text-muted">Total V2: {{ totalEthV2 }}</span><br/>-->
+                <hr/>
+                <h3 class="text-danger">{{ parseFloat(totalEth) + parseFloat(totalEthV2) }} ETH</h3>
                 </p>
             </div>
-            <div class="col">
+            <div class="d-none d-sm-block col">
                 <a class="btn btn-primary btn-lg" href="#" role="button" @click="mintBuilding()">Mint building</a>
                 <hr/>
                 <div class="alert alert-danger">
@@ -1504,7 +1509,7 @@
             this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
             const allBuildings = [];
-            for (let i = 1; i <= this.totalBuildings; i++) {
+            for (let i = (this.totalBuildings - 30); i <= this.totalBuildings; i++) {
                 allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
             }
 
