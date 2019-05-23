@@ -45,8 +45,8 @@
                     <div class="row">
                         <div class="col">
                             <select class="custom-select mb-2" v-model="form.selectedSpecial">
-                                <option v-for="(value, key) in form.specials" :value="key">
-                                    {{ key }}: {{ value.name }}
+                                <option v-for="(value, key) in form.specials" :value="{data:value, id:key}">
+                                    {{ key }}: {{ value.name }} : {{ value.city }} : {{ value.background_color }}
                                 </option>
                             </select>
                             <input type="text" class="form-control mb-2 mr-sm-2" placeholder="0x123..." v-model="form.recipient">
@@ -1441,11 +1441,15 @@
 
                 const special = this.form.selectedSpecial;
                 const recipient = this.form.recipient;
-                if (special !== null && recipient !== null) {
+                if (special !== null && special.id !== null && recipient !== null) {
 
                     console.log(`Special:`, special);
 
-                    const tx = await this.blockcitiesContract.createBuilding(0, 0, 0, 0, 0, 0, 0, special, recipient);
+                    const {id, data} = special;
+                    const city = data.cityId || 0;
+                    const backgroundColorway = data.background_colorId || 0;
+                    
+                    const tx = await this.blockcitiesContract.createBuilding(0, backgroundColorway, city, 0, 0, 0, 0, id, recipient);
 
                     const receipt = await tx.wait(1);
                     const tokenIdBN = receipt.events.pop().args[0];
