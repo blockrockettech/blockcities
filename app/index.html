@@ -1448,7 +1448,7 @@
                     const {id, data} = special;
                     const city = data.cityId || 0;
                     const backgroundColorway = data.background_colorId || 0;
-                    
+
                     const tx = await this.blockcitiesContract.createBuilding(0, backgroundColorway, city, 0, 0, 0, 0, id, recipient);
 
                     const receipt = await tx.wait(1);
