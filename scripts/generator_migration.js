@@ -11,7 +11,7 @@ const {gas, gasPrice} = {gas: 6721975, gasPrice: '7000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 // FIXME generic way of picking this up
-const logic_generator_migration_1 = require('./data/logic_generator_migration_1');
+const logic_generator_migration_2 = require('./data/logic_generator_migration_2');
 
 function getHttpProviderUri (network) {
     if (network === 'local') {
@@ -46,7 +46,7 @@ const networkSplitter = (network, {ropsten, rinkeby, mainnet, local}) => {
         case 5777:
         case '5777':
         case 'local':
-            // This may change if a clean deploy of KODA locally is not done
+            // This may change if a clean deploy of BC locally is not done
             return local;
         default:
             throw new Error(`Unknown network ID ${network}`);
@@ -103,12 +103,38 @@ void async function () {
     // ////////////////////////
     // // Buildings Mappings //
     // ////////////////////////
-    const buildingsConfig = logic_generator_migration_1.data.buildings;
+    const buildingsConfig = logic_generator_migration_2.data.buildings;
+
+    // CITY
+    const cityConfig = logic_generator_migration_2.data.city.config;
+    const cityConfigPromises = _.map(cityConfig, (data, city) => {
+        console.log(`Updating city mappings [${city}] data [${data}]`);
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
+    });
 
     // BASE
     const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         if (base) {
-            console.log(`Adding building [${building}] base [${base}]`);
+            console.log(`Updating building [${building}] base [${base}]`);
             return new Promise((resolve, reject) => {
                 web3.eth
                     .sendTransaction({
@@ -138,7 +164,7 @@ void async function () {
     // BODY
     const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         if (body) {
-            console.log(`Adding building [${building}] body [${base}]`);
+            console.log(`Updating building [${building}] body [${base}]`);
             return new Promise((resolve, reject) => {
                 web3.eth
                     .sendTransaction({
@@ -168,7 +194,7 @@ void async function () {
     // ROOF
     const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
         if (roof) {
-            console.log(`Adding building [${building}] roof [${roof}]`);
+            console.log(`Updating building [${building}] roof [${roof}]`);
             return new Promise((resolve, reject) => {
                 web3.eth
                     .sendTransaction({
@@ -200,9 +226,10 @@ void async function () {
     /////////////////////
 
     const promises = [
-        ...buildingBasePromises, // DONE
-        ...buildingBodyPromises, // DONE
-        ...buildingRoofPromises // DONE
+        ...cityConfigPromises,
+        ...buildingBasePromises,
+        ...buildingBodyPromises,
+        ...buildingRoofPromises
     ];
     console.log(promises);
 
