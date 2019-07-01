@@ -105,6 +105,30 @@ void async function () {
     // ////////////////////////
     const buildingsConfig = logic_generator_migration_2.data.buildings;
 
+    // SPECIAL MODULO
+    // make it very very hard to get a special... //FIXME is the required?
+    const specialModuloPromise = new Promise((resolve, reject) => {
+        web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_ADDRESS,
+                data: LogicGeneratorContract.methods.updateSpecialModulo(123456789).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .once('transactionHash', function (hash) {
+                successes.push(hash);
+                resolve(hash);
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                reject(e);
+            });
+        startingNonce++;
+    });
+
+
     // CITY
     const cityConfig = logic_generator_migration_2.data.city.config;
     const cityConfigPromises = _.map(cityConfig, (data, city) => {
@@ -226,6 +250,7 @@ void async function () {
     /////////////////////
 
     const promises = [
+        specialModuloPromise,
         ...cityConfigPromises,
         ...buildingBasePromises,
         ...buildingBodyPromises,
