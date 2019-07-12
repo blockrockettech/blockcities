@@ -116,8 +116,7 @@
     /* global Vue, ethers, Toasted, axios */
     Vue.use(Toasted);
 
-    const provider = new ethers.providers.Web3Provider(web3.currentProvider);
-    const signer = provider.getSigner();
+
 
     new Vue({
         el: '#vue-app',
@@ -1468,6 +1467,11 @@
             }
         },
         created: async function () {
+
+            await window.ethereum.enable();
+            const provider = new ethers.providers.Web3Provider(web3.currentProvider);
+            const signer = provider.getSigner();
+
             this.blocknumber = await provider.getBlockNumber();
             const {chainId} = await provider.getNetwork();
             const rootApi = await this.getRootApi();
