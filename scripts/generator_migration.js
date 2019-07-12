@@ -7,7 +7,7 @@ const LogicGenerator = require('../build/contracts/LogicGenerator');
 
 const {INFURA_KEY} = require('../constants');
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '7000000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '5000000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 // FIXME generic way of picking this up
@@ -105,8 +105,7 @@ void async function () {
     // ////////////////////////
     const buildingsConfig = logic_generator_migration_2.data.buildings;
 
-    // SPECIAL MODULO
-    // make it very very hard to get a special... //FIXME is the required?
+    // SPECIAL MODULO - make it very hard to get a special
     const specialModuloPromise = new Promise((resolve, reject) => {
         web3.eth
             .sendTransaction({
@@ -127,6 +126,7 @@ void async function () {
             });
         startingNonce++;
     });
+    console.log(`Updating special modulo`);
 
 
     // CITY
@@ -250,11 +250,11 @@ void async function () {
     /////////////////////
 
     const promises = [
-        specialModuloPromise,
-        ...cityConfigPromises,
-        ...buildingBasePromises,
-        ...buildingBodyPromises,
-        ...buildingRoofPromises
+        // specialModuloPromise, // DONE
+        // ...cityConfigPromises, // DONE
+        // ...buildingBasePromises, // DONE
+        // ...buildingBodyPromises, // DONE
+        // ...buildingRoofPromises, // DONE
     ];
     console.log(promises);
 
