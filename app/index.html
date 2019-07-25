@@ -70,8 +70,11 @@
 
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
-            <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
-            <!--<img class="card-img-top" :src="`http://localhost:5000/block-cities/us-central1/api/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">-->
+            <!--<img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">-->
+
+            <img class="card-img-top" :src="`${ getRootApi() }/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">
+            <img class="card-img-top" :src="`${ getRootApi() }/network/${ chainId }/token/${ b.data.attributes.tokenId }/image/svg`" :alt="b.data.name" style="max-height: 250px">
+
             <div class="card-body">
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
                 <p class="text-center">{{ b.data.description }}</p>
@@ -115,8 +118,6 @@
 <script>
     /* global Vue, ethers, Toasted, axios */
     Vue.use(Toasted);
-
-
 
     new Vue({
         el: '#vue-app',
@@ -1343,13 +1344,13 @@
                     'background-color': `#${hex}`
                 };
             },
-            async getRootApi () {
+            getRootApi() {
                 if (this.chainId === 5777) {
                     return 'http://localhost:5000/block-cities/us-central1/api';
                 }
                 return 'https://us-central1-block-cities.cloudfunctions.net/api';
             },
-            async getVendingMachineAddress () {
+            async getVendingMachineAddress() {
                 if (this.chainId === 1) {
                     return '0x88583556156ec0d26a54472f33eba8d55d37dd6a';
                 }
@@ -1361,7 +1362,7 @@
                 // }
                 alert('Unknown network ID: ' + this.chainId);
             },
-            async getVendingMachineV2Address () {
+            async getVendingMachineV2Address() {
                 if (this.chainId === 1) {
                     return '0x24a896E29f79bE656F0216aE45E6cd79Bb80459b';
                 }
@@ -1373,7 +1374,7 @@
                 // }
                 alert('Unknown network ID: ' + this.chainId);
             },
-            async getBlockCitiesAddress () {
+            async getBlockCitiesAddress() {
                 if (this.chainId === 1) {
                     return '0x2f2d5aa0efdb9ca3c9bb789693d06bebea88792f';
                 }
@@ -1385,7 +1386,7 @@
                 // }
                 alert('Unknown network ID: ' + this.chainId);
             },
-            async refresh () {
+            async refresh() {
                 // refresh total
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
@@ -1396,7 +1397,7 @@
                 this.buildings.push(resp);
                 this.buildingMetaData = resp.data;
             },
-            async mintBuilding () {
+            async mintBuilding() {
 
                 this.pricePerBuildingInWei = (await this.vendingContract.totalPrice(1));
 
@@ -1427,7 +1428,7 @@
 
                 await this.refresh();
             },
-            async createSpecial () {
+            async createSpecial() {
                 let overrides = {
 
                     // The maximum units of gas for the transaction to use
@@ -1468,59 +1469,64 @@
         },
         created: async function () {
 
-            await window.ethereum.enable();
-            const provider = new ethers.providers.Web3Provider(web3.currentProvider);
-            const signer = provider.getSigner();
+            try {
+                await window.ethereum.enable();
+                const provider = new ethers.providers.Web3Provider(web3.currentProvider);
+                const signer = provider.getSigner();
 
-            this.blocknumber = await provider.getBlockNumber();
-            const {chainId} = await provider.getNetwork();
-            const rootApi = await this.getRootApi();
+                this.blocknumber = await provider.getBlockNumber();
+                const {chainId} = await provider.getNetwork();
+                const rootApi = await this.getRootApi();
 
-            this.chainId = chainId;
+                this.chainId = chainId;
 
-            let specialsResponse = await axios.get(`${rootApi}/config/buildings/specials`, {headers: {'Access-Control-Allow-Origin': '*'}});
-            this.form.specials = specialsResponse.data;
+                let specialsResponse = await axios.get(`${rootApi}/configs/buildings/specials`, {headers: {'Access-Control-Allow-Origin': '*'}});
+                this.form.specials = specialsResponse.data;
 
-            const vendingAddress = await this.getVendingMachineAddress();
+                const vendingAddress = await this.getVendingMachineAddress();
 
-            this.vendingContract = new ethers.Contract(
-                vendingAddress,
-                this.vendingAbi,
-                signer
-            );
+                this.vendingContract = new ethers.Contract(
+                    vendingAddress,
+                    this.vendingAbi,
+                    signer
+                );
 
-            const vendingAddressV2 = await this.getVendingMachineV2Address();
+                const vendingAddressV2 = await this.getVendingMachineV2Address();
 
-            this.vendingContractV2 = new ethers.Contract(
-                vendingAddressV2,
-                this.vendingAbiV2,
-                signer
-            );
+                this.vendingContractV2 = new ethers.Contract(
+                    vendingAddressV2,
+                    this.vendingAbiV2,
+                    signer
+                );
 
-            const blockcitiesAddress = await this.getBlockCitiesAddress();
+                const blockcitiesAddress = await this.getBlockCitiesAddress();
 
-            this.blockcitiesContract = new ethers.Contract(
-                blockcitiesAddress,
-                this.blockcitiesAbi,
-                signer
-            );
+                this.blockcitiesContract = new ethers.Contract(
+                    blockcitiesAddress,
+                    this.blockcitiesAbi,
+                    signer
+                );
 
-            this.pricePerBuildingInWei = (await this.vendingContractV2.totalPrice(1));
-            this.pricePerBuildingInEth = ethers.utils.formatEther(this.pricePerBuildingInWei);
-            this.lastPricePerBuildingInEth = ethers.utils.formatEther((await this.vendingContractV2.lastSalePrice()));
-            this.lastSaleBlock = await this.vendingContractV2.lastSaleBlock();
+                this.pricePerBuildingInWei = (await this.vendingContractV2.totalPrice(1));
+                this.pricePerBuildingInEth = ethers.utils.formatEther(this.pricePerBuildingInWei);
+                this.lastPricePerBuildingInEth = ethers.utils.formatEther((await this.vendingContractV2.lastSalePrice()));
+                this.lastSaleBlock = await this.vendingContractV2.lastSaleBlock();
 
-            this.totalEth = ethers.utils.formatEther((await this.vendingContract.totalPurchasesInWei()));
-            this.totalEthV2 = ethers.utils.formatEther((await this.vendingContractV2.totalPurchasesInWei()));
+                this.totalEth = ethers.utils.formatEther((await this.vendingContract.totalPurchasesInWei()));
+                this.totalEthV2 = ethers.utils.formatEther((await this.vendingContractV2.totalPurchasesInWei()));
 
-            this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
+                this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-            const allBuildings = [];
-            for (let i = (this.totalBuildings - 30); i <= this.totalBuildings; i++) {
-                allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
+                const allBuildings = [];
+                for (let i = (this.totalBuildings - 30); i <= this.totalBuildings; i++) {
+                    allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
+                }
+
+                this.buildings = await Promise.all(allBuildings);
+            } catch (e) {
+                console.error(e);
             }
 
-            this.buildings = await Promise.all(allBuildings);
         }
     });
 </script>
