@@ -1345,10 +1345,10 @@
                 };
             },
             getRootApi() {
-                if (this.chainId === 5777) {
+                // if (this.chainId === 5777) {
                     return 'http://localhost:5000/block-cities/us-central1/api';
-                }
-                return 'https://us-central1-block-cities.cloudfunctions.net/api';
+                // }
+                // return 'https://us-central1-block-cities.cloudfunctions.net/api';
             },
             async getVendingMachineAddress() {
                 if (this.chainId === 1) {
