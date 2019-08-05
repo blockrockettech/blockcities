@@ -43,6 +43,7 @@ module.exports = {
                 roof: [],
             },
         },
-        specials: [12, 13, 14, 15, 16, 16, 16, 16], // change appropriately - add come script changes to run this in
+        // change appropriately based on weightings/distribution
+        specials: [12, 13, 14, 15, 16, 17, 18, 19, 20],
     }
 };

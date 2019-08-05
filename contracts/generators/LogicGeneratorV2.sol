@@ -29,6 +29,7 @@ contract LogicGeneratorV2 is Ownable, ILogicGenerator {
 
     uint256 public specialModulo = 13; // give one every x blocks on average
 
+    // TODO check this variable?
     function generate(address _sender)
     external
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
