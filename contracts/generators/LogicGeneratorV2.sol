@@ -29,29 +29,31 @@ contract LogicGeneratorV2 is Ownable, ILogicGenerator {
 
     uint256 public specialModulo = 13; // give one every x blocks on average
 
-    // TODO check this variable?
     function generate(address _sender)
     external
     returns (uint256 city, uint256 building, uint256 base, uint256 body, uint256 roof, uint256 special) {
         bytes32 hash = blockhash(block.number);
 
-        uint256 aCity = cityPercentages[_generate(hash, msg.sender, cityPercentages.length)];
+        uint256 aCity = cityPercentages[_generate(hash, _sender, cityPercentages.length)];
 
-        uint256 aBuilding = cityMappings[aCity][_generate(hash, msg.sender, cityMappings[aCity].length)];
+        uint256 aBuilding = cityMappings[aCity][_generate(hash, _sender, cityMappings[aCity].length)];
 
-        uint256 aBase = buildingBaseMappings[aBuilding][_generate(hash, msg.sender, buildingBaseMappings[aBuilding].length)];
-        uint256 aBody = buildingBodyMappings[aBuilding][_generate(hash, msg.sender, buildingBodyMappings[aBuilding].length)];
-        uint256 aRoof = buildingRoofMappings[aBuilding][_generate(hash, msg.sender, buildingRoofMappings[aBuilding].length)];
-        uint256 aSpecial = 0;
-
-        // 1 in X roughly
-        if (isSpecial(block.number)) {
-            aSpecial = specialMappings[_generate(hash, msg.sender, specialMappings.length)];
-        }
+        uint256 aBase = buildingBaseMappings[aBuilding][_generate(hash, _sender, buildingBaseMappings[aBuilding].length)];
+        uint256 aBody = buildingBodyMappings[aBuilding][_generate(hash, _sender, buildingBodyMappings[aBuilding].length)];
+        uint256 aRoof = buildingRoofMappings[aBuilding][_generate(hash, _sender, buildingRoofMappings[aBuilding].length)];
+        uint256 aSpecial = _getSpecial(hash, _sender);
 
         emit Generated(aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
 
         return (aCity, aBuilding, aBase, aBody, aRoof, aSpecial);
+    }
+
+    function _getSpecial(bytes32 hash, address _sender) internal returns (uint256) {
+        // 1 in X roughly
+        if (isSpecial(block.number)) {
+            return specialMappings[_generate(hash, _sender, specialMappings.length)];
+        }
+        return 0;
     }
 
     function _generate(bytes32 _hash, address _sender, uint256 _max) internal returns (uint256) {

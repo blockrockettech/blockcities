@@ -4,7 +4,7 @@ const LogicGeneratorV2 = artifacts.require('LogicGeneratorV2');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('LogicGenerator V2 tests', (accounts) => {
+contract('LogicGenerator V2 tests', (accounts) => {
 
     const other = accounts[2];
     const creator = accounts[1];
@@ -98,7 +98,7 @@ contract.only('LogicGenerator V2 tests', (accounts) => {
         });
     });
 
-    function randomAccount () {
+    function randomAccount() {
         // Random account between 0-5
         return accounts[Math.floor(Math.random() * Math.floor(5))];
     }
