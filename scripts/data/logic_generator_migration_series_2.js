@@ -12,8 +12,9 @@ module.exports = {
                 // CHI
                 2: [1, 1, 9, 10, 10, 11, 11, 16, 16, 19],
 
+                // FIXME 21 removed on second pass due to svg issue
                 // SF
-                3: [12, 12, 12, 12, 13, 13, 13, 13, 13, 21]
+                3: [12, 12, 12, 12, 13, 13, 13, 13, 13]
             }
         },
         buildings: {
