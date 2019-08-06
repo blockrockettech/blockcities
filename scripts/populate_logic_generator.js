@@ -11,7 +11,7 @@ const logic_generator_config = require('./data/logic_generator_migration_series_
 
 // TODO ensure GAS is changed!
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '2500000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '5100000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 function getHttpProviderUri(network) {
@@ -105,8 +105,8 @@ void async function () {
     // // City Distribution //
     // ///////////////////////
 
-    // // TODO mainnet
     // // DONE ropsten
+    // // DONE mainnet
     // const cityDistribution = logic_generator_config.data.city.distribution;
     // const cityPromise = new Promise((resolve, reject) => {
     //     web3.eth
@@ -133,7 +133,7 @@ void async function () {
     // // City Mappings //
     // ///////////////////
 
-    // // TODO mainnet
+    // // DONE mainnet
     // // DONE ropsten
     // const cityConfig = logic_generator_config.data.city.config;
     // const cityConfigPromises = _.map(cityConfig, (data, city) => {
@@ -165,8 +165,9 @@ void async function () {
     // // ////////////////////////
     const buildingsConfig = logic_generator_config.data.buildings;
 
-    // // // TODO mainnet
-    // // // DONE ropsten
+    // BASE
+    // // DONE mainnet
+    // // DONE ropsten
     // const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
     //     console.log(`Adding building [${building}] base [${base}]`);
     //     return new Promise((resolve, reject) => {
@@ -190,9 +191,10 @@ void async function () {
     //         startingNonce++;
     //     });
     // });
-    //
-    // // BODY - TODO
-    // // // DONE ropsten
+
+    // // BODY
+    // // DONE ropsten
+    // // DONE mainnet
     // const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
     //     console.log(`Adding building [${building}] body [${body}]`);
     //     return new Promise((resolve, reject) => {
@@ -216,9 +218,10 @@ void async function () {
     //         startingNonce++;
     //     });
     // });
-    //
-    // // ROOF - TODO
-    // // // DONE ropsten
+
+    // ROOF
+    // DONE ropsten
+    // DONE mainnet
     // const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
     //     console.log(`Adding building [${building}] roof [${roof}]`);
     //     return new Promise((resolve, reject) => {
@@ -246,10 +249,12 @@ void async function () {
     // // //////////////////////
     // // // Special Mappings //
     // // //////////////////////
-    //
-    // const specialsConfig = _.get(logic_generator_config.data, 'specials');
-    //
-    // // Specials - TODO
+
+    const specialsConfig = _.get(logic_generator_config.data, 'specials');
+
+    // Specials
+    // DONE ropsten
+    // DONE mainnet
     // const specialPromise = new Promise((resolve, reject) => {
     //     if (!specialsConfig) {
     //         console.log('Skipping specials as no data found');
