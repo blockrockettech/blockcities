@@ -183,6 +183,7 @@ contract CityGenerator is Ownable {
     // doesnt require knowledge of number of cities in the main contract
 
 
+    // FIXME add cities via migration
     constructor () public {
         // San Francisco
         configs.push(Config(1, 5));
