@@ -247,7 +247,7 @@ void async function () {
     // Specials - TODO
     const specialPromise = new Promise((resolve, reject) => {
         if (!specialsConfig) {
-            console.log('Skipping specials and no data found');
+            console.log('Skipping specials as no data found');
             return resolve();
         }
         web3.eth
