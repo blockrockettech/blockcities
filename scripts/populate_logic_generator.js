@@ -7,7 +7,7 @@ const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
 
 const {INFURA_KEY} = require('../constants');
 
-const logic_generator_config = require('./data/logic_generator_migration_series_2');
+const logic_generator_config = require('./data/logic_generator_migration_series_2_cryptobuildings_specials');
 
 // TODO ensure GAS is changed!
 
@@ -251,34 +251,33 @@ void async function () {
     // // //////////////////////
 
     const specialsConfig = _.get(logic_generator_config.data, 'specials');
+    console.log(specialsConfig);
 
-    // Specials
-    // DONE ropsten
-    // DONE mainnet
-    // const specialPromise = new Promise((resolve, reject) => {
-    //     if (!specialsConfig) {
-    //         console.log('Skipping specials as no data found');
-    //         return resolve();
-    //     }
-    //     web3.eth
-    //         .sendTransaction({
-    //             from: fromAccount,
-    //             to: LOGIC_GENERATOR_V2_ADDRESS,
-    //             data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
-    //             gas: gas,
-    //             gasPrice: gasPrice,
-    //             nonce: startingNonce
-    //         })
-    //         .once('transactionHash', function (hash) {
-    //             successes.push(hash);
-    //             resolve(hash);
-    //         })
-    //         .catch((e) => {
-    //             failures.push({error: e});
-    //             reject(e);
-    //         });
-    //     startingNonce++;
-    // });
+    //Specials
+    const specialPromise = new Promise((resolve, reject) => {
+        if (!specialsConfig) {
+            console.log('Skipping specials as no data found');
+            return resolve();
+        }
+        web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_V2_ADDRESS,
+                data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .once('transactionHash', function (hash) {
+                successes.push(hash);
+                resolve(hash);
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                reject(e);
+            });
+        startingNonce++;
+    });
 
     /////////////////////
     // Wait and Output //
@@ -290,7 +289,7 @@ void async function () {
         // ...buildingBasePromises,
         // ...buildingBodyPromises,
         // ...buildingRoofPromises,
-        // specialPromise
+        specialPromise
     ];
     console.log(promises);
 

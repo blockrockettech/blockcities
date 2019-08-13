@@ -70,10 +70,7 @@
 
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
-            <!--<img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">-->
-
-            <img class="card-img-top" :src="`${ getRootApi() }/network/${ chainId }/token/${ b.data.attributes.tokenId }/image`" :alt="b.data.name" style="max-height: 250px">
-            <img class="card-img-top" :src="`${ getRootApi() }/network/${ chainId }/token/${ b.data.attributes.tokenId }/image/svg`" :alt="b.data.name" style="max-height: 250px">
+            <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
 
             <div class="card-body">
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
@@ -100,6 +97,9 @@
                 <p class="small"><span class="text-muted">Architect</span> <code>{{ b.data.attributes.architect }}</code></p>
             </div>
         </div>
+    </div>
+    <div v-else>
+        Loading...
     </div>
 </div>
 
@@ -1346,9 +1346,9 @@
             },
             getRootApi() {
                 // if (this.chainId === 5777) {
-                    return 'http://localhost:5000/block-cities/us-central1/api';
+                //     return 'http://localhost:5000/block-cities/us-central1/api';
                 // }
-                // return 'https://us-central1-block-cities.cloudfunctions.net/api';
+                return 'https://us-central1-block-cities.cloudfunctions.net/api';
             },
             async getVendingMachineAddress() {
                 if (this.chainId === 1) {
@@ -1518,7 +1518,7 @@
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
                 const allBuildings = [];
-                for (let i = (this.totalBuildings - 30); i <= this.totalBuildings; i++) {
+                for (let i = 250; i <= this.totalBuildings; i++) {
                     allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
                 }
 
