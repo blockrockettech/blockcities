@@ -7,7 +7,8 @@ const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
 
 const {INFURA_KEY} = require('../constants');
 
-const logic_generator_config = require('./data/logic_generator_migration_series_2_times_building');
+// CHEESEY!!
+const logic_generator_config = require('./data/logic_generator_migration_series_2_cheesy_bump_roof');
 
 // TODO ensure GAS is changed!
 
@@ -105,29 +106,29 @@ void async function () {
     // // City Distribution //
     // ///////////////////////
 
-    // // DONE ropsten
-    // // DONE mainnet
-    // const cityDistribution = logic_generator_config.data.city.distribution;
-    // const cityPromise = new Promise((resolve, reject) => {
-    //     web3.eth
-    //         .sendTransaction({
-    //             from: fromAccount,
-    //             to: LOGIC_GENERATOR_V2_ADDRESS,
-    //             data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
-    //             gas: gas,
-    //             gasPrice: gasPrice,
-    //             nonce: startingNonce
-    //         })
-    //         .once('transactionHash', function (hash) {
-    //             successes.push(hash);
-    //             resolve(hash);
-    //         })
-    //         .catch((e) => {
-    //             failures.push({error: e});
-    //             reject(e);
-    //         });
-    //     startingNonce++;
-    // });
+    // DONE ropsten
+    // DONE mainnet
+    const cityDistribution = logic_generator_config.data.city.distribution;
+    const cityPromise = new Promise((resolve, reject) => {
+        web3.eth
+            .sendTransaction({
+                from: fromAccount,
+                to: LOGIC_GENERATOR_V2_ADDRESS,
+                data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
+                gas: gas,
+                gasPrice: gasPrice,
+                nonce: startingNonce
+            })
+            .once('transactionHash', function (hash) {
+                successes.push(hash);
+                resolve(hash);
+            })
+            .catch((e) => {
+                failures.push({error: e});
+                reject(e);
+            });
+        startingNonce++;
+    });
 
     // ///////////////////
     // // City Mappings //
@@ -250,46 +251,46 @@ void async function () {
     // // // Special Mappings //
     // // //////////////////////
 
-    const specialsConfig = _.get(logic_generator_config.data, 'specials');
-    console.log(specialsConfig);
-
-    //Specials
-    const specialPromise = new Promise((resolve, reject) => {
-        if (!specialsConfig) {
-            console.log('Skipping specials as no data found');
-            return resolve();
-        }
-        web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_V2_ADDRESS,
-                data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .once('transactionHash', function (hash) {
-                successes.push(hash);
-                resolve(hash);
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                reject(e);
-            });
-        startingNonce++;
-    });
+    // const specialsConfig = _.get(logic_generator_config.data, 'specials');
+    // console.log(specialsConfig);
+    //
+    // //Specials
+    // const specialPromise = new Promise((resolve, reject) => {
+    //     if (!specialsConfig) {
+    //         console.log('Skipping specials as no data found');
+    //         return resolve();
+    //     }
+    //     web3.eth
+    //         .sendTransaction({
+    //             from: fromAccount,
+    //             to: LOGIC_GENERATOR_V2_ADDRESS,
+    //             data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
+    //             gas: gas,
+    //             gasPrice: gasPrice,
+    //             nonce: startingNonce
+    //         })
+    //         .once('transactionHash', function (hash) {
+    //             successes.push(hash);
+    //             resolve(hash);
+    //         })
+    //         .catch((e) => {
+    //             failures.push({error: e});
+    //             reject(e);
+    //         });
+    //     startingNonce++;
+    // });
 
     /////////////////////
     // Wait and Output //
     /////////////////////
 
     const promises = [
-        // cityPromise,
+        cityPromise,
         // ...cityConfigPromises,
         // ...buildingBasePromises,
         // ...buildingBodyPromises,
         // ...buildingRoofPromises,
-        specialPromise
+        // specialPromise
     ];
     console.log(promises);
 
