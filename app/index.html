@@ -70,9 +70,8 @@
 
     <div class="card-columns" v-if="buildings">
         <div class="card m-2 p-2" v-for="b in buildings" :style="bg(b.data.background_color)">
-            <img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="max-height: 250px">
-
             <div class="card-body">
+                <p class="text-center mx-auto"><img class="card-img-top" :src="b.data.image" :alt="b.data.name" style="width: 150px"></p>
                 <h3 class="card-title text-center">{{ b.data.name }}</h3>
                 <p class="text-center">{{ b.data.description }}</p>
                 <p class="small">
@@ -1345,9 +1344,9 @@
                 };
             },
             getRootApi() {
-                // if (this.chainId === 5777) {
-                //     return 'http://localhost:5000/block-cities/us-central1/api';
-                // }
+                if (this.chainId === 5777) {
+                    return 'http://localhost:5000/block-cities/us-central1/api';
+                }
                 return 'https://us-central1-block-cities.cloudfunctions.net/api';
             },
             async getVendingMachineAddress() {
@@ -1517,12 +1516,11 @@
 
                 this.totalBuildings = (await this.blockcitiesContract.totalBuildings()).toNumber();
 
-                const allBuildings = [];
-                for (let i = 250; i <= this.totalBuildings; i++) {
-                    allBuildings.push(axios.get(`${rootApi}/network/${this.chainId}/token/${i}`));
-                }
 
-                this.buildings = await Promise.all(allBuildings);
+                for (let i =  this.totalBuildings - 50; i <= this.totalBuildings; i++) {
+                    const b = await axios.get(`${rootApi}/network/${this.chainId}/token/${i}`);
+                    this.buildings.push(b);
+                }
             } catch (e) {
                 console.error(e);
             }

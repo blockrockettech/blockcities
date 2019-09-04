@@ -7,11 +7,11 @@ const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
 
 const {INFURA_KEY} = require('../constants');
 
-const logic_generator_config = require('./data/logic_generator_migration_series_2_cryptobuildings_specials');
+const logic_generator_config = require('./data/logic_generator_migration_series_2_times_building');
 
 // TODO ensure GAS is changed!
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '5100000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '3100000000'};
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 function getHttpProviderUri(network) {

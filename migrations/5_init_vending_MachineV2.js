@@ -29,7 +29,7 @@ module.exports = async function (deployer, network, accounts) {
         _logicGenerator.address,    // randomiser
         _colourGenerator.address,   // randomiser
         _blockCities.address,       // 721
-        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7", // Preseton
+        "0x64C971d7e3c0483FA97A7714ec55d1E1943731c7", // Preston
         _owner,                                       // BR
         {
             from: _owner
