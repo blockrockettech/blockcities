@@ -105,9 +105,6 @@ void async function () {
     // ///////////////////////
     // // City Distribution //
     // ///////////////////////
-
-    // DONE ropsten
-    // DONE mainnet
     const cityDistribution = logic_generator_config.data.city.distribution;
     const cityPromise = new Promise((resolve, reject) => {
         web3.eth
@@ -130,126 +127,123 @@ void async function () {
         startingNonce++;
     });
 
-    // ///////////////////
-    // // City Mappings //
-    // ///////////////////
+    ///////////////////
+    // City Mappings //
+    ///////////////////
+    const cityConfig = logic_generator_config.data.city.config;
+    const cityConfigPromises = _.map(cityConfig, (data, city) => {
+        console.log(data, city);
+        return new Promise((resolve, reject) => {
+            web3.eth
+                .sendTransaction({
+                    from: fromAccount,
+                    to: LOGIC_GENERATOR_V2_ADDRESS,
+                    data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
+                    gas: gas,
+                    gasPrice: gasPrice,
+                    nonce: startingNonce
+                })
+                .once('transactionHash', function (hash) {
+                    successes.push(hash);
+                    resolve(hash);
+                })
+                .catch((e) => {
+                    failures.push({error: e});
+                    reject(e);
+                });
+            startingNonce++;
+        });
+    });
 
-    // // DONE mainnet
-    // // DONE ropsten
-    // const cityConfig = logic_generator_config.data.city.config;
-    // const cityConfigPromises = _.map(cityConfig, (data, city) => {
-    //     console.log(data, city);
-    //     return new Promise((resolve, reject) => {
-    //         web3.eth
-    //             .sendTransaction({
-    //                 from: fromAccount,
-    //                 to: LOGIC_GENERATOR_V2_ADDRESS,
-    //                 data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
-    //                 gas: gas,
-    //                 gasPrice: gasPrice,
-    //                 nonce: startingNonce
-    //             })
-    //             .once('transactionHash', function (hash) {
-    //                 successes.push(hash);
-    //                 resolve(hash);
-    //             })
-    //             .catch((e) => {
-    //                 failures.push({error: e});
-    //                 reject(e);
-    //             });
-    //         startingNonce++;
-    //     });
-    // });
-
-    // // ////////////////////////
-    // // // Buildings Mappings //
-    // // ////////////////////////
+    ////////////////////////
+    // Buildings Mappings //
+    ////////////////////////
     const buildingsConfig = logic_generator_config.data.buildings;
 
     // BASE
-    // // DONE mainnet
-    // // DONE ropsten
-    // const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-    //     console.log(`Adding building [${building}] base [${base}]`);
-    //     return new Promise((resolve, reject) => {
-    //         web3.eth
-    //             .sendTransaction({
-    //                 from: fromAccount,
-    //                 to: LOGIC_GENERATOR_V2_ADDRESS,
-    //                 data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
-    //                 gas: gas,
-    //                 gasPrice: gasPrice,
-    //                 nonce: startingNonce
-    //             })
-    //             .once('transactionHash', function (hash) {
-    //                 successes.push(hash);
-    //                 resolve(hash);
-    //             })
-    //             .catch((e) => {
-    //                 failures.push({error: e});
-    //                 reject(e);
-    //             });
-    //         startingNonce++;
-    //     });
-    // });
+    const buildingBasePromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] base [${base}]`);
+        if (base) {
+            return new Promise((resolve, reject) => {
+                web3.eth
+                    .sendTransaction({
+                        from: fromAccount,
+                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
+                        gas: gas,
+                        gasPrice: gasPrice,
+                        nonce: startingNonce
+                    })
+                    .once('transactionHash', function (hash) {
+                        successes.push(hash);
+                        resolve(hash);
+                    })
+                    .catch((e) => {
+                        failures.push({error: e});
+                        reject(e);
+                    });
+                startingNonce++;
+            });
+        }
+    });
 
-    // // BODY
-    // // DONE ropsten
-    // // DONE mainnet
-    // const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-    //     console.log(`Adding building [${building}] body [${body}]`);
-    //     return new Promise((resolve, reject) => {
-    //         web3.eth
-    //             .sendTransaction({
-    //                 from: fromAccount,
-    //                 to: LOGIC_GENERATOR_V2_ADDRESS,
-    //                 data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
-    //                 gas: gas,
-    //                 gasPrice: gasPrice,
-    //                 nonce: startingNonce
-    //             })
-    //             .once('transactionHash', function (hash) {
-    //                 successes.push(hash);
-    //                 resolve(hash);
-    //             })
-    //             .catch((e) => {
-    //                 failures.push({error: e});
-    //                 reject(e);
-    //             });
-    //         startingNonce++;
-    //     });
-    // });
+    // BODY
+    const buildingBodyPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] body [${body}]`);
+        if (body) {
+            return new Promise((resolve, reject) => {
+                web3.eth
+                    .sendTransaction({
+                        from: fromAccount,
+                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
+                        gas: gas,
+                        gasPrice: gasPrice,
+                        nonce: startingNonce
+                    })
+                    .once('transactionHash', function (hash) {
+                        successes.push(hash);
+                        resolve(hash);
+                    })
+                    .catch((e) => {
+                        failures.push({error: e});
+                        reject(e);
+                    });
+                startingNonce++;
+            });
+        }
+    });
 
     // ROOF
-    // DONE ropsten
-    // DONE mainnet
-    // const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
-    //     console.log(`Adding building [${building}] roof [${roof}]`);
-    //     return new Promise((resolve, reject) => {
-    //         web3.eth
-    //             .sendTransaction({
-    //                 from: fromAccount,
-    //                 to: LOGIC_GENERATOR_V2_ADDRESS,
-    //                 data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
-    //                 gas: gas,
-    //                 gasPrice: gasPrice,
-    //                 nonce: startingNonce
-    //             })
-    //             .once('transactionHash', function (hash) {
-    //                 successes.push(hash);
-    //                 resolve(hash);
-    //             })
-    //             .catch((e) => {
-    //                 failures.push({error: e});
-    //                 reject(e);
-    //             });
-    //         startingNonce++;
-    //     });
-    // });
+    const buildingRoofPromises = _.map(buildingsConfig, ({base, body, roof}, building) => {
+        console.log(`Adding building [${building}] roof [${roof}]`);
+        if (roof) {
+            return new Promise((resolve, reject) => {
+                web3.eth
+                    .sendTransaction({
+                        from: fromAccount,
+                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
+                        gas: gas,
+                        gasPrice: gasPrice,
+                        nonce: startingNonce
+                    })
+                    .once('transactionHash', function (hash) {
+                        successes.push(hash);
+                        resolve(hash);
+                    })
+                    .catch((e) => {
+                        failures.push({error: e});
+                        reject(e);
+                    });
+                startingNonce++;
+            });
+        }
+    });
 
-    // // //////////////////////
-    // // // Special Mappings //
-    // // //////////////////////
+    //////////////////////
+    // Special Mappings //
+    //////////////////////
 
     // const specialsConfig = _.get(logic_generator_config.data, 'specials');
     // console.log(specialsConfig);
@@ -286,10 +280,10 @@ void async function () {
 
     const promises = [
         cityPromise,
-        // ...cityConfigPromises,
+        ...cityConfigPromises,
         // ...buildingBasePromises,
-        // ...buildingBodyPromises,
-        // ...buildingRoofPromises,
+        ...buildingBodyPromises,
+        ...buildingRoofPromises,
         // specialPromise
     ];
     console.log(promises);
