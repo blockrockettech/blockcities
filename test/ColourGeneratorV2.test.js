@@ -4,7 +4,7 @@ const ColourGeneratorV2 = artifacts.require('ColourGeneratorV2');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('ColourGeneratorV2 tests', (accounts) => {
+contract('ColourGeneratorV2 tests', (accounts) => {
 
     const other = accounts[2];
     const creator = accounts[1];

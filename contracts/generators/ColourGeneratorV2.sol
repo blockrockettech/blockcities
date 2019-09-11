@@ -20,6 +20,7 @@ contract ColourGeneratorV2 is IColourGenerator {
         require(msg.sender == platform || msg.sender == partner);
         _;
     }
+
     constructor (address payable _platform) public {
         platform = _platform;
         partner = msg.sender;
