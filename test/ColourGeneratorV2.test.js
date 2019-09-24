@@ -15,6 +15,12 @@ contract('ColourGeneratorV2 tests', (accounts) => {
         this.generator = await ColourGeneratorV2.new(platform, {from: creator});
         await this.generator.updateExteriorPercentages([0, 1, 2], {from: creator});
         await this.generator.updateBackgroundsPercentages([0, 1, 2], {from: creator});
+
+        const exteriors = await this.generator.exteriorPercentageArray();
+        const backgrounds = await this.generator.backgroundsPercentagesArray();
+
+        exteriors.length.should.be.equal(3);
+        backgrounds.length.should.be.equal(3);
     });
 
     it('generate me some randoms', async function () {
@@ -22,7 +28,7 @@ contract('ColourGeneratorV2 tests', (accounts) => {
             const account = randomAccount();
             console.log(`Generating colours [${i}] for account [${account}]`);
             const {logs} = await this.generator.generate(account);
-            console.log(logs);
+            // console.log(logs);
         }
     });
 

@@ -52,4 +52,12 @@ contract ColourGeneratorV2 is IColourGenerator {
     function updateBackgroundsPercentages(uint256[] memory _params) public onlyPlatformOrPartner {
         backgroundsPercentages = _params;
     }
+
+    function exteriorPercentageArray() public view returns (uint256[] memory _exteriorPercentages) {
+        return exteriorPercentages;
+    }
+
+    function backgroundsPercentagesArray() public view returns (uint256[] memory _backgroundsPercentages) {
+        return backgroundsPercentages;
+    }
 }
