@@ -18,11 +18,9 @@ module.exports = async function (deployer, network, accounts) {
         _owner = new HDWalletProvider(process.env.BLOCK_CITIES_MNEMONIC, `https://mainnet.infura.io/${INFURA_KEY}`, 0).getAddress();
     }
 
-
     const _blockCitiesVendingMachineV2 = await BlockCitiesVendingMachineV2.deployed();
     const _colourGeneratorV2 = await ColourGeneratorV2.deployed();
     const _logicGeneratorV3 = await LogicGeneratorV3.deployed();
-
 
     await _blockCitiesVendingMachineV2.setColourGenerator(_colourGeneratorV2.address, {from: _owner});
     await _blockCitiesVendingMachineV2.setLogicGenerator(_logicGeneratorV3.address, {from: _owner});

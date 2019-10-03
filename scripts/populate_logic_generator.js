@@ -3,16 +3,17 @@ const Web3 = require('web3');
 const program = require('commander');
 const HDWalletProvider = require('truffle-hdwallet-provider');
 
+const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
 const LogicGeneratorV3 = require('../build/contracts/LogicGeneratorV3');
 
 const {INFURA_KEY} = require('../constants');
 
-// MONSTER!!
-const logic_generator_config = require('./data/logic_generator_migration_series_2');
+// PARKING!!
+const logic_generator_config = require('./data/logic_generator_migration_series_2_5_parkingdecks');
 
 // TODO ensure GAS is changed!
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '21000000000'};
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '5100000000'}; // 3.1
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 function getHttpProviderUri(network) {
@@ -77,8 +78,8 @@ void async function () {
         throw new Error(`Error missing BLOCK_CITIES_MNEMONIC`);
     }
 
-    const LOGIC_GENERATOR_V2_ABI = LogicGeneratorV3.abi;
-    const LOGIC_GENERATOR_V2_ADDRESS = LogicGeneratorV3.networks[_.toString(program.network)].address;
+    const LOGIC_GENERATOR_V2_ABI = LogicGeneratorV2.abi;
+    const LOGIC_GENERATOR_V2_ADDRESS = LogicGeneratorV2.networks[_.toString(program.network)].address;
     if (!LOGIC_GENERATOR_V2_ADDRESS || !LOGIC_GENERATOR_V2_ABI) {
         throw new Error(`Missing ABI or Address for logic generator`);
     }
@@ -105,27 +106,27 @@ void async function () {
     ///////////////////////
     // City Distribution //
     ///////////////////////
-    const cityDistribution = logic_generator_config.data.city.distribution;
-    const cityPromise = new Promise((resolve, reject) => {
-        web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_V2_ADDRESS,
-                data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .once('transactionHash', function (hash) {
-                successes.push(hash);
-                resolve(hash);
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                reject(e);
-            });
-        startingNonce++;
-    });
+    // const cityDistribution = logic_generator_config.data.city.distribution;
+    // const cityPromise = new Promise((resolve, reject) => {
+    //     web3.eth
+    //         .sendTransaction({
+    //             from: fromAccount,
+    //             to: LOGIC_GENERATOR_V2_ADDRESS,
+    //             data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
+    //             gas: gas,
+    //             gasPrice: gasPrice,
+    //             nonce: startingNonce
+    //         })
+    //         .once('transactionHash', function (hash) {
+    //             successes.push(hash);
+    //             resolve(hash);
+    //         })
+    //         .catch((e) => {
+    //             failures.push({error: e});
+    //             reject(e);
+    //         });
+    //     startingNonce++;
+    // });
 
     /////////////////
     //City Mappings //
@@ -245,46 +246,46 @@ void async function () {
     // Special Mappings //
     //////////////////////
 
-    const specialsConfig = _.get(logic_generator_config.data, 'specials');
-    console.log(specialsConfig);
-
-    //Specials
-    const specialPromise = new Promise((resolve, reject) => {
-        if (!specialsConfig) {
-            console.log('Skipping specials as no data found');
-            return resolve();
-        }
-        web3.eth
-            .sendTransaction({
-                from: fromAccount,
-                to: LOGIC_GENERATOR_V2_ADDRESS,
-                data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
-                gas: gas,
-                gasPrice: gasPrice,
-                nonce: startingNonce
-            })
-            .once('transactionHash', function (hash) {
-                successes.push(hash);
-                resolve(hash);
-            })
-            .catch((e) => {
-                failures.push({error: e});
-                reject(e);
-            });
-        startingNonce++;
-    });
+    // const specialsConfig = _.get(logic_generator_config.data, 'specials');
+    // console.log(specialsConfig);
+    //
+    // //Specials
+    // const specialPromise = new Promise((resolve, reject) => {
+    //     if (!specialsConfig) {
+    //         console.log('Skipping specials as no data found');
+    //         return resolve();
+    //     }
+    //     web3.eth
+    //         .sendTransaction({
+    //             from: fromAccount,
+    //             to: LOGIC_GENERATOR_V2_ADDRESS,
+    //             data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
+    //             gas: gas,
+    //             gasPrice: gasPrice,
+    //             nonce: startingNonce
+    //         })
+    //         .once('transactionHash', function (hash) {
+    //             successes.push(hash);
+    //             resolve(hash);
+    //         })
+    //         .catch((e) => {
+    //             failures.push({error: e});
+    //             reject(e);
+    //         });
+    //     startingNonce++;
+    // });
 
     /////////////////////
     // Wait and Output //
     /////////////////////
 
     const promises = [
-        cityPromise,
+        // cityPromise,
         ...cityConfigPromises,
         ...buildingBasePromises,
         ...buildingBodyPromises,
         ...buildingRoofPromises,
-        specialPromise
+        // specialPromise
     ];
     console.log(promises);
 

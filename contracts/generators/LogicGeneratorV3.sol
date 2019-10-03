@@ -15,14 +15,13 @@ contract LogicGeneratorV3 is ILogicGenerator {
     );
 
     uint256[] public cityPercentages;
+    uint256[] public specialMappings;
 
     mapping(uint256 => uint256[]) public cityMappings;
 
     mapping(uint256 => uint256[]) public buildingBaseMappings;
     mapping(uint256 => uint256[]) public buildingBodyMappings;
     mapping(uint256 => uint256[]) public buildingRoofMappings;
-
-    uint256[] public specialMappings;
 
     uint256 public specialModulo = 13; // give one every x blocks on average
 
@@ -102,5 +101,29 @@ contract LogicGeneratorV3 is ILogicGenerator {
 
     function updateSpecialMappings(uint256[] memory _params) public onlyPlatformOrPartner {
         specialMappings = _params;
+    }
+
+    function cityPercentagesArray() public view returns (uint256[] memory _cityPercentages) {
+        return cityPercentages;
+    }
+
+    function specialMappingsArray() public view returns (uint256[] memory _specialMappings) {
+        return specialMappings;
+    }
+
+    function cityMappingsArray(uint256 _city) public view returns (uint256[] memory _cityMappings) {
+        return cityMappings[_city];
+    }
+
+    function buildingBaseMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingBaseMappings) {
+        return buildingBaseMappings[_building];
+    }
+
+    function buildingBodyMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingBodyMappings) {
+        return buildingBodyMappings[_building];
+    }
+
+    function buildingRoofMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingRoofMappings) {
+        return buildingRoofMappings[_building];
     }
 }
