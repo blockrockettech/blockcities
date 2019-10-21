@@ -246,11 +246,15 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
     context('minting limit', function () {
         it('mints below the limit', async function () {
+            (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(4));
+
             const batchPrice = await this.vendingMachine.totalPrice(new BN(4));
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+
+            (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(0));
         });
 
         it('batch mints below the limit', async function () {

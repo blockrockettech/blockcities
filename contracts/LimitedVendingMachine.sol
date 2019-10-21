@@ -358,4 +358,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         colourGenerator = _colourGenerator;
         return true;
     }
+
+    function buildingsMintAllowanceRemaining() external view returns (uint256) {
+        return buildingMintLimit.sub(totalBuildings);
+    }
 }
