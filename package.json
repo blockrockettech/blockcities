@@ -31,6 +31,7 @@
   "dependencies": {
     "lodash": "^4.17.11",
     "truffle": "^5.0.10",
-    "truffle-hdwallet-provider": "^1.0.6"
+    "truffle-hdwallet-provider": "^1.0.6",
+    "truffle-plugin-verify": "^0.3.3"
   }
 }
