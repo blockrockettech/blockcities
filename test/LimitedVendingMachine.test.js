@@ -16,6 +16,8 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
     const firstURI = 'abc123';
     const baseURI = 'https://api.blockcities.co/';
 
+    const buildingMintLimit = new BN(5);
+
     beforeEach(async function () {
 
         // Create 721 contract
@@ -53,7 +55,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             this.blockCities.address,
             blockcitiesAccount,
             creator,
-            5,
+            buildingMintLimit,
             {
                 from: creator
             }
@@ -71,6 +73,9 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         this.priceStep = await this.vendingMachine.priceStepInWei();
 
         this.currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+
+        (await this.vendingMachine.buildingMintLimit()).should.be.bignumber.equal(buildingMintLimit);
+        (await this.vendingMachine.totalBuildings()).should.be.bignumber.equal(new BN(0));
 
         const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.currentPrice});
         expectEvent.inLogs(
@@ -237,6 +242,63 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             totalBuildingsPost.should.be.bignumber.equal(totalBuildingsPre.add(numberOfBuildings));
         });
 
+    });
+
+    context('minting limit', function () {
+        it('mints below the limit', async function () {
+            const batchPrice = await this.vendingMachine.totalPrice(new BN(4));
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+        });
+
+        it('batch mints below the limit', async function () {
+            const numberOfBuildings = new BN(4);
+            const batchPrice = await this.vendingMachine.totalPrice(numberOfBuildings);
+
+            await this.vendingMachine.mintBatch(numberOfBuildings, {from: tokenOwner, value: batchPrice});
+
+            const totalBuildingsPost = await this.blockCities.totalBuildings();
+            totalBuildingsPost.should.be.bignumber.equal(buildingMintLimit);
+        });
+
+        it('mintBatchTo() below the limit', async function () {
+            const numberOfBuildings = new BN(4);
+            const _to = tokenOwner;
+            const batchPrice = await this.vendingMachine.totalPrice(numberOfBuildings);
+
+            await this.vendingMachine.mintBatchTo(_to, numberOfBuildings, {from: _to, value: batchPrice});
+
+            const totalBuildingsPost = await this.blockCities.totalBuildings();
+            totalBuildingsPost.should.be.bignumber.equal(buildingMintLimit);
+        });
+
+        it('mints reverts above the limit', async function () {
+            const batchPrice = await this.vendingMachine.totalPrice(new BN(5));
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            shouldFail.reverting(this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice}));
+        });
+
+        it('reverts with a batch mint above the limit', async function () {
+            const numberOfBuildings = new BN(5);
+            const batchPrice = await this.vendingMachine.totalPrice(numberOfBuildings);
+
+            await shouldFail.reverting(this.vendingMachine.mintBatch(numberOfBuildings, {from: tokenOwner, value: batchPrice}));
+        });
+
+        it('mintBatchTo() reverts above mint limit', async function () {
+            const numberOfBuildings = new BN(5);
+            const _to = tokenOwner;
+            const batchPrice = await this.vendingMachine.totalPrice(numberOfBuildings);
+
+            await shouldFail.reverting(
+                this.vendingMachine.mintBatchTo(_to, numberOfBuildings, {from: _to, value: batchPrice})
+            );
+        });
     });
 
     context('total price and adjusting bands', function () {
@@ -582,7 +644,10 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             );
 
             const tokensOfOwner = await this.blockCities.tokensOfOwner(_to);
-            tokensOfOwner.map(lodash.toNumber).should.be.deep.equal([1, tokenId.toNumber()]);
+            tokensOfOwner.map(lodash.toNumber).should.be.deep.equal(
+                [1, tokenId.toNumber()],
+
+            );
         });
 
     });

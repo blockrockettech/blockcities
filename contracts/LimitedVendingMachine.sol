@@ -115,12 +115,10 @@ contract LimitedVendingMachine is FundsSplitterV2 {
             credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
-        require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
         _reconcileCreditsAndFunds(currentPrice, 1);
 
         uint256 tokenId = _generate(msg.sender);
-        totalBuildings = totalBuildings.add(1);
 
         _stepIncrease();
 
@@ -184,6 +182,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     }
 
     function _generate(address _to) internal returns (uint256 _tokenId) {
+        require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
+
         Building memory building = _generateBuilding();
         Colour memory colour = _generateColours();
 
@@ -198,6 +198,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
             building.special,
             _to
         );
+
+        totalBuildings = totalBuildings.add(1);
 
         emit VendingMachineTriggered(tokenId, _to);
 
