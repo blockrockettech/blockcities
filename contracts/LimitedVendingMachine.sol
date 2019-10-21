@@ -9,7 +9,7 @@ import "./FundsSplitterV2.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-contract BlockCitiesVendingMachineV2 is FundsSplitterV2 {
+contract LimitedVendingMachine is FundsSplitterV2 {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
