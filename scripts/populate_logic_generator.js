@@ -3,7 +3,7 @@ const Web3 = require('web3');
 const program = require('commander');
 const HDWalletProvider = require('truffle-hdwallet-provider');
 
-const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
+// const LogicGeneratorV2 = require('../build/contracts/LogicGeneratorV2');
 const LogicGeneratorV3 = require('../build/contracts/LogicGeneratorV3');
 
 const {INFURA_KEY} = require('../constants');
@@ -13,7 +13,7 @@ const logic_generator_config = require('./data/logic_generator_migration_series_
 
 // TODO ensure GAS is changed!
 
-const {gas, gasPrice} = {gas: 6721975, gasPrice: '5100000000'}; // 3.1
+const {gas, gasPrice} = {gas: 6721975, gasPrice: '1600000000'}; // 1.6
 console.log(`gas=${gas} | gasPrice=${gasPrice}`);
 
 function getHttpProviderUri(network) {
@@ -78,9 +78,9 @@ void async function () {
         throw new Error(`Error missing BLOCK_CITIES_MNEMONIC`);
     }
 
-    const LOGIC_GENERATOR_V2_ABI = LogicGeneratorV2.abi;
-    const LOGIC_GENERATOR_V2_ADDRESS = LogicGeneratorV2.networks[_.toString(program.network)].address;
-    if (!LOGIC_GENERATOR_V2_ADDRESS || !LOGIC_GENERATOR_V2_ABI) {
+    const LOGIC_GENERATOR_ABI = LogicGeneratorV3.abi;
+    const LOGIC_GENERATOR_ADDRESS = LogicGeneratorV3.networks[_.toString(program.network)].address;
+    if (!LOGIC_GENERATOR_ADDRESS || !LOGIC_GENERATOR_ABI) {
         throw new Error(`Missing ABI or Address for logic generator`);
     }
 
@@ -101,7 +101,7 @@ void async function () {
     let startingNonce = await web3.eth.getTransactionCount(fromAccount);
     console.log(`Using account [${fromAccount}] with starting nonce [${startingNonce}]`);
 
-    const LogicGeneratorContract = new web3.eth.Contract(LOGIC_GENERATOR_V2_ABI, LOGIC_GENERATOR_V2_ADDRESS);
+    const LogicGeneratorContract = new web3.eth.Contract(LOGIC_GENERATOR_ABI, LOGIC_GENERATOR_ADDRESS);
 
     ///////////////////////
     // City Distribution //
@@ -111,7 +111,7 @@ void async function () {
     //     web3.eth
     //         .sendTransaction({
     //             from: fromAccount,
-    //             to: LOGIC_GENERATOR_V2_ADDRESS,
+    //             to: LOGIC_GENERATOR_ADDRESS,
     //             data: LogicGeneratorContract.methods.updateCityPercentages(cityDistribution).encodeABI(),
     //             gas: gas,
     //             gasPrice: gasPrice,
@@ -138,7 +138,7 @@ void async function () {
             web3.eth
                 .sendTransaction({
                     from: fromAccount,
-                    to: LOGIC_GENERATOR_V2_ADDRESS,
+                    to: LOGIC_GENERATOR_ADDRESS,
                     data: LogicGeneratorContract.methods.updateCityMappings(city, data).encodeABI(),
                     gas: gas,
                     gasPrice: gasPrice,
@@ -169,7 +169,7 @@ void async function () {
                 web3.eth
                     .sendTransaction({
                         from: fromAccount,
-                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        to: LOGIC_GENERATOR_ADDRESS,
                         data: LogicGeneratorContract.methods.updateBuildingBaseMappings(building, base).encodeABI(),
                         gas: gas,
                         gasPrice: gasPrice,
@@ -196,7 +196,7 @@ void async function () {
                 web3.eth
                     .sendTransaction({
                         from: fromAccount,
-                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        to: LOGIC_GENERATOR_ADDRESS,
                         data: LogicGeneratorContract.methods.updateBuildingBodyMappings(building, body).encodeABI(),
                         gas: gas,
                         gasPrice: gasPrice,
@@ -223,7 +223,7 @@ void async function () {
                 web3.eth
                     .sendTransaction({
                         from: fromAccount,
-                        to: LOGIC_GENERATOR_V2_ADDRESS,
+                        to: LOGIC_GENERATOR_ADDRESS,
                         data: LogicGeneratorContract.methods.updateBuildingRoofMappings(building, roof).encodeABI(),
                         gas: gas,
                         gasPrice: gasPrice,
@@ -245,7 +245,6 @@ void async function () {
     //////////////////////
     // Special Mappings //
     //////////////////////
-
     // const specialsConfig = _.get(logic_generator_config.data, 'specials');
     // console.log(specialsConfig);
     //
@@ -258,7 +257,7 @@ void async function () {
     //     web3.eth
     //         .sendTransaction({
     //             from: fromAccount,
-    //             to: LOGIC_GENERATOR_V2_ADDRESS,
+    //             to: LOGIC_GENERATOR_ADDRESS,
     //             data: LogicGeneratorContract.methods.updateSpecialMappings(specialsConfig).encodeABI(),
     //             gas: gas,
     //             gasPrice: gasPrice,
