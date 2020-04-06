@@ -11,6 +11,7 @@ const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-help
 
 contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
+    const ZERO = new BN(0);
     const firstTokenId = new BN(1);
 
     const firstURI = 'abc123';
@@ -56,6 +57,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             blockcitiesAccount,
             creator,
             buildingMintLimit,
+            ZERO,
             {
                 from: creator
             }
@@ -77,7 +79,10 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         (await this.vendingMachine.buildingMintLimit()).should.be.bignumber.equal(buildingMintLimit);
         (await this.vendingMachine.totalBuildings()).should.be.bignumber.equal(new BN(0));
 
-        const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: this.currentPrice});
+        const {logs} = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, {
+            from: tokenOwner,
+            value: this.currentPrice
+        });
         expectEvent.inLogs(
             logs,
             `VendingMachineTriggered`,
@@ -225,7 +230,6 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
 
 
-
         it('mints reverts above the limit', async function () {
             let price = await this.vendingMachine.totalPrice();
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
@@ -249,7 +253,17 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
     });
 
-    context('ensure only owner can last sale price', function () {
+    context.only('ensure you can\'t mint the same building twice', function () {
+        it('mints below the limit', async function () {
+            let price = await this.vendingMachine.totalPrice();
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, {
+                from: tokenOwner,
+                value: price
+            }));
+        });
+    });
+
+    context('ensure only owner can adjust last sale price', function () {
         it('should revert if not owner', async function () {
             await shouldFail.reverting(this.vendingMachine.setLastSalePrice(1, {from: tokenOwner}));
         });
@@ -466,13 +480,6 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: 0});
         });
-
-        it('should add credit batch', async function () {
-            await this.vendingMachine.addCreditBatch([tokenOwner, anyone], 2, {from: creator});
-
-            (await this.vendingMachine.credits(tokenOwner)).should.be.bignumber.equal('2');
-            (await this.vendingMachine.credits(anyone)).should.be.bignumber.equal('2');
-        });
     });
 
     context.skip('random buildings to console', function () {
@@ -511,27 +518,6 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
     });
 
-    context('should be able to mintBuildingTo() and define the recipient of the building', async function () {
-
-        it('mintBuildingTo() succeeds', async function () {
-            const currentPrice = await this.vendingMachine.totalPrice();
-            const _to = tokenOwner;
-            const tokenId = new BN(2);
-
-            const {logs} = await this.vendingMachine.mintBuildingTo(_to, {from: creator, value: currentPrice});
-            expectEvent.inLogs(
-                logs,
-                `VendingMachineTriggered`,
-                {_tokenId: tokenId, _architect: _to}
-            );
-
-            const tokensOfOwner = await this.blockCities.tokensOfOwner(_to);
-            tokensOfOwner.map(lodash.toNumber).should.be.deep.equal([1, tokenId.toNumber()]);
-        });
-
-    });
-
-
     context('splitFunds', function () {
 
         it('all parties get the correct amounts', async function () {
@@ -545,7 +531,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const partner = new BN((await web3.eth.getBalance(creator)));
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
-            const receipt = await this.vendingMachine.mintBuildingTo(purchaser, {
+            const receipt = await this.vendingMachine.mintBuilding({
                 from: purchaser,
                 value: overpayPrice
             });
@@ -585,7 +571,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
             // send msg.value even though we have credits
-            const receipt = await this.vendingMachine.mintBuildingTo(purchaser, {
+            const receipt = await this.vendingMachine.mintBuilding({
                 from: purchaser,
                 value: currentPrice
             });
@@ -650,7 +636,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
     });
 
-    async function getGasCosts (receipt) {
+    async function getGasCosts(receipt) {
         let tx = await web3.eth.getTransaction(receipt.tx);
         let gasPrice = new BN(tx.gasPrice);
         return gasPrice.mul(new BN(receipt.receipt.gasUsed));

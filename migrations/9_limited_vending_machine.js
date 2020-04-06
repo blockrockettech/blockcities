@@ -35,6 +35,7 @@ module.exports = async function (deployer, network, accounts) {
         preston,
         _owner,                                       // BR
         buildingMintLimit,
+        0,
         {
             from: _owner
         });

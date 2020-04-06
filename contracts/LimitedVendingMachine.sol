@@ -49,19 +49,19 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         uint256 _newLastSalePrice
     );
 
-    struct Colour {
-        uint256 exteriorColorway;
-        uint256 backgroundColorway;
-    }
-
-    struct Building {
-        uint256 city;
-        uint256 building;
-        uint256 base;
-        uint256 body;
-        uint256 roof;
-        uint256 special;
-    }
+//    struct Colour {
+//        uint256 exteriorColorway;
+//        uint256 backgroundColorway;
+//    }
+//
+//    struct Building {
+//        uint256 city;
+//        uint256 building;
+//        uint256 base;
+//        uint256 body;
+//        uint256 roof;
+//        uint256 special;
+//    }
 
     ILogicGenerator public logicGenerator;
 
@@ -86,6 +86,9 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 
     uint256 public buildingMintLimit;
     uint256 public totalBuildings;
+    uint256 public city;
+
+    mapping(bytes32 => bool) public buildingRegistry;
 
     constructor (
         ILogicGenerator _logicGenerator,
@@ -93,7 +96,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         IBlockCitiesCreator _blockCities,
         address payable _platform,
         address payable _partnerAddress,
-        uint256 _buildingMintLimit
+        uint256 _buildingMintLimit,
+        uint256 _city
     ) public FundsSplitterV2(_platform, _partnerAddress) {
         logicGenerator = _logicGenerator;
         colourGenerator = _colourGenerator;
@@ -104,13 +108,11 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         buildingMintLimit = _buildingMintLimit;
 
         super.addWhitelisted(msg.sender);
+
+        city = _city;
     }
 
-    function mintBuilding() public payable returns (uint256 _tokenId) {
-        mintBuildingTo(msg.sender);
-    }
-
-    function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
+    function mintBuilding(uint256 _building, uint256 _base, uint256 _body, uint256 _roof,  uint256 _exteriorColorway, uint256 _backgroundColorway) public payable returns (uint256 _tokenId) {
         uint256 currentPrice = totalPrice();
         require(
             credits[msg.sender] > 0 || msg.value >= currentPrice,
@@ -119,65 +121,44 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 
         _reconcileCreditsAndFunds(currentPrice);
 
-        uint256 tokenId = _generate(_to);
+        uint256 tokenId = _generate(_building, _base, _body, _roof, _exteriorColorway, _backgroundColorway);
 
         _stepIncrease();
 
         return tokenId;
     }
 
-    function _generate(address _to) internal returns (uint256 _tokenId) {
+    function _generate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _exteriorColorway, uint256 _backgroundColorway) internal returns (uint256 _tokenId) {
         require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
-        Building memory building = _generateBuilding();
-        Colour memory colour = _generateColours();
+        // validate building can be built at this time
 
-        // check unique
-        bytes32 buildingHash = keccak256(abi.encode(building.city, building.building, building.base, building.body, building.roof, building.special));
+        // check unique and not already built
+        bytes32 buildingHash = keccak256(abi.encode(city, _building, _base, _body, _roof, 0));
+        require(!buildingRegistry[buildingHash], "Building already exists");
 
         uint256 tokenId = blockCities.createBuilding(
-            colour.exteriorColorway,
-            colour.backgroundColorway,
-            building.city,
-            building.building,
-            building.base,
-            building.body,
-            building.roof,
-            building.special,
-            _to
+            _exteriorColorway,
+            _backgroundColorway,
+            city,
+            _building,
+            _base,
+            _body,
+            _roof,
+            0,
+            msg.sender
         );
 
         // add to registry to avoid dupes
+        buildingRegistry[buildingHash] = true;
 
         totalBuildings = totalBuildings.add(1);
 
-        emit VendingMachineTriggered(tokenId, _to);
+        emit VendingMachineTriggered(tokenId, msg.sender);
 
         return tokenId;
     }
-
-    function _generateColours() internal returns (Colour memory){
-        (uint256 _exteriorColorway, uint256 _backgroundColorway) = colourGenerator.generate(msg.sender);
-
-        return Colour({
-            exteriorColorway : _exteriorColorway,
-            backgroundColorway : _backgroundColorway
-            });
-    }
-
-    function _generateBuilding() internal returns (Building memory){
-        (uint256 _city, uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special) = logicGenerator.generate(msg.sender);
-
-        return Building({
-            city : _city,
-            building : _building,
-            base : _base,
-            body : _body,
-            roof : _roof,
-            special : _special
-            });
-    }
-
+    
     function _reconcileCreditsAndFunds(uint256 _currentPrice) internal {
         // use credits first
         if (credits[msg.sender] >= 1) {
@@ -242,14 +223,6 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         credits[_to] = credits[_to].add(_amount);
 
         emit CreditAdded(_to, _amount);
-
-        return true;
-    }
-
-    function addCreditBatch(address[] memory _addresses, uint256 _amount) public onlyWhitelisted returns (bool) {
-        for (uint i = 0; i < _addresses.length; i++) {
-            addCreditAmount(_addresses[i], _amount);
-        }
 
         return true;
     }
