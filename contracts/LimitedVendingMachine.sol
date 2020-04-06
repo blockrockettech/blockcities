@@ -19,8 +19,6 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 
     event CreditAdded(address indexed _to, uint256 _amount);
 
-    event PriceDiscountBandsChanged(uint256[2] _priceDiscountBands);
-
     event PriceStepInWeiChanged(
         uint256 _oldPriceStepInWei,
         uint256 _newPriceStepInWei
@@ -74,7 +72,6 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     mapping(address => uint256) public credits;
 
     uint256 public totalPurchasesInWei = 0;
-    uint256[2] public priceDiscountBands = [80, 70];
 
     uint256 public floorPricePerBuildingInWei = 0.05 ether;
 
@@ -114,13 +111,13 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     }
 
     function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
-        uint256 currentPrice = totalPrice(1);
+        uint256 currentPrice = totalPrice();
         require(
             credits[msg.sender] > 0 || msg.value >= currentPrice,
             "Must supply at least the required minimum purchase value or have credit"
         );
 
-        _reconcileCreditsAndFunds(currentPrice, 1);
+        _reconcileCreditsAndFunds(currentPrice);
 
         uint256 tokenId = _generate(_to);
 
@@ -181,10 +178,10 @@ contract LimitedVendingMachine is FundsSplitterV2 {
             });
     }
 
-    function _reconcileCreditsAndFunds(uint256 _currentPrice, uint256 _numberOfBuildings) internal {
+    function _reconcileCreditsAndFunds(uint256 _currentPrice) internal {
         // use credits first
-        if (credits[msg.sender] >= _numberOfBuildings) {
-            credits[msg.sender] = credits[msg.sender].sub(_numberOfBuildings);
+        if (credits[msg.sender] >= 1) {
+            credits[msg.sender] = credits[msg.sender].sub(1);
 
             // refund msg.value when using up credits
             if (msg.value > 0) {
@@ -198,7 +195,7 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 
     function _stepIncrease() internal {
 
-        lastSalePrice = totalPrice(1).add(priceStepInWei);
+        lastSalePrice = totalPrice().add(priceStepInWei);
         lastSaleBlock = block.number;
 
         if (lastSalePrice >= ceilingPricePerBuildingInWei) {
@@ -206,7 +203,7 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         }
     }
 
-    function totalPrice(uint256 _numberOfBuildings) public view returns (uint256) {
+    function totalPrice() public view returns (uint256) {
 
         uint256 calculatedPrice = lastSalePrice;
 
@@ -224,27 +221,12 @@ contract LimitedVendingMachine is FundsSplitterV2 {
             }
         }
 
-        if (_numberOfBuildings < 5) {
-            return _numberOfBuildings.mul(calculatedPrice);
-        }
-        else if (_numberOfBuildings < 10) {
-            return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[0]);
-        }
-
-        return _numberOfBuildings.mul(calculatedPrice).div(100).mul(priceDiscountBands[1]);
+        return calculatedPrice;
     }
 
     function setPriceStepInWei(uint256 _priceStepInWei) public onlyWhitelisted returns (bool) {
         emit PriceStepInWeiChanged(priceStepInWei, _priceStepInWei);
         priceStepInWei = _priceStepInWei;
-        return true;
-    }
-
-    function setPriceDiscountBands(uint256[2] memory _newPriceDiscountBands) public onlyWhitelisted returns (bool) {
-        priceDiscountBands = _newPriceDiscountBands;
-
-        emit PriceDiscountBandsChanged(_newPriceDiscountBands);
-
         return true;
     }
 

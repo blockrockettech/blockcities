@@ -72,7 +72,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         this.floor = await this.vendingMachine.floorPricePerBuildingInWei();
         this.priceStep = await this.vendingMachine.priceStepInWei();
 
-        this.currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+        this.currentPrice = await this.vendingMachine.totalPrice();
 
         (await this.vendingMachine.buildingMintLimit()).should.be.bignumber.equal(buildingMintLimit);
         (await this.vendingMachine.totalBuildings()).should.be.bignumber.equal(new BN(0));
@@ -140,17 +140,17 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const priceStep = await this.vendingMachine.priceStepInWei();
 
             const blockSale = await this.vendingMachine.lastSaleBlock();
-            const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
+            const priceBefore = await this.vendingMachine.totalPrice();
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
 
-            const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfter = await this.vendingMachine.totalPrice();
             priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
 
             // should move step up once
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceAfter.add(priceAfter)});
 
-            const priceAfterBatch = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterBatch = await this.vendingMachine.totalPrice();
             priceAfterBatch.should.be.bignumber.equal(priceAfter.add(priceStep));
         });
 
@@ -160,12 +160,12 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
 
-            const priceAfter0 = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfter0 = await this.vendingMachine.totalPrice();
             priceAfter0.should.be.bignumber.equal(ceiling);
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
 
-            const priceAfter1 = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfter1 = await this.vendingMachine.totalPrice();
             priceAfter1.should.be.bignumber.equal(ceiling);
         });
     });
@@ -175,11 +175,11 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         it('price adjusts on invocation', async function () {
 
             const blockStep = await this.vendingMachine.blockStep();
-            const priceBefore = await this.vendingMachine.totalPrice(new BN(1));
+            const priceBefore = await this.vendingMachine.totalPrice();
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
 
-            const priceAfter = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfter = await this.vendingMachine.totalPrice();
 
             priceAfter.should.be.bignumber.equal(priceBefore.add(this.priceStep));
 
@@ -188,7 +188,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 await this.vendingMachine.addCredit(tokenOwner, {from: creator});
             }
 
-            const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterBlockStep = await this.vendingMachine.totalPrice();
             priceAfterBlockStep.should.be.bignumber.equal(priceBefore);
         });
 
@@ -203,7 +203,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 await this.vendingMachine.addCredit(tokenOwner, {from: creator});
             }
 
-            const priceAfterBlockStep = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterBlockStep = await this.vendingMachine.totalPrice();
             priceAfterBlockStep.should.be.bignumber.equal(floor);
         });
     });
@@ -212,11 +212,14 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         it('mints below the limit', async function () {
             (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(4));
 
-            const batchPrice = await this.vendingMachine.totalPrice(new BN(4));
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
+            let price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
 
             (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(0));
         });
@@ -224,12 +227,15 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
 
         it('mints reverts above the limit', async function () {
-            const batchPrice = await this.vendingMachine.totalPrice(new BN(5));
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice});
-            shouldFail.reverting(this.vendingMachine.mintBuilding({from: tokenOwner, value: batchPrice}));
+            let price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            price = await this.vendingMachine.totalPrice();
+            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            shouldFail.reverting(this.vendingMachine.mintBuilding({from: tokenOwner, value: price}));
         });
     });
 
@@ -238,44 +244,8 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         const startingPrice = new BN('75000000000000000');
 
         it('returns total price for one', async function () {
-            const price = await this.vendingMachine.totalPrice(new BN(1));
+            const price = await this.vendingMachine.totalPrice();
             price.should.be.bignumber.equal(startingPrice.add(this.priceStep));
-        });
-
-        it('returns total price for three', async function () {
-            const price = await this.vendingMachine.totalPrice(new BN(3));
-
-            price.should.be.bignumber.equal(startingPrice.add(this.priceStep).mul(new BN(3)));
-        });
-
-        it('returns total price for five', async function () {
-            const price = await this.vendingMachine.totalPrice(new BN(5));
-
-            // 20% off
-            price.should.be.bignumber.equal(startingPrice.add(this.priceStep).mul(new BN(5)).div(new BN(100)).mul(new BN(80)));
-        });
-
-        it('returns total price for ten', async function () {
-            const price = await this.vendingMachine.totalPrice(new BN(10));
-
-            // 30% off
-            price.should.be.bignumber.equal(startingPrice.add(this.priceStep).mul(new BN(10)).div(new BN(100)).mul(new BN(70)));
-        });
-
-        it('adjusts percentage bands', async function () {
-            await this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: creator});
-
-            // 15% off
-            let price = await this.vendingMachine.totalPrice(new BN(5));
-            price.should.be.bignumber.equal(startingPrice.add(this.priceStep).mul(new BN(5)).div(new BN(100)).mul(new BN(85)));
-
-            // 25% off
-            price = await this.vendingMachine.totalPrice(new BN(10));
-            price.should.be.bignumber.equal(startingPrice.add(this.priceStep).mul(new BN(10)).div(new BN(100)).mul(new BN(75)));
-        });
-
-        it('adjusts percentage bands can only be done be owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setPriceDiscountBands([new BN(85), new BN(75)], {from: tokenOwner}));
         });
     });
 
@@ -285,7 +255,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
 
         it('should set if owner', async function () {
-            const priceNow = await this.vendingMachine.totalPrice(new BN(1));
+            const priceNow = await this.vendingMachine.totalPrice();
             const {logs} = await this.vendingMachine.setLastSalePrice(123, {from: creator});
             expectEvent.inLogs(
                 logs,
@@ -425,7 +395,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
     context('ensure only owner can burn', function () {
         beforeEach(async function () {
-            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice();
             const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: currentPrice});
 
             expectEvent.inLogs(
@@ -507,7 +477,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
     context.skip('random buildings to console', function () {
         it('should mint random', async function () {
-            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice();
 
             for (let i = 1; i < 13; i++) {
                 const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: currentPrice});
@@ -544,7 +514,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
     context('should be able to mintBuildingTo() and define the recipient of the building', async function () {
 
         it('mintBuildingTo() succeeds', async function () {
-            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice();
             const _to = tokenOwner;
             const tokenId = new BN(2);
 
@@ -568,7 +538,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const purchaser = whitelisted;
             const overpay = new BN(1000000);
 
-            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice();
             const overpayPrice = currentPrice.add(overpay);
 
             const blockcities = new BN((await web3.eth.getBalance(blockcitiesAccount)));
@@ -610,7 +580,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             // Check only 1 purchase made so far
             (await this.vendingMachine.totalPurchasesInWei()).should.be.bignumber.equal(this.currentPrice);
 
-            const currentPrice = await this.vendingMachine.totalPrice(new BN(1));
+            const currentPrice = await this.vendingMachine.totalPrice();
 
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
@@ -642,17 +612,17 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         it('price adjusts on invocation', async function () {
             const priceStep = await this.vendingMachine.priceStepInWei();
 
-            const priceBeforeTest = await this.vendingMachine.totalPrice(new BN(1));
+            const priceBeforeTest = await this.vendingMachine.totalPrice();
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
 
-            const priceAfterOneStep = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterOneStep = await this.vendingMachine.totalPrice();
             priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
 
             // should move step up once
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
 
-            const priceAfterTwoStep = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterTwoStep = await this.vendingMachine.totalPrice();
             priceAfterTwoStep.should.be.bignumber.equal(priceAfterOneStep.add(priceStep));
 
             const blockStep = await this.vendingMachine.blockStep();
@@ -662,7 +632,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 await this.vendingMachine.addCredit(tokenOwner, {from: creator});
             }
 
-            const priceAfterCooldownOne = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterCooldownOne = await this.vendingMachine.totalPrice();
             priceAfterCooldownOne.should.be.bignumber.equal(priceAfterOneStep);
 
             // advance blockstep
@@ -670,12 +640,12 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 await this.vendingMachine.addCredit(tokenOwner, {from: creator});
             }
 
-            const priceAfterCooldownTwo = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterCooldownTwo = await this.vendingMachine.totalPrice();
             priceAfterCooldownTwo.should.be.bignumber.equal(priceBeforeTest);
 
             await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
 
-            const priceAfterThreeStep = await this.vendingMachine.totalPrice(new BN(1));
+            const priceAfterThreeStep = await this.vendingMachine.totalPrice();
             priceAfterThreeStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
         });
     });
