@@ -2,9 +2,6 @@ pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-import "./generators/IColourGenerator.sol";
-import "./generators/ILogicGenerator.sol";
-
 import "./FundsSplitterV2.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
@@ -63,10 +60,6 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 //        uint256 special;
 //    }
 
-    ILogicGenerator public logicGenerator;
-
-    IColourGenerator public colourGenerator;
-
     IBlockCitiesCreator public blockCities;
 
     mapping(address => uint256) public credits;
@@ -91,16 +84,12 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     mapping(bytes32 => bool) public buildingRegistry;
 
     constructor (
-        ILogicGenerator _logicGenerator,
-        IColourGenerator _colourGenerator,
         IBlockCitiesCreator _blockCities,
         address payable _platform,
         address payable _partnerAddress,
         uint256 _buildingMintLimit,
         uint256 _city
     ) public FundsSplitterV2(_platform, _partnerAddress) {
-        logicGenerator = _logicGenerator;
-        colourGenerator = _colourGenerator;
         blockCities = _blockCities;
 
         lastSaleBlock = block.number;
@@ -134,8 +123,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         // validate building can be built at this time
 
         // check unique and not already built
-        bytes32 buildingHash = keccak256(abi.encode(city, _building, _base, _body, _roof, 0));
-        require(!buildingRegistry[buildingHash], "Building already exists");
+        bytes32 buildingAndColorwayHash = keccak256(abi.encode(city, _building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway));
+        require(!buildingRegistry[buildingAndColorwayHash], "Building already exists");
 
         uint256 tokenId = blockCities.createBuilding(
             _exteriorColorway,
@@ -150,7 +139,7 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         );
 
         // add to registry to avoid dupes
-        buildingRegistry[buildingHash] = true;
+        buildingRegistry[buildingAndColorwayHash] = true;
 
         totalBuildings = totalBuildings.add(1);
 
@@ -158,7 +147,7 @@ contract LimitedVendingMachine is FundsSplitterV2 {
 
         return tokenId;
     }
-    
+
     function _reconcileCreditsAndFunds(uint256 _currentPrice) internal {
         // use credits first
         if (credits[msg.sender] >= 1) {
@@ -254,16 +243,6 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     function setLastSalePrice(uint256 _lastSalePrice) public onlyWhitelisted returns (bool) {
         emit LastSalePriceChanged(lastSalePrice, _lastSalePrice);
         lastSalePrice = _lastSalePrice;
-        return true;
-    }
-
-    function setLogicGenerator(ILogicGenerator _logicGenerator) public onlyWhitelisted returns (bool) {
-        logicGenerator = _logicGenerator;
-        return true;
-    }
-
-    function setColourGenerator(IColourGenerator _colourGenerator) public onlyWhitelisted returns (bool) {
-        colourGenerator = _colourGenerator;
         return true;
     }
 

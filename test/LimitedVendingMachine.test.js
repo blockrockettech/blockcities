@@ -2,9 +2,6 @@ const lodash = require('lodash');
 
 const BlockCities = artifacts.require('BlockCities');
 
-const LogicGenerator = artifacts.require('LogicGenerator');
-const ColourGenerator = artifacts.require('ColourGenerator');
-
 const LimitedVendingMachine = artifacts.require('LimitedVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
@@ -12,6 +9,8 @@ const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-help
 contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const ZERO = new BN(0);
+    const ONE = new BN(1);
+    const TWO = new BN(2);
     const firstTokenId = new BN(1);
 
     const firstURI = 'abc123';
@@ -24,35 +23,8 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
-        // Create generators
-        this.generator = await LogicGenerator.new({from: creator});
-
-        await this.generator.updateCityPercentages([0, 1], {from: creator});
-
-        await this.generator.updateCityMappings(0, [0, 1], {from: creator});
-        await this.generator.updateCityMappings(1, [2, 3], {from: creator});
-
-        await this.generator.updateBuildingBaseMappings(0, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(1, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(2, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBaseMappings(3, [0, 1, 2], {from: creator});
-
-        await this.generator.updateBuildingBodyMappings(0, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(1, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(2, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingBodyMappings(3, [0, 1, 2], {from: creator});
-
-        await this.generator.updateBuildingRoofMappings(0, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(1, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(2, [0, 1, 2], {from: creator});
-        await this.generator.updateBuildingRoofMappings(3, [0, 1, 2], {from: creator});
-
-        this.colourGenerator = await ColourGenerator.new({from: creator});
-
         // Create vending machine
         this.vendingMachine = await LimitedVendingMachine.new(
-            this.generator.address,
-            this.colourGenerator.address,
             this.blockCities.address,
             blockcitiesAccount,
             creator,
@@ -117,14 +89,14 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 _architect,
             } = await this.blockCities.attributes(1);
 
-            _exteriorColorway.should.be.bignumber.gte(new BN(0));
-            _backgroundColorway.should.be.bignumber.gte(new BN(0));
-            _city.should.be.bignumber.gte(new BN(0));
-            _building.should.be.bignumber.gte(new BN(0));
-            _base.should.be.bignumber.gte(new BN(0));
-            _body.should.be.bignumber.gte(new BN(0));
-            _roof.should.be.bignumber.gte(new BN(0));
-            _special.should.be.bignumber.gte(new BN(0));
+            _exteriorColorway.should.be.bignumber.gte(ZERO);
+            _backgroundColorway.should.be.bignumber.gte(ZERO);
+            _city.should.be.bignumber.gte(ZERO);
+            _building.should.be.bignumber.gte(ZERO);
+            _base.should.be.bignumber.gte(ZERO);
+            _body.should.be.bignumber.gte(ZERO);
+            _roof.should.be.bignumber.gte(ZERO);
+            _special.should.be.bignumber.gte(ZERO);
             _architect.should.be.equal(tokenOwner);
         });
 
@@ -147,13 +119,19 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const blockSale = await this.vendingMachine.lastSaleBlock();
             const priceBefore = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: tokenOwner,
+                value: priceBefore
+            });
 
             const priceAfter = await this.vendingMachine.totalPrice();
             priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceAfter.add(priceAfter)});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, TWO, {
+                from: tokenOwner,
+                value: priceAfter.add(priceAfter)
+            });
 
             const priceAfterBatch = await this.vendingMachine.totalPrice();
             priceAfterBatch.should.be.bignumber.equal(priceAfter.add(priceStep));
@@ -163,12 +141,18 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const ceiling = await this.vendingMachine.ceilingPricePerBuildingInWei();
             await this.vendingMachine.setLastSalePrice(ceiling, {from: creator});
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: tokenOwner,
+                value: ceiling
+            });
 
             const priceAfter0 = await this.vendingMachine.totalPrice();
             priceAfter0.should.be.bignumber.equal(ceiling);
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: ceiling});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, TWO, {
+                from: tokenOwner,
+                value: ceiling
+            });
 
             const priceAfter1 = await this.vendingMachine.totalPrice();
             priceAfter1.should.be.bignumber.equal(ceiling);
@@ -182,7 +166,10 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const blockStep = await this.vendingMachine.blockStep();
             const priceBefore = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBefore});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: tokenOwner,
+                value: priceBefore
+            });
 
             const priceAfter = await this.vendingMachine.totalPrice();
 
@@ -218,28 +205,31 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(4));
 
             let price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ONE, ZERO, ZERO, ZERO, {from: tokenOwner, value: price});
 
-            (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(0));
+            (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(ZERO);
         });
 
 
         it('mints reverts above the limit', async function () {
             let price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: price});
-            shouldFail.reverting(this.vendingMachine.mintBuilding({from: tokenOwner, value: price}));
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ONE, ZERO, ZERO, ZERO, {from: tokenOwner, value: price});
+            shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ONE, ZERO, ZERO, ZERO, ZERO, {
+                from: tokenOwner,
+                value: price
+            }));
         });
     });
 
@@ -253,7 +243,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
     });
 
-    context.only('ensure you can\'t mint the same building twice', function () {
+    context('ensure you can\'t mint the same building twice', function () {
         it('mints below the limit', async function () {
             let price = await this.vendingMachine.totalPrice();
             await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, {
@@ -373,44 +363,14 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             );
         });
     });
-
-    context('ensure only owner can change logic generator', function () {
-        beforeEach(async function () {
-            this.newLogicGenerator = await LogicGenerator.new({from: creator});
-        });
-
-        it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: tokenOwner}));
-        });
-
-        it('should set if owner', async function () {
-            await this.vendingMachine.setLogicGenerator(this.newLogicGenerator.address, {from: creator});
-            const newValue = await this.vendingMachine.logicGenerator();
-            newValue.should.be.equal(this.newLogicGenerator.address);
-        });
-    });
-
-    context('ensure only owner can colour generator', function () {
-
-        beforeEach(async function () {
-            this.newColourGenerator = await ColourGenerator.new({from: creator});
-        });
-
-        it('should revert if not owner', async function () {
-            await shouldFail.reverting(this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: tokenOwner}));
-        });
-
-        it('should set if owner', async function () {
-            await this.vendingMachine.setColourGenerator(this.newColourGenerator.address, {from: creator});
-            const newValue = await this.vendingMachine.colourGenerator();
-            newValue.should.be.equal(this.newColourGenerator.address);
-        });
-    });
-
+    
     context('ensure only owner can burn', function () {
         beforeEach(async function () {
             const currentPrice = await this.vendingMachine.totalPrice();
-            const {logs} = await this.vendingMachine.mintBuilding({from: tokenOwner, value: currentPrice});
+            const {logs} = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: tokenOwner,
+                value: currentPrice
+            });
 
             expectEvent.inLogs(
                 logs,
@@ -453,7 +413,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
     context('ensure can not mint with less than minimum purchase value', function () {
         it('should revert if not enough payable', async function () {
-            await shouldFail.reverting(this.vendingMachine.mintBuilding({
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
                 from: tokenOwner,
                 value: 0
             }));
@@ -462,7 +422,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
     context('credits', function () {
         it('should fail if no credit and no value', async function () {
-            await shouldFail.reverting(this.vendingMachine.mintBuilding({
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
                 from: tokenOwner,
                 value: 0
             }));
@@ -478,7 +438,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
                 }
             );
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: 0});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: 0});
         });
     });
 
@@ -487,7 +447,10 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const currentPrice = await this.vendingMachine.totalPrice();
 
             for (let i = 1; i < 13; i++) {
-                const tokenId = await this.vendingMachine.mintBuilding({from: accounts[i], value: currentPrice});
+                const tokenId = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                    from: accounts[i],
+                    value: currentPrice
+                });
                 const attrs = await this.blockCities.attributes(tokenId, {from: accounts[i]});
                 console.log(`
                     ID: ${tokenId},
@@ -531,7 +494,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const partner = new BN((await web3.eth.getBalance(creator)));
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
-            const receipt = await this.vendingMachine.mintBuilding({
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{
                 from: purchaser,
                 value: overpayPrice
             });
@@ -571,7 +534,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
             // send msg.value even though we have credits
-            const receipt = await this.vendingMachine.mintBuilding({
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{
                 from: purchaser,
                 value: currentPrice
             });
@@ -600,13 +563,13 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
             const priceBeforeTest = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{from: tokenOwner, value: priceBeforeTest});
 
             const priceAfterOneStep = await this.vendingMachine.totalPrice();
             priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO,{from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
 
             const priceAfterTwoStep = await this.vendingMachine.totalPrice();
             priceAfterTwoStep.should.be.bignumber.equal(priceAfterOneStep.add(priceStep));
@@ -629,7 +592,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             const priceAfterCooldownTwo = await this.vendingMachine.totalPrice();
             priceAfterCooldownTwo.should.be.bignumber.equal(priceBeforeTest);
 
-            await this.vendingMachine.mintBuilding({from: tokenOwner, value: priceBeforeTest});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO,{from: tokenOwner, value: priceBeforeTest});
 
             const priceAfterThreeStep = await this.vendingMachine.totalPrice();
             priceAfterThreeStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));

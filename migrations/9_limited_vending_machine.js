@@ -4,13 +4,7 @@ const { INFURA_KEY } = require('../constants');
 const LimitedVendingMachine = artifacts.require('./LimitedVendingMachine.sol');
 const BlockCities = artifacts.require('./BlockCities.sol');
 
-const LogicGeneratorV3 = artifacts.require('./LogicGeneratorV3.sol');
-const ColourGeneratorV2 = artifacts.require('./ColourGeneratorV2.sol');
-
 module.exports = async function (deployer, network, accounts) {
-    const _logicGenerator = await LogicGeneratorV3.deployed();
-    const _colourGenerator = await ColourGeneratorV2.deployed();
-
     const _blockCities = await BlockCities.deployed();
 
     let _owner = accounts[0];
@@ -29,13 +23,11 @@ module.exports = async function (deployer, network, accounts) {
 
     // Deploy vending machine
     await deployer.deploy(LimitedVendingMachine,
-        _logicGenerator.address,    // randomiser
-        _colourGenerator.address,   // randomiser
         _blockCities.address,       // 721
         preston,
         _owner,                                       // BR
         buildingMintLimit,
-        0,
+        0, // city
         {
             from: _owner
         });
