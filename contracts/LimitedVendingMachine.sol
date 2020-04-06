@@ -110,19 +110,7 @@ contract LimitedVendingMachine is FundsSplitterV2 {
     }
 
     function mintBuilding() public payable returns (uint256 _tokenId) {
-        uint256 currentPrice = totalPrice(1);
-        require(
-            credits[msg.sender] > 0 || msg.value >= currentPrice,
-            "Must supply at least the required minimum purchase value or have credit"
-        );
-
-        _reconcileCreditsAndFunds(currentPrice, 1);
-
-        uint256 tokenId = _generate(msg.sender);
-
-        _stepIncrease();
-
-        return tokenId;
+        mintBuildingTo(msg.sender);
     }
 
     function mintBuildingTo(address _to) public payable returns (uint256 _tokenId) {
@@ -141,51 +129,14 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         return tokenId;
     }
 
-    function mintBatch(uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
-        uint256 currentPrice = totalPrice(_numberOfBuildings);
-        require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
-            "Must supply at least the required minimum purchase value or have credit"
-        );
-
-        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
-
-        uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
-
-        for (uint i = 0; i < _numberOfBuildings; i++) {
-            generatedTokenIds[i] = _generate(msg.sender);
-        }
-
-        _stepIncrease();
-
-        return generatedTokenIds;
-    }
-
-    function mintBatchTo(address _to, uint256 _numberOfBuildings) public payable returns (uint256[] memory _tokenIds) {
-        uint256 currentPrice = totalPrice(_numberOfBuildings);
-        require(
-            credits[msg.sender] >= _numberOfBuildings || msg.value >= currentPrice,
-            "Must supply at least the required minimum purchase value or have credit"
-        );
-
-        _reconcileCreditsAndFunds(currentPrice, _numberOfBuildings);
-
-        uint256[] memory generatedTokenIds = new uint256[](_numberOfBuildings);
-
-        for (uint i = 0; i < _numberOfBuildings; i++) {
-            generatedTokenIds[i] = _generate(_to);
-        }
-
-        _stepIncrease();
-
-        return generatedTokenIds;
-    }
-
     function _generate(address _to) internal returns (uint256 _tokenId) {
         require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
         Building memory building = _generateBuilding();
         Colour memory colour = _generateColours();
+
+        // check unique
+        bytes32 buildingHash = keccak256(abi.encode(building.city, building.building, building.base, building.body, building.roof, building.special));
 
         uint256 tokenId = blockCities.createBuilding(
             colour.exteriorColorway,
@@ -198,6 +149,8 @@ contract LimitedVendingMachine is FundsSplitterV2 {
             building.special,
             _to
         );
+
+        // add to registry to avoid dupes
 
         totalBuildings = totalBuildings.add(1);
 
