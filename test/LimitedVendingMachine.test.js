@@ -363,7 +363,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             );
         });
     });
-    
+
     context('ensure only owner can burn', function () {
         beforeEach(async function () {
             const currentPrice = await this.vendingMachine.totalPrice();
@@ -439,45 +439,6 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
             );
 
             await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: 0});
-        });
-    });
-
-    context.skip('random buildings to console', function () {
-        it('should mint random', async function () {
-            const currentPrice = await this.vendingMachine.totalPrice();
-
-            for (let i = 1; i < 13; i++) {
-                const tokenId = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
-                    from: accounts[i],
-                    value: currentPrice
-                });
-                const attrs = await this.blockCities.attributes(tokenId, {from: accounts[i]});
-                console.log(`
-                    ID: ${tokenId},
-                    _exteriorColorway: ${attrs[0].toString()},
-                    _windowColorway: ${attrs[1].toString()},
-                    _city: ${attrs[2].toString()},
-                    _base: ${attrs[3].toString()},
-                    _body: ${attrs[4].toString()},
-                    _roof: ${attrs[5].toString()},
-                    _special: ${attrs[6].toString()},
-                    _architect: ${attrs[7].toString()},
-                `);
-            }
-        });
-    });
-
-    // FIXME - should be in BlockCities test file - create one
-    context('ensure whitelisted can update base token URI', function () {
-        it('should revert if not whitelisted', async function () {
-            await shouldFail.reverting(this.blockCities.updateTokenBaseURI(firstURI, {from: tokenOwner}));
-        });
-
-        it('should allow if whitelisted', async function () {
-            await this.blockCities.updateTokenBaseURI(firstURI, {from: whitelisted});
-
-            const base = await this.blockCities.tokenBaseURI();
-            base.should.be.equal(firstURI);
         });
     });
 
@@ -596,6 +557,26 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
 
             const priceAfterThreeStep = await this.vendingMachine.totalPrice();
             priceAfterThreeStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
+        });
+    });
+
+    context.only('pausing minting', function () {
+        const purchaser = whitelisted;
+
+        it('reverts mint when contract is paused', async function () {
+            await this.vendingMachine.pause({from: creator});
+
+            const price = await this.vendingMachine.totalPrice();
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: purchaser,
+                value: price
+            }));
+
+            await this.vendingMachine.unpause({from: creator});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: purchaser,
+                value: price
+            })
         });
     });
 

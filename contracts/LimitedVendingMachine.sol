@@ -1,12 +1,13 @@
 pragma solidity ^0.5.0;
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 import "./FundsSplitterV2.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
 
-contract LimitedVendingMachine is FundsSplitterV2 {
+contract LimitedVendingMachine is FundsSplitterV2, Pausable {
     using SafeMath for uint256;
 
     event VendingMachineTriggered(
@@ -101,7 +102,14 @@ contract LimitedVendingMachine is FundsSplitterV2 {
         city = _city;
     }
 
-    function mintBuilding(uint256 _building, uint256 _base, uint256 _body, uint256 _roof,  uint256 _exteriorColorway, uint256 _backgroundColorway) public payable returns (uint256 _tokenId) {
+    function mintBuilding(
+        uint256 _building,
+        uint256 _base,
+        uint256 _body,
+        uint256 _roof,
+        uint256 _exteriorColorway,
+        uint256 _backgroundColorway
+    ) whenNotPaused public payable returns (uint256 _tokenId) {
         uint256 currentPrice = totalPrice();
         require(
             credits[msg.sender] > 0 || msg.value >= currentPrice,
