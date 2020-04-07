@@ -118,20 +118,63 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
 
         _reconcileCreditsAndFunds(currentPrice);
 
-        uint256 tokenId = _generate(_building, _base, _body, _roof, _exteriorColorway, _backgroundColorway);
+        // always pass a special value of zero; as specials created via own function
+        uint256 tokenId = _generate(_building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway);
 
         _stepIncrease();
 
         return tokenId;
     }
 
-    function _generate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _exteriorColorway, uint256 _backgroundColorway) internal returns (uint256 _tokenId) {
+    function mintSpecial(
+        uint256 _special
+    ) onlyWhitelisted public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice();
+        require(
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
+            "Must supply at least the required minimum purchase value or have credit"
+        );
+
+        _reconcileCreditsAndFunds(currentPrice);
+
+        uint256 tokenId = _generate(0, 0, 0, 0, _special, 0, 0);
+
+        _stepIncrease();
+
+        return tokenId;
+    }
+
+    function premintBuilding(
+        uint256 _building,
+        uint256 _base,
+        uint256 _body,
+        uint256 _roof,
+        uint256 _exteriorColorway,
+        uint256 _backgroundColorway
+    ) onlyWhitelisted public payable returns (uint256 _tokenId) {
+        uint256 currentPrice = totalPrice();
+        require(
+            credits[msg.sender] > 0 || msg.value >= currentPrice,
+            "Must supply at least the required minimum purchase value or have credit"
+        );
+
+        _reconcileCreditsAndFunds(currentPrice);
+
+        // always pass a special value of zero; as specials created via own function
+        uint256 tokenId = _generate(_building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway);
+
+        _stepIncrease();
+
+        return tokenId;
+    }
+
+    function _generate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special, uint256 _exteriorColorway, uint256 _backgroundColorway) internal returns (uint256 _tokenId) {
         require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
         // validate building can be built at this time
 
         // check unique and not already built
-        bytes32 buildingAndColorwayHash = keccak256(abi.encode(city, _building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway));
+        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway, _backgroundColorway));
         require(!buildingRegistry[buildingAndColorwayHash], "Building already exists");
 
         uint256 tokenId = blockCities.createBuilding(
@@ -142,7 +185,7 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
             _base,
             _body,
             _roof,
-            0,
+            _special,
             msg.sender
         );
 

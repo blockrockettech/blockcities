@@ -127,3 +127,4 @@ contract LogicGeneratorV3 is ILogicGenerator {
         return buildingRoofMappings[_building];
     }
 }
+

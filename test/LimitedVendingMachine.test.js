@@ -6,7 +6,7 @@ const LimitedVendingMachine = artifacts.require('LimitedVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const ZERO = new BN(0);
     const ONE = new BN(1);
@@ -560,7 +560,7 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         });
     });
 
-    context.only('pausing minting', function () {
+    context('pausing minting', function () {
         const purchaser = whitelisted;
 
         it('reverts mint when contract is paused', async function () {
