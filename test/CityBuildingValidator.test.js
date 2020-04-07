@@ -17,7 +17,7 @@ contract.only('CityBuildingValidator tests', (accounts) => {
     before(async function () {
         this.validator = await CityBuildingValidator.new(platform, ZERO, {from: creator});
 
-        await this.validator.updateCityMappings(ZERO, [ZERO, ONE], {from: creator});
+        await this.validator.updateBuildingMappings(ZERO, [ZERO, ONE], {from: creator});
 
         await this.validator.updateBuildingBaseMappings(ZERO, ZERO, [ZERO, ONE], {from: creator});
         await this.validator.updateBuildingBaseMappings(ZERO, ONE, [ONE], {from: creator});

@@ -1,10 +1,13 @@
 pragma solidity ^0.5.0;
 
-contract CityBuildingValidator {
+import "./IValidator.sol";
 
-    uint256 city;
+contract CityBuildingValidator is IValidator {
 
-    mapping(uint256 => uint256[]) public cityMappings;
+    uint256 public city;
+    uint256 public rotation;
+
+    mapping(uint256 => uint256[]) public buildingMappings;
     mapping(uint256 => mapping(uint256 => uint256[])) public buildingBaseMappings;
     mapping(uint256 => mapping(uint256 => uint256[])) public buildingBodyMappings;
     mapping(uint256 => mapping(uint256 => uint256[])) public buildingRoofMappings;
@@ -24,14 +27,8 @@ contract CityBuildingValidator {
         city = _city;
     }
 
-    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof)
-    public view
-    returns (bool) {
-        //        bytes32 hash = blockhash(block.number);
-
-        uint256 rotation = 0;
-
-        uint256[] memory buildingOptions = cityMappings[rotation];
+    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof) external view returns (bool) {
+        uint256[] memory buildingOptions = buildingMappings[rotation];
         if (!contains(buildingOptions, _building)) {
             return false;
         }
@@ -67,8 +64,12 @@ contract CityBuildingValidator {
         return found;
     }
 
-    function updateCityMappings(uint256 _rotation, uint256[] memory _params) public onlyPlatformOrPartner {
-        cityMappings[_rotation] = _params;
+    function updateRotation(uint256 _rotation) public onlyPlatformOrPartner {
+       rotation = _rotation;
+    }
+
+    function updateBuildingMappings(uint256 _rotation, uint256[] memory _params) public onlyPlatformOrPartner {
+        buildingMappings[_rotation] = _params;
     }
 
     function updateBuildingBaseMappings(uint256 _rotation, uint256 _building, uint256[] memory _params) public onlyPlatformOrPartner {
@@ -82,17 +83,25 @@ contract CityBuildingValidator {
     function updateBuildingRoofMappings(uint256 _rotation, uint256 _building, uint256[] memory _params) public onlyPlatformOrPartner {
         buildingRoofMappings[_rotation][_building] = _params;
     }
-    //
-    //    function buildingBaseMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingBaseMappings) {
-    //        return buildingBaseMappings[_building];
-    //    }
-    //
-    //    function buildingBodyMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingBodyMappings) {
-    //        return buildingBodyMappings[_building];
-    //    }
-    //
-    //    function buildingRoofMappingsArray(uint256 _building) public view returns (uint256[] memory _buildingRoofMappings) {
-    //        return buildingRoofMappings[_building];
-    //    }
+
+    function buildingMappingsArray() public view returns (uint256[] memory) {
+        return buildingMappings[rotation];
+    }
+
+    function buildingBaseMappingsArray(uint256 _building) public view returns (uint256[] memory) {
+        return buildingBaseMappings[rotation][_building];
+    }
+
+    function buildingBodyMappingsArray(uint256 _building) public view returns (uint256[] memory) {
+        return buildingBodyMappings[rotation][_building];
+    }
+
+    function buildingRoofMappingsArray(uint256 _building) public view returns (uint256[] memory) {
+        return buildingRoofMappings[rotation][_building];
+    }
+
+    function currentRotation() public view returns (uint256) {
+        return rotation;
+    }
 }
 

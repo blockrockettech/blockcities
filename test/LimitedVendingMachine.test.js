@@ -2,11 +2,12 @@ const lodash = require('lodash');
 
 const BlockCities = artifacts.require('BlockCities');
 
+const CityBuildingValidator = artifacts.require('CityBuildingValidator');
 const LimitedVendingMachine = artifacts.require('LimitedVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const ZERO = new BN(0);
     const ONE = new BN(1);
@@ -18,18 +19,29 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
     const buildingMintLimit = new BN(5);
 
+    const city = ZERO;
+
     beforeEach(async function () {
 
         // Create 721 contract
         this.blockCities = await BlockCities.new(baseURI, {from: creator});
 
+        // Create 721 contract
+        this.cityBuildingValidator = await CityBuildingValidator.new(blockcitiesAccount, city, {from: creator});
+        await this.cityBuildingValidator.updateBuildingMappings(ZERO, [ZERO], {from: creator});
+        await this.cityBuildingValidator.updateBuildingBaseMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
+        await this.cityBuildingValidator.updateBuildingBodyMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
+        await this.cityBuildingValidator.updateBuildingRoofMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
+
+
         // Create vending machine
         this.vendingMachine = await LimitedVendingMachine.new(
             this.blockCities.address,
+            this.cityBuildingValidator.address,
             blockcitiesAccount,
             creator,
             buildingMintLimit,
-            ZERO,
+            city,
             {
                 from: creator
             }

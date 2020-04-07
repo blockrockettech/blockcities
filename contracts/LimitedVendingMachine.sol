@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "./FundsSplitterV2.sol";
 import "./libs/Strings.sol";
 import "./IBlockCitiesCreator.sol";
+import "./validators/IValidator.sol";
 
 contract LimitedVendingMachine is FundsSplitterV2, Pausable {
     using SafeMath for uint256;
@@ -62,6 +63,7 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
 //    }
 
     IBlockCitiesCreator public blockCities;
+    IValidator public validator;
 
     mapping(address => uint256) public credits;
 
@@ -86,12 +88,14 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
 
     constructor (
         IBlockCitiesCreator _blockCities,
+        IValidator _validator,
         address payable _platform,
         address payable _partnerAddress,
         uint256 _buildingMintLimit,
         uint256 _city
     ) public FundsSplitterV2(_platform, _partnerAddress) {
         blockCities = _blockCities;
+        validator = _validator;
 
         lastSaleBlock = block.number;
 
@@ -168,10 +172,20 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         return tokenId;
     }
 
-    function _generate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special, uint256 _exteriorColorway, uint256 _backgroundColorway) internal returns (uint256 _tokenId) {
+    function _generate(
+        uint256 _building,
+        uint256 _base,
+        uint256 _body,
+        uint256 _roof,
+        uint256 _special,
+        uint256 _exteriorColorway,
+        uint256 _backgroundColorway
+    ) internal returns (uint256 _tokenId) {
         require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
         // validate building can be built at this time
+        bool valid = validator.validate(_building, _base, _body, _roof);
+        require(valid, "Building must be valid");
 
         // check unique and not already built
         bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway, _backgroundColorway));
@@ -197,6 +211,11 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         emit VendingMachineTriggered(tokenId, msg.sender);
 
         return tokenId;
+    }
+
+    function built(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special, uint256 _exteriorColorway, uint256 _backgroundColorway) public view returns (bool) {
+        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway, _backgroundColorway));
+        return buildingRegistry[buildingAndColorwayHash];
     }
 
     function _reconcileCreditsAndFunds(uint256 _currentPrice) internal {
