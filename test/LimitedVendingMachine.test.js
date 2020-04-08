@@ -465,7 +465,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const partner = new BN((await web3.eth.getBalance(creator)));
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
-            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
                 from: purchaser,
                 value: overpayPrice
             });
@@ -505,7 +505,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
             // send msg.value even though we have credits
-            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
                 from: purchaser,
                 value: currentPrice
             });
@@ -534,13 +534,19 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
             const priceBeforeTest = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE,{from: tokenOwner, value: priceBeforeTest});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: tokenOwner,
+                value: priceBeforeTest
+            });
 
             const priceAfterOneStep = await this.vendingMachine.totalPrice();
             priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO,{from: tokenOwner, value: priceAfterOneStep.add(priceAfterOneStep)});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {
+                from: tokenOwner,
+                value: priceAfterOneStep.add(priceAfterOneStep)
+            });
 
             const priceAfterTwoStep = await this.vendingMachine.totalPrice();
             priceAfterTwoStep.should.be.bignumber.equal(priceAfterOneStep.add(priceStep));
@@ -563,7 +569,10 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const priceAfterCooldownTwo = await this.vendingMachine.totalPrice();
             priceAfterCooldownTwo.should.be.bignumber.equal(priceBeforeTest);
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO,{from: tokenOwner, value: priceBeforeTest});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO, {
+                from: tokenOwner,
+                value: priceBeforeTest
+            });
 
             const priceAfterThreeStep = await this.vendingMachine.totalPrice();
             priceAfterThreeStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
@@ -586,7 +595,37 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
                 from: purchaser,
                 value: price
-            })
+            });
+        });
+    });
+
+    context('pre-minting', function () {
+        it('must be whitelisted to pre-mint', async function () {
+            let price = await this.vendingMachine.totalPrice();
+            await shouldFail.reverting(this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+                from: anyone,
+                value: price
+            }));
+
+            const count = await this.vendingMachine.totalBuildings();
+            await this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: creator});
+            const postCount = await this.vendingMachine.totalBuildings();
+            postCount.should.be.bignumber.equal(count.add(ONE));
+        });
+    });
+
+    context('mint special', function () {
+        it('must be whitelisted to mint special', async function () {
+            let price = await this.vendingMachine.totalPrice();
+            await shouldFail.reverting(this.vendingMachine.mintSpecial(ZERO, {
+                from: anyone,
+                value: price
+            }));
+
+            const count = await this.vendingMachine.totalBuildings();
+            await this.vendingMachine.mintSpecial(ZERO, {from: creator});
+            const postCount = await this.vendingMachine.totalBuildings();
+            postCount.should.be.bignumber.equal(count.add(ONE));
         });
     });
 

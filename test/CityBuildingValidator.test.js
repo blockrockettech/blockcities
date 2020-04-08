@@ -4,7 +4,7 @@ const CityBuildingValidator = artifacts.require('CityBuildingValidator');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('CityBuildingValidator tests', (accounts) => {
+contract('CityBuildingValidator tests', (accounts) => {
 
     const other = accounts[3];
     const platform = accounts[2];

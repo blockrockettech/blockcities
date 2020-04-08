@@ -48,20 +48,6 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         uint256 _newLastSalePrice
     );
 
-//    struct Colour {
-//        uint256 exteriorColorway;
-//        uint256 backgroundColorway;
-//    }
-//
-//    struct Building {
-//        uint256 city;
-//        uint256 building;
-//        uint256 base;
-//        uint256 body;
-//        uint256 roof;
-//        uint256 special;
-//    }
-
     IBlockCitiesCreator public blockCities;
     IValidator public validator;
 
@@ -132,18 +118,24 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
 
     function mintSpecial(
         uint256 _special
-    ) onlyWhitelisted public payable returns (uint256 _tokenId) {
-        uint256 currentPrice = totalPrice();
-        require(
-            credits[msg.sender] > 0 || msg.value >= currentPrice,
-            "Must supply at least the required minimum purchase value or have credit"
+    ) onlyWhitelisted public returns (uint256 _tokenId) {
+        require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
+
+        uint256 tokenId = blockCities.createBuilding(
+            0,
+            0,
+            city,
+            0,
+            0,
+            0,
+            0,
+            _special,
+            msg.sender
         );
 
-        _reconcileCreditsAndFunds(currentPrice);
+        totalBuildings = totalBuildings.add(1);
 
-        uint256 tokenId = _generate(0, 0, 0, 0, _special, 0, 0);
-
-        _stepIncrease();
+        emit VendingMachineTriggered(tokenId, msg.sender);
 
         return tokenId;
     }
@@ -155,21 +147,9 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         uint256 _roof,
         uint256 _exteriorColorway,
         uint256 _backgroundColorway
-    ) onlyWhitelisted public payable returns (uint256 _tokenId) {
-        uint256 currentPrice = totalPrice();
-        require(
-            credits[msg.sender] > 0 || msg.value >= currentPrice,
-            "Must supply at least the required minimum purchase value or have credit"
-        );
-
-        _reconcileCreditsAndFunds(currentPrice);
-
+    ) onlyWhitelisted public returns (uint256 _tokenId) {
         // always pass a special value of zero; as specials created via own function
-        uint256 tokenId = _generate(_building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway);
-
-        _stepIncrease();
-
-        return tokenId;
+        return _generate(_building, _base, _body, _roof, 0, _exteriorColorway, _backgroundColorway);
     }
 
     function _generate(
