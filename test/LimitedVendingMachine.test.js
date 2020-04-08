@@ -7,14 +7,13 @@ const LimitedVendingMachine = artifacts.require('LimitedVendingMachine');
 
 const {BN, constants, expectEvent, shouldFail} = require('openzeppelin-test-helpers');
 
-contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
+contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelisted, blockcitiesAccount, ...accounts]) => {
 
     const ZERO = new BN(0);
     const ONE = new BN(1);
     const TWO = new BN(2);
     const firstTokenId = new BN(1);
 
-    const firstURI = 'abc123';
     const baseURI = 'https://api.blockcities.co/';
 
     const buildingMintLimit = new BN(5);
@@ -32,7 +31,6 @@ contract.only('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whi
         await this.cityBuildingValidator.updateBuildingBaseMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
         await this.cityBuildingValidator.updateBuildingBodyMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
         await this.cityBuildingValidator.updateBuildingRoofMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
-
 
         // Create vending machine
         this.vendingMachine = await LimitedVendingMachine.new(
