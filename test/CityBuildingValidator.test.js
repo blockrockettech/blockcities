@@ -19,6 +19,7 @@ contract('CityBuildingValidator tests', (accounts) => {
         this.validator = await CityBuildingValidator.new(platform, ZERO, {from: creator});
 
         await this.validator.updateBuildingMappings(ZERO, [ZERO, ONE], {from: creator});
+        await this.validator.updateExteriorMappings(ZERO, [ZERO, ONE], {from: creator});
 
         await this.validator.updateBuildingBaseMappings(ZERO, ZERO, [ZERO, ONE], {from: creator});
         await this.validator.updateBuildingBaseMappings(ZERO, ONE, [ONE], {from: creator});
@@ -32,19 +33,19 @@ contract('CityBuildingValidator tests', (accounts) => {
 
     context('validate buildings', function () {
         it('only valid buildings for rotation should return true', async function () {
-            let res = await this.validator.validate(ZERO, ZERO, ZERO, ZERO, {from: creator});
+            let res = await this.validator.validate(ZERO, ZERO, ZERO, ZERO, ZERO, {from: creator});
             res.should.be.equal(true);
 
-            res = await this.validator.validate(ZERO, ONE, ONE, ONE, {from: creator});
+            res = await this.validator.validate(ZERO, ONE, ONE, ONE, ZERO, {from: creator});
             res.should.be.equal(true);
 
-            res = await this.validator.validate(ZERO, TWO, ONE, ONE, {from: creator});
+            res = await this.validator.validate(ZERO, TWO, ONE, ONE, ZERO, {from: creator});
             res.should.be.equal(false);
 
-            res = await this.validator.validate(ZERO, ONE, TWO, ONE, {from: creator});
+            res = await this.validator.validate(ZERO, ONE, TWO, ONE, ZERO, {from: creator});
             res.should.be.equal(false);
 
-            res = await this.validator.validate(ZERO, ONE, ONE, TWO, {from: creator});
+            res = await this.validator.validate(ZERO, ONE, ONE, TWO, ZERO, {from: creator});
             res.should.be.equal(false);
         });
     });

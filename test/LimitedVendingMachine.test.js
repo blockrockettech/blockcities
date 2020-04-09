@@ -28,6 +28,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
         // Create 721 contract
         this.cityBuildingValidator = await CityBuildingValidator.new(blockcitiesAccount, city, {from: creator});
         await this.cityBuildingValidator.updateBuildingMappings(ZERO, [ZERO], {from: creator});
+        await this.cityBuildingValidator.updateExteriorMappings(ZERO, [ZERO, ONE, TWO], {from: creator});
         await this.cityBuildingValidator.updateBuildingBaseMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
         await this.cityBuildingValidator.updateBuildingBodyMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
         await this.cityBuildingValidator.updateBuildingRoofMappings(ZERO, ZERO, [ZERO, ONE, TWO], {from: creator});
@@ -129,7 +130,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const blockSale = await this.vendingMachine.lastSaleBlock();
             const priceBefore = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: priceBefore
             });
@@ -138,7 +139,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             priceAfter.should.be.bignumber.equal(priceBefore.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, TWO, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ONE, TWO, {
                 from: tokenOwner,
                 value: priceAfter.add(priceAfter)
             });
@@ -151,7 +152,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const ceiling = await this.vendingMachine.ceilingPricePerBuildingInWei();
             await this.vendingMachine.setLastSalePrice(ceiling, {from: creator});
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: ceiling
             });
@@ -159,7 +160,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const priceAfter0 = await this.vendingMachine.totalPrice();
             priceAfter0.should.be.bignumber.equal(ceiling);
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, TWO, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ONE, TWO, {
                 from: tokenOwner,
                 value: ceiling
             });
@@ -176,7 +177,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const blockStep = await this.vendingMachine.blockStep();
             const priceBefore = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: priceBefore
             });
@@ -215,7 +216,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             (await this.vendingMachine.buildingsMintAllowanceRemaining()).should.be.bignumber.equal(new BN(4));
 
             let price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ONE, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
             await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
@@ -229,7 +230,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
         it('mints reverts above the limit', async function () {
             let price = await this.vendingMachine.totalPrice();
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
+            await this.vendingMachine.mintBuilding(ZERO, ONE, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
             await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {from: tokenOwner, value: price});
             price = await this.vendingMachine.totalPrice();
@@ -377,7 +378,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
     context('ensure only owner can burn', function () {
         beforeEach(async function () {
             const currentPrice = await this.vendingMachine.totalPrice();
-            const {logs} = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            const {logs} = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: currentPrice
             });
@@ -423,7 +424,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
     context('ensure can not mint with less than minimum purchase value', function () {
         it('should revert if not enough payable', async function () {
-            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: 0
             }));
@@ -432,7 +433,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
     context('credits', function () {
         it('should fail if no credit and no value', async function () {
-            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: 0
             }));
@@ -448,7 +449,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
                 }
             );
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: tokenOwner, value: 0});
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {from: tokenOwner, value: 0});
         });
     });
 
@@ -465,7 +466,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const partner = new BN((await web3.eth.getBalance(creator)));
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
-            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: purchaser,
                 value: overpayPrice
             });
@@ -505,7 +506,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const purchaserBalanceBefore = new BN((await web3.eth.getBalance(purchaser)));
 
             // send msg.value even though we have credits
-            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            const receipt = await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: purchaser,
                 value: currentPrice
             });
@@ -534,7 +535,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
 
             const priceBeforeTest = await this.vendingMachine.totalPrice();
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: tokenOwner,
                 value: priceBeforeTest
             });
@@ -543,7 +544,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             priceAfterOneStep.should.be.bignumber.equal(priceBeforeTest.add(priceStep));
 
             // should move step up once
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ZERO, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ONE, ZERO, {
                 from: tokenOwner,
                 value: priceAfterOneStep.add(priceAfterOneStep)
             });
@@ -569,7 +570,7 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             const priceAfterCooldownTwo = await this.vendingMachine.totalPrice();
             priceAfterCooldownTwo.should.be.bignumber.equal(priceBeforeTest);
 
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ZERO, ZERO, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ONE, ONE, ZERO, ZERO, {
                 from: tokenOwner,
                 value: priceBeforeTest
             });
@@ -586,13 +587,13 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
             await this.vendingMachine.pause({from: creator});
 
             const price = await this.vendingMachine.totalPrice();
-            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await shouldFail.reverting(this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: purchaser,
                 value: price
             }));
 
             await this.vendingMachine.unpause({from: creator});
-            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await this.vendingMachine.mintBuilding(ZERO, ZERO, ZERO, ONE, ONE, ONE, {
                 from: purchaser,
                 value: price
             });
@@ -602,13 +603,13 @@ contract('LimitedVendingMachineTest', ([_, creator, tokenOwner, anyone, whitelis
     context('pre-minting', function () {
         it('must be whitelisted to pre-mint', async function () {
             let price = await this.vendingMachine.totalPrice();
-            await shouldFail.reverting(this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {
+            await shouldFail.reverting(this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ZERO, ONE, ONE, {
                 from: anyone,
                 value: price
             }));
 
             const count = await this.vendingMachine.totalBuildings();
-            await this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ZERO, ZERO, ONE, {from: creator});
+            await this.vendingMachine.premintBuilding(ZERO, ZERO, ZERO, ONE, ONE, ONE, {from: creator});
             const postCount = await this.vendingMachine.totalBuildings();
             postCount.should.be.bignumber.equal(count.add(ONE));
         });
