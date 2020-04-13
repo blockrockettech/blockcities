@@ -193,8 +193,8 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         return tokenId;
     }
 
-    function built(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special, uint256 _exteriorColorway, uint256 _backgroundColorway) public view returns (bool) {
-        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway, _backgroundColorway));
+    function built(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _special, uint256 _exteriorColorway) public view returns (bool) {
+        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway));
         return buildingRegistry[buildingAndColorwayHash];
     }
 

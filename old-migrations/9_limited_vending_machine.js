@@ -1,6 +1,7 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const {INFURA_KEY} = require('../constants');
 
+const BlockCities = artifacts.require('./BlockCities.sol');
 const CityBuildingValidator = artifacts.require('./CityBuildingValidator.sol');
 const LimitedVendingMachine = artifacts.require('./LimitedVendingMachine.sol');
 
@@ -23,9 +24,10 @@ module.exports = async function (deployer, network, accounts) {
 
     await deployer.deploy(CityBuildingValidator, preston, city, {from: _owner});
 
+
     // Deploy vending machine
     await deployer.deploy(LimitedVendingMachine,
-        "0x74b8D7E2b681d1C4f13bd8722937A722bCc7A4F3",       // 721
+        BlockCities.address,       // 721
         CityBuildingValidator.address,
         preston,
         _owner,                                       // BR
@@ -38,7 +40,7 @@ module.exports = async function (deployer, network, accounts) {
     console.log(`LimitedVendingMachine address ${LimitedVendingMachine.address}`);
 
     // const _limitedVendingMachine = await LimitedVendingMachine.deployed();
-
+    //
     // // Whitelist vending machine in the core contract
     // await _blockCities.addWhitelisted(_limitedVendingMachine.address, {from: _owner});
     //

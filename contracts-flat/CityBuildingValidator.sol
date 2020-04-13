@@ -4,7 +4,7 @@
 pragma solidity ^0.5.0;
 
 interface IValidator {
-    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof) external view returns (bool);
+    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _exterior) external view returns (bool);
 }
 
 // File: contracts/validators/CityBuildingValidator.sol
@@ -22,6 +22,8 @@ contract CityBuildingValidator is IValidator {
     mapping(uint256 => mapping(uint256 => uint256[])) public buildingBodyMappings;
     mapping(uint256 => mapping(uint256 => uint256[])) public buildingRoofMappings;
 
+    mapping(uint256 => uint256[]) public exteriorMappings;
+
     address payable public platform;
     address payable public partner;
 
@@ -37,7 +39,7 @@ contract CityBuildingValidator is IValidator {
         city = _city;
     }
 
-    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof) external view returns (bool) {
+    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _exterior) external view returns (bool) {
         uint256[] memory buildingOptions = buildingMappings[rotation];
         if (!contains(buildingOptions, _building)) {
             return false;
@@ -55,6 +57,11 @@ contract CityBuildingValidator is IValidator {
 
         uint256[] memory roofOptions = buildingRoofMappings[rotation][_building];
         if (!contains(roofOptions, _roof)) {
+            return false;
+        }
+
+        uint256[] memory exteriorOptions = exteriorMappings[rotation];
+        if (!contains(exteriorOptions, _exterior)) {
             return false;
         }
 
@@ -94,6 +101,10 @@ contract CityBuildingValidator is IValidator {
         buildingRoofMappings[_rotation][_building] = _params;
     }
 
+    function updateExteriorMappings(uint256 _rotation, uint256[] memory _params) public onlyPlatformOrPartner {
+        exteriorMappings[_rotation] = _params;
+    }
+
     function buildingMappingsArray() public view returns (uint256[] memory) {
         return buildingMappings[rotation];
     }
@@ -108,6 +119,10 @@ contract CityBuildingValidator is IValidator {
 
     function buildingRoofMappingsArray(uint256 _building) public view returns (uint256[] memory) {
         return buildingRoofMappings[rotation][_building];
+    }
+
+    function exteriorMappingsArray() public view returns (uint256[] memory) {
+        return exteriorMappings[rotation];
     }
 
     function currentRotation() public view returns (uint256) {

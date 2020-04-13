@@ -452,7 +452,7 @@ interface IBlockCitiesCreator {
 pragma solidity ^0.5.0;
 
 interface IValidator {
-    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof) external view returns (bool);
+    function validate(uint256 _building, uint256 _base, uint256 _body, uint256 _roof, uint256 _exterior) external view returns (bool);
 }
 
 // File: contracts/LimitedVendingMachine.sol
@@ -621,11 +621,11 @@ contract LimitedVendingMachine is FundsSplitterV2, Pausable {
         require(totalBuildings < buildingMintLimit, "The building mint limit has been reached");
 
         // validate building can be built at this time
-        bool valid = validator.validate(_building, _base, _body, _roof);
+        bool valid = validator.validate(_building, _base, _body, _roof, _exteriorColorway);
         require(valid, "Building must be valid");
 
         // check unique and not already built
-        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway, _backgroundColorway));
+        bytes32 buildingAndColorwayHash = keccak256(abi.encode(_building, _base, _body, _roof, _special, _exteriorColorway));
         require(!buildingRegistry[buildingAndColorwayHash], "Building already exists");
 
         uint256 tokenId = blockCities.createBuilding(
